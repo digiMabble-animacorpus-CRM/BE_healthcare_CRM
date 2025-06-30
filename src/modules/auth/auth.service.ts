@@ -63,6 +63,9 @@ export class AuthService {
   }
 
 
+
+
+
   async loginWithEmail({ email_id, password, device_token, remember_me }: LoginDto): Promise<{ user: Partial<User>, accessToken: string, refreshToken: string }> {
     logger.info(`Login_Entry: ` + JSON.stringify({ email_id, remember_me }));
 
@@ -100,6 +103,10 @@ export class AuthService {
       refreshToken: refresh_token,
     };
   }
+
+
+
+
 
   public async generateTokens(payload: any, remember_me = false): Promise<{ access_token: string, refresh_token: string }> {
     const accessTokenPayload = { ...payload };
@@ -149,21 +156,23 @@ export class AuthService {
     }
 
     try {
+      logger.debug(`User found: ${user.email_id}`);
       const resetToken = await this.generateToken({
         user_id: user.id,
         email: user.email_id,
         purpose: 'password_reset'
       }, true);
-
+  logger.debug(`Token generated: ${resetToken}`);
       await this.userService.createPasswordResetToken(email_id, resetToken);
-
+logger.debug(`Token saved to DB`);
       const resetUrl = `${process.env.FRONTEND_BASE_URL}/reset-password?token=${resetToken}`;
-
+    logger.debug(`Reset URL: ${resetUrl}`);
       await MailUtils.sendPasswordResetEmail(email_id, resetUrl);
-      
+       logger.debug(`Email sent`);
       return { message: 'If a user with that email exists, a password reset link has been sent.' };
     } catch (error) {
       logger.error(`Error processing password reset for ${email_id}: ${error.message}`);
+       logger.error(error.stack); 
       throw new HttpException('An unexpected error occurred while processing your request.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

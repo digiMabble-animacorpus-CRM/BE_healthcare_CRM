@@ -12,7 +12,8 @@ export const databaseConfig: IDatabaseConfig = Object.freeze({
     host: process.env.DB_HOST_LOCAL,
     port: process.env.DB_PORT_LOCAL,
     dialect: process.env.DB_DIALECT_LOCAL,
-    frontEndBaseUrl: process.env.FRONTEND_FORGET_URL_LOCAL
+    frontEndBaseUrl: process.env.FRONTEND_FORGET_URL_LOCAL,
+    ssl: false,
   },
   development: {
     username: process.env.DB_USER_DEV,
