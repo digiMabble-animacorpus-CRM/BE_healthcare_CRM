@@ -1,9 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MinLength, IsNumber, IsUrl, IsIn } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MinLength,
+  IsNumber,
+  IsIn,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateAddressDto } from 'src/modules/addresses/dto/create-address.dto';
-
-
 
 export class CreateCustomerDto {
   @ApiProperty({ example: 'John Doe', description: 'Customer name (min 2 chars, letters and spaces only)' })
@@ -41,20 +48,38 @@ export class CreateCustomerDto {
   @IsNumber()
   invest_property?: number;
 
-  @ApiProperty({ example: 'Active', enum: ['Active', 'Inactive', 'Prospect'] })
-  @IsNotEmpty()
+  @ApiProperty({ example: 'new', enum: ['new', 'worked'], required: false })
+  @IsOptional()
   @IsString()
-  @IsIn(['Active', 'Inactive', 'Prospect'])
-  status: string;
+  @IsIn(['new', 'worked'])
+  status?: string;
 
   @ApiProperty({ example: 'https://example.com/profile_url.png', required: false })
   @IsOptional()
   @IsString()
   customer_image_url?: string;
 
-
   @ApiProperty({ type: CreateAddressDto })
   @IsNotEmpty()
   @Type(() => CreateAddressDto)
   address: CreateAddressDto;
+
+  @ApiProperty({ example: 'Main Branch', required: false })
+  @IsOptional()
+  @IsString()
+  branch?: string;
+
+  @ApiProperty({ example: 'Male', required: false })
+  @IsOptional()
+  @IsString()
+  gender?: string;
+
+  @ApiProperty({ example: '1990-05-15', required: false })
+  @IsOptional()
+  dob?: Date;
+
+  @ApiProperty({ example: 'Instagram', required: false })
+  @IsOptional()
+  @IsString()
+  source?: string;
 }

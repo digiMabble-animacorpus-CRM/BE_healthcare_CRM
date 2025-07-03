@@ -42,11 +42,14 @@ export class CustomersService extends BaseService<Customer> {
       const address = this.addressRepository.create(createCustomerDto.address);
       const savedAddress = await this.addressRepository.save(address);
 
-      // Create customer with saved address
-      const customer = this.customerRepository.create({
-        ...createCustomerDto,
-        address: savedAddress,
-      });
+   
+          // Create customer with saved address
+    const customer = this.customerRepository.create({
+      ...createCustomerDto,
+      status: createCustomerDto.status ?? 'new', // Set default manually
+      address: savedAddress,
+    });
+      // Save customer
 
       const savedCustomer = await this.customerRepository.save(customer);
 
@@ -83,38 +86,50 @@ export class CustomersService extends BaseService<Customer> {
     }
   }
 
-  async findAllWithPaginationCustomer(
-    page: number,
-    limit: number,
-    searchText?: string,
-  ): Promise<{ data: Customer[]; total: number }> {
-    try {
-      logger.info(`Customer_FindAllWithPagination_Entry: page=${page}, limit=${limit}, search=${searchText}`);
+async findAllWithPaginationCustomer(
+  page: number,
+  limit: number,
+  searchText?: string,
+  branch?: string,
+  fromDate?: string,
+  toDate?: string,
+): Promise<{ data: Customer[]; total: number }> {
+  try {
+    const query = this.customerRepository.createQueryBuilder('customer')
+      .leftJoinAndSelect('customer.address', 'address')
+      .where('customer.is_deleted = :isDeleted', { isDeleted: false });
 
-      const query = this.customerRepository.createQueryBuilder('customer')
-        .leftJoinAndSelect('customer.address', 'address')
-        .where('customer.is_deleted = :isDeleted', { isDeleted: false });
-
-      if (searchText) {
-        query.andWhere(
-          '(customer.customerName ILIKE :search OR customer.email ILIKE :search OR customer.phoneNumber ILIKE :search)',
-          { search: `%${searchText}%` },
-        );
-      }
-
-      const [data, total] = await query
-        .orderBy('customer.created_at', 'DESC')
-        .skip((page - 1) * limit)
-        .take(limit)
-        .getManyAndCount();
-
-      logger.info(`Customer_FindAllWithPagination_Exit: Found ${data.length} of ${total} customers`);
-      return { data, total };
-    } catch (error) {
-      logger.error(`Customer_FindAllWithPagination_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    if (searchText) {
+      query.andWhere(
+        `(customer.customer_name ILIKE :search OR customer.email ILIKE :search OR customer.phone_number ILIKE :search)`,
+        { search: `%${searchText}%` },
+      );
     }
+
+    if (branch) {
+      query.andWhere('customer.source = :branch', { branch });
+    }
+
+    if (fromDate && toDate) {
+      query.andWhere('DATE(customer.created_at) BETWEEN :fromDate AND :toDate', {
+        fromDate,
+        toDate,
+      });
+    }
+
+    const [data, total] = await query
+      .orderBy('customer.created_at', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return { data, total };
+  } catch (error) {
+    throw new HttpException(EM100, EC500);
   }
+}
+
+
 
   async findOne(id: number): Promise<Customer> {
     try {

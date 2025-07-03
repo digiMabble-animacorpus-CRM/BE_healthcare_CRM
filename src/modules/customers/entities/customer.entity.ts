@@ -22,11 +22,29 @@ export class Customer extends BaseModel {
   @Column({ type: 'float', nullable: true, default: 0 })
   invest_property: number;
 
+  //  NEW: Gender field
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  gender?: string;
+
+  //  NEW: Date of birth field (used for calculating age)
+  @Column({ type: 'date', nullable: true })
+  dob?: Date;
+
+  //  NEW: Source (dropdown field)
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  source?: string;
+   //  NEW: Branch 
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  branch?: string;
+
+  // NEW: Status (default "new", later updated to "worked")
+  @Column({ type: 'varchar', length: 20, default: 'new' })
+  status: string;
+
   @ManyToOne(() => Address, { nullable: false, cascade: true, eager: true })
   @JoinColumn({ name: 'address_id' })
   address: Address;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   customer_image_url?: string;
-
 }

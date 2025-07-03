@@ -33,23 +33,31 @@ export class AuthController {
 @ApiResponse({ status: 401, description: 'Invalid credentials' })
 async login(@Body() reqBody: any) {
   try {
-    console.log(' Encrypted login body:', reqBody);
+    console.log('Encrypted login body:', reqBody);
 
-    // 1. Decrypt the data
-    const decryptedString = AES.decrypt(reqBody.data); // Assumes { data: "<encrypted_string>" }
-    const decryptedObject = JSON.parse(decryptedString);
-    console.log(' Decrypted login body:', decryptedString, decryptedObject);
+    // 1. Decrypt the data (support both encrypted and plain input)
+    let decryptedObject;
+    if (reqBody.data) {
+      // Encrypted input from frontend
+      const decryptedString = AES.decrypt(reqBody.data); // Your decrypt method
+      decryptedObject = JSON.parse(decryptedString);
+      console.log('Decrypted login body:', decryptedString, decryptedObject);
+    } else {
+      // Plain input (e.g., Postman testing)
+      decryptedObject = reqBody;
+      console.log('Plain login body:', decryptedObject);
+    }
 
     // 2. Transform to DTO and validate
     const dto = plainToClass(LoginDto, decryptedObject);
     await validateOrReject(dto);
 
-    // 3. Proceed with existing login logic
+    // 3. Login logic
     const data = await this.authService.loginWithEmail(dto);
     return HandleResponse.buildSuccessObj(EC200, EM106, data);
 
   } catch (error) {
-    console.error(' Login error:', error);
+    console.error('Login error:', error);
     return HandleResponse.buildErrObj(error.status || 500, EM100, error);
   }
 }
@@ -73,24 +81,40 @@ async login(@Body() reqBody: any) {
   @ApiResponse({ status: 400, description: 'Validation failed or data is missing' })
 async signupAdmin(@Body() reqBody: any) {
   try {
-    console.log(' Encrypted body:', reqBody);
-    // Decrypt the AES payload
-    const decryptedString = AES.decrypt(reqBody.data); // assumes { data: "<encrypted_string>" }
-    const decryptedObject = JSON.parse(decryptedString);
-    console.log('Decrypted body:', decryptedString , decryptedObject);
+    console.log('Encrypted body:', reqBody);
+
+    let decryptedObject;
+
+    //  Handle AES-encrypted or plain request body
+    if (reqBody.data) {
+      const decryptedString = AES.decrypt(reqBody.data); // AES decryption function
+      decryptedObject = JSON.parse(decryptedString);
+      console.log('Decrypted body:', decryptedString, decryptedObject);
+    } else {
+      decryptedObject = reqBody; // Plain request (e.g., Postman or dev)
+      console.log('Plain body:', decryptedObject);
+    }
+
     //  Transform and validate
     const dto = plainToClass(SignupAdminDto, decryptedObject);
     await validateOrReject(dto);
 
-    //  Proceed to normal service call
+    //  Call service
     const data = await this.authService.signup(dto, 'admin');
 
     return HandleResponse.buildSuccessObj(201, 'Admin signup successful! Please verify your email.', data);
+
   } catch (error) {
     console.error('Signup Admin Error:', error);
+
+    if (error instanceof HttpException) {
+      throw error;
+    }
+
     throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+
 
 
 
