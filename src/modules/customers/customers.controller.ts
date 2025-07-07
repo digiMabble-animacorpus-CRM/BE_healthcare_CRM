@@ -11,7 +11,7 @@ import {
   HttpException,
   BadRequestException,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags,ApiOperation,ApiBody,ApiResponse,ApiQuery,ApiParam } from '@nestjs/swagger';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -29,6 +29,11 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) { }
 
  @Post()
+ @ApiOperation({ summary: 'Create a new customer (plain JSON only)' })
+ @ApiBody({ type: CreateCustomerDto }) // Plain JSON only
+ @ApiResponse({ status: 201, description: 'Customer created successfully' })
+ @ApiResponse({ status: 400, description: 'Validation error' })
+ @ApiResponse({ status: 500, description: 'Internal server error' })
 async create(@Body() reqBody: any) {
   try {
     let decryptedObject;
@@ -61,6 +66,16 @@ async create(@Body() reqBody: any) {
 }
 
 @Get()
+ @ApiOperation({ summary: 'Get all customers with pagination and filters (plain query only)' })
+  @ApiResponse({ status: 200, description: 'Customers fetched successfully' })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiQuery({ name: 'pagNo', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'searchText', required: false, type: String })
+  @ApiQuery({ name: 'branch', required: false, type: String })
+  @ApiQuery({ name: 'fromDate', required: false, type: String })
+  @ApiQuery({ name: 'toDate', required: false, type: String })
 async findAll(@Query() queryParams: any) {
   try {
     let decryptedObject;
@@ -104,6 +119,11 @@ async findAll(@Query() queryParams: any) {
 
 
 @Get(':id')
+@ApiOperation({ summary: 'Get customer by ID (plain ID only)' })
+  @ApiParam({ name: 'id', required: true, type: Number, example: 123 })
+  @ApiResponse({ status: 200, description: 'Customer fetched successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid ID or request format' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
 async findOne(@Param('id') id: string, @Query('data') encryptedData?: string) {
   try {
     let customerId: number;
@@ -142,6 +162,12 @@ async findOne(@Param('id') id: string, @Query('data') encryptedData?: string) {
 
 
 @Patch(':id')
+@ApiOperation({ summary: 'Update a customer by ID (plain JSON only)' })
+  @ApiParam({ name: 'id', required: true, type: Number, example: 123 })
+  @ApiBody({ type: UpdateCustomerDto })
+  @ApiResponse({ status: 200, description: 'Customer updated successfully' })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
 async update(
   @Param('id', ParseIntPipe) id: number,
   @Body() reqBody: any,
@@ -178,6 +204,11 @@ async update(
 
 
  @Delete(':id')
+ @ApiOperation({ summary: 'Delete a customer by ID' })
+  @ApiParam({ name: 'id', required: true, type: Number, example: 123 })
+  @ApiResponse({ status: 204, description: 'Customer deleted successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid ID or input' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
 async remove(@Param('id', ParseIntPipe) id: number, @Body() reqBody: any) {
   try {
     if (reqBody?.data) {

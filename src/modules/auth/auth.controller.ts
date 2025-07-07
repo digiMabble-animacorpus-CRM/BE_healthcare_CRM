@@ -16,20 +16,10 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
 @Post('login')
-@ApiOperation({ summary: 'Login with email and password' })
-@ApiBody({
-  description: 'AES-encrypted LoginDto payload in the `data` field.',
-  schema: {
-    type: 'object',
-    properties: {
-      data: {
-        type: 'string',
-        example: 'U2FsdGVkX1+ANOTHER_ENCRYPTED_STRING==',
-      },
-    },
-  },
-})
+@ApiOperation({ summary: 'Login with email and password (plain JSON only)' })
+@ApiBody({ type: LoginDto })
 @ApiResponse({ status: 200, description: 'Login success. Returns JWT tokens.' })
+@ApiResponse({ status: 400, description: 'Validation failed or bad request' })
 @ApiResponse({ status: 401, description: 'Invalid credentials' })
 async login(@Body() reqBody: any) {
   try {
@@ -64,21 +54,10 @@ async login(@Body() reqBody: any) {
 
 
   @Post('signup-admin')
-  @ApiOperation({ summary: 'Signup as admin' })
-  @ApiBody({
-    description: 'AES-encrypted SignupAdminDto payload, sent in the `data` field.',
-    schema: {
-      type: 'object',
-      properties: {
-        data: {
-          type: 'string',
-          example: 'U2FsdGVkX1+ENCRYPTED_DATA_HERE==',
-        },
-      },
-    },
-  })
-  @ApiResponse({ status: 201, description: 'Signup successful' })
-  @ApiResponse({ status: 400, description: 'Validation failed or data is missing' })
+@ApiOperation({ summary: 'Signup as admin (plain JSON only)' })
+@ApiBody({ type: SignupAdminDto })
+@ApiResponse({ status: 201, description: 'Signup successful' })
+@ApiResponse({ status: 400, description: 'Validation failed or data is missing' })
 async signupAdmin(@Body() reqBody: any) {
   try {
     console.log('Encrypted body:', reqBody);
