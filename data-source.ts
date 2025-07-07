@@ -4,6 +4,8 @@ import { DataSource } from 'typeorm';
 import { DBconfig } from './src/config';
 import { Customer } from './src/modules/customers/entities/customer.entity';
 import { Address } from './src/modules/addresses/entities/address.entity';
+import { Therapist } from './src/modules/therapist/entities/therapist.entity';
+
 // import any other entities
 
 export const AppDataSource = new DataSource({
@@ -16,6 +18,7 @@ export const AppDataSource = new DataSource({
   entities: [
     Customer,
     Address,
+    Therapist,
     `${__dirname}/src/modules/**/entities/*.entity{.ts,.js}`
   ],
   migrations: ['src/migrations/*.ts'],
