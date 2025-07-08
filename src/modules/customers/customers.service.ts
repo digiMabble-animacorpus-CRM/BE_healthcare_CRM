@@ -71,20 +71,25 @@ export class CustomersService extends BaseService<Customer> {
   }
 
   async findAll(options?: FindManyOptions<Customer>): Promise<Customer[]> {
-    try {
-      logger.info('Customer_FindAll_Entry');
-      const customers = await this.customerRepository.find({
-        ...options,
-        relations: ['address'],
-        order: { created_at: 'DESC' },
-      });
-      logger.info(`Customer_FindAll_Exit: Found ${customers.length} customers`);
-      return customers;
-    } catch (error) {
-      logger.error(`Customer_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
-    }
+  try {
+    logger.info('Customer_FindAll_Entry');
+    const customers = await this.customerRepository.find({
+      where: {
+        ...(options?.where || {}),
+        is_deleted: false, 
+      },
+      relations: ['address'],
+      order: { created_at: 'DESC' },
+      ...options,
+    });
+    logger.info(`Customer_FindAll_Exit: Found ${customers.length} customers`);
+    return customers;
+  } catch (error) {
+    logger.error(`Customer_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
 
 async findAllWithPaginationCustomer(
   page: number,
@@ -130,30 +135,33 @@ async findAllWithPaginationCustomer(
 }
 
 
-
   async findOne(id: number): Promise<Customer> {
-    try {
-      logger.info(`Customer_FindOne_Entry: id=${id}`);
-      const customer = await this.customerRepository.findOne({
-        where: { id },
-        relations: ['address'],
-      });
+  try {
+    logger.info(`Customer_FindOne_Entry: id=${id}`);
+    const customer = await this.customerRepository.findOne({
+      where: {
+        id,
+        is_deleted: false, 
+      },
+      relations: ['address'],
+    });
 
-      if (!customer) {
-        logger.error(`Customer_FindOne_Error: No record found for ID ${id}`);
-        throw new NotFoundException(Errors.NO_RECORD_FOUND);
-      }
-
-      logger.info(`Customer_FindOne_Exit: ${JSON.stringify(customer)}`);
-      return customer;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      logger.error(`Customer_FindOne_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    if (!customer) {
+      logger.error(`Customer_FindOne_Error: No record found for ID ${id}`);
+      throw new NotFoundException(Errors.NO_RECORD_FOUND);
     }
+
+    logger.info(`Customer_FindOne_Exit: ${JSON.stringify(customer)}`);
+    return customer;
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw error;
+    }
+    logger.error(`Customer_FindOne_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
 
   async updateCustomer(id: number, updateCustomerDto: UpdateCustomerDto): Promise<Customer> {
     try {
