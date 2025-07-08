@@ -158,7 +158,7 @@ async findAll(@Query() queryParams: any) {
       const dto = plainToClass(UpdateTherapistDto, decryptedObject);
       await validateOrReject(dto);
 
-      const data = await this.therapistsService.update(id, dto);
+      const data = await this.therapistsService.updateTherapist(id, dto);
       return HandleResponse.buildSuccessObj(EC200, EM116, data);
     } catch (error) {
       console.error('Update therapist error:', error);
@@ -176,7 +176,7 @@ async findAll(@Query() queryParams: any) {
         console.log('Decrypted delete body:', JSON.parse(decrypted));
       }
 
-      await this.therapistsService.remove(id);
+      await this.therapistsService.removeTherapist(id);
       return HandleResponse.buildSuccessObj(EC204, EM127, null);
     } catch (error) {
       console.error('Delete therapist error:', error);

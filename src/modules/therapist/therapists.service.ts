@@ -67,21 +67,26 @@ export class TherapistsService extends BaseService<Therapist> {
     }
   }
 
+
   async findAll(options?: FindManyOptions<Therapist>): Promise<Therapist[]> {
-    try {
-      logger.info('Therapist_FindAll_Entry');
-      const therapists = await this.therapistRepository.find({
-        ...options,
-        relations: ['address'],
-        order: { created_at: 'DESC' },
-      });
-      logger.info(`Therapist_FindAll_Exit: Found ${therapists.length} therapists`);
-      return therapists;
-    } catch (error) {
-      logger.error(`Therapist_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
-    }
+  try {
+    logger.info('Therapist_FindAll_Entry');
+    const therapists = await this.therapistRepository.find({
+      where: {
+        ...(options?.where || {}),
+        is_deleted: false, 
+      },
+      relations: ['address'],
+      order: { created_at: 'DESC' },
+      ...options,
+    });
+    logger.info(`Therapist_FindAll_Exit: Found ${therapists.length} therapists`);
+    return therapists;
+  } catch (error) {
+    logger.error(`Therapist_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
 
   async searchWithFilters(dto: TherapistFilterDto): Promise<{ data: Therapist[]; total: number }> {
   const {
@@ -129,51 +134,62 @@ export class TherapistsService extends BaseService<Therapist> {
   }
 }
 
-
   async findOne(id: number): Promise<Therapist> {
-    try {
-      logger.info(`Therapist_FindOne_Entry: id=${id}`);
-      const therapist = await this.therapistRepository.findOne({
-        where: { id },
-        relations: ['address'],
-      });
+  try {
+    logger.info(`Therapist_FindOne_Entry: id=${id}`);
+    const therapist = await this.therapistRepository.findOne({
+      where: {
+        id,
+        is_deleted: false, // ✅ Only fetch if not deleted
+      },
+      relations: ['address'],
+    });
 
-      if (!therapist) {
-        logger.error(`Therapist_FindOne_Error: No record found for ID ${id}`);
-        throw new NotFoundException(Errors.NO_RECORD_FOUND);
-      }
-
-      logger.info(`Therapist_FindOne_Exit: ${JSON.stringify(therapist)}`);
-      return therapist;
-    } catch (error) {
-      logger.error(`Therapist_FindOne_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    if (!therapist) {
+      logger.error(`Therapist_FindOne_Error: No record found for ID ${id}`);
+      throw new NotFoundException(Errors.NO_RECORD_FOUND);
     }
+
+    logger.info(`Therapist_FindOne_Exit: ${JSON.stringify(therapist)}`);
+    return therapist;
+  } catch (error) {
+    logger.error(`Therapist_FindOne_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
 
-  async updateTherapist(id: number, dto: UpdateTherapistDto): Promise<Therapist> {
-    try {
-      logger.info(`Therapist_Update_Entry: id=${id}, data=${JSON.stringify(dto)}`);
 
-      const therapist = await this.findOne(id);
+ async updateTherapist(id: number, dto: UpdateTherapistDto): Promise<Therapist> {
+  try {
+    logger.info(`Therapist_Update_Entry: id=${id}, data=${JSON.stringify(dto)}`);
 
-      if (dto.address) {
-        await this.addressRepository.update(therapist.address.id, dto.address);
-      }
+    // Load therapist with address
+    const therapist = await this.therapistRepository.findOne({
+      where: { id },
+      relations: ['address'],
+    });
 
-      await this.therapistRepository.update(id, {
-        ...dto,
-        address: undefined,
-      });
+    if (!therapist) throw new NotFoundException('Therapist not found');
 
-      const updated = await this.findOne(id);
-      logger.info(`Therapist_Update_Exit: ${JSON.stringify(updated)}`);
-      return updated;
-    } catch (error) {
-      logger.error(`Therapist_Update_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    // Update therapist fields (excluding address)
+    Object.assign(therapist, { ...dto, address: therapist.address });
+
+    // Update nested address if present
+    if (dto.address) {
+      Object.assign(therapist.address, dto.address);
     }
+
+    // Save full entity with nested update
+    const updated = await this.therapistRepository.save(therapist);
+
+    logger.info(`Therapist_Update_Exit: ${JSON.stringify(updated)}`);
+    return updated;
+  } catch (error) {
+    logger.error(`Therapist_Update_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
 
   async removeTherapist(id: number): Promise<void> {
     try {
