@@ -165,7 +165,7 @@ export class AuthService {
   logger.debug(`Token generated: ${resetToken}`);
       await this.userService.createPasswordResetToken(email_id, resetToken);
 logger.debug(`Token saved to DB`);
-      const resetUrl = `${process.env.FRONTEND_BASE_URL}/reset-password?token=${resetToken}`;
+      const resetUrl = `${process.env.FRONTEND_BASE_URL}/auth/reset-password?token=${resetToken}`;
     logger.debug(`Reset URL: ${resetUrl}`);
       await MailUtils.sendPasswordResetEmail(email_id, resetUrl);
        logger.debug(`Email sent`);
@@ -177,7 +177,7 @@ logger.debug(`Token saved to DB`);
     }
   }
 
-  async resetPassword(token: string, newPassword: string) {
+  async resetPassword(token: string, password: string) {
     const { valid, email } = await this.userService.verifyToken(token, 'password_reset');
 
     if (!valid || !email) {
@@ -193,7 +193,7 @@ logger.debug(`Token saved to DB`);
 
     try {
       await this.userService.update(user.id, {
-        password: Encryption.hashPassword(newPassword)
+        password: Encryption.hashPassword(password)
       });
 
       await this.userService.deleteTokensByEmailAndType(email, 'password_reset');
