@@ -78,6 +78,7 @@ import { Exclude } from 'class-transformer';
 import { Role } from 'src/modules/roles/entities/role.entity';
 import { Address } from 'src/modules/addresses/entities/address.entity';
 import { SocialLinks } from 'src/modules/social-links/entities/social-links.entity';
+import { Permission } from 'src/modules/permissions/entities/permission.entity';
 
 @Entity({ name: 'users' })
 export default class User extends BaseModel {
@@ -155,5 +156,14 @@ export default class User extends BaseModel {
     inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' }
   })
   roles: Role[];
+
+  @ManyToMany(() => Permission, (permission) => permission.users, { eager: true }) // Optional: eager loading
+@JoinTable({
+  name: 'user_permissions',
+  joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+  inverseJoinColumn: { name: 'permission_id', referencedColumnName: 'id' },
+})
+permissions: Permission[];
+
 }
 

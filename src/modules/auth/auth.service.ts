@@ -1,6 +1,8 @@
-import { ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException ,} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Role } from 'src/modules/roles/entities/role.entity';
 import { UsersService } from '../users/users.service';
 import User from 'src/modules/users/entities/user.entity';
 import { logger } from 'src/core/utils/logger';
@@ -16,51 +18,83 @@ export class AuthService {
   constructor(
     private readonly userService: UsersService, 
     private readonly jwtService: JwtService,
-    private readonly addressesService: AddressesService
+    private readonly addressesService: AddressesService,
+     @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
   ) { }
 
-  async signup(signupData: SignupAdminDto, user_type: 'admin'): Promise<any> {
-    logger.info(`Signup_Entry: Email=${signupData.email_id} | UserType=${user_type}`);
-
-    const existingUser = await this.userService.findOneByEmail(signupData.email_id);
-    if (existingUser) {
-      logger.warn(`Signup_Failure: Email=${signupData.email_id} | Reason=EmailAlreadyExists`);
-      throw new ConflictException(Errors.EMAIL_ID_ALREADY_EXISTS);
-    }
-
-    try {
-      const userData: Partial<User> = {
-        ...signupData,
-        user_type,
-        email_verified: false,
-        last_login: new Date(),
-        is_blocked: false,
-        preferences: [],
-        company_name: null,
-        website: null,
-        tax_id: null,
-      };
-      
-      const newUser = await this.userService.create(userData);
-
-      const { access_token, refresh_token } = await this.generateTokens({
-        user_id: newUser.id,
-        user_type: newUser.user_type,
-        email: newUser.email_id,
-      });
-      
-      const { password, ...userResponse } = newUser;
 
 
-      return {
-        ...userResponse,
-        access_token,
-        refresh_token
-      };
-    } catch (error) {
-      throw error;
-    }
+async signup(signupData: SignupAdminDto, user_type: 'admin' | 'branch-admin' | 'staff' | 'super-admin'): Promise<any> {
+  logger.info(`Signup_Entry: Email=${signupData.email_id} | UserType=${user_type}`);
+
+  //  Check for unique email only
+  const existingUser = await this.userService.findOneByEmail(signupData.email_id);
+  if (existingUser) {
+    logger.warn(`Signup_Failure: Email=${signupData.email_id} | Reason=EmailAlreadyExists`);
+    throw new ConflictException(Errors.EMAIL_ID_ALREADY_EXISTS);
   }
+
+  try {
+    // Get Role based on user_type
+    const role = await this.roleRepository.findOne({ where: { name: user_type } });
+
+    if (!role) {
+      logger.warn(`Signup_Failure: Role not found for user_type=${user_type}`);
+      throw new NotFoundException(`Role "${user_type}" not found`);
+    }
+
+    // Prepare user object with role
+    const userData: Partial<User> = {
+      ...signupData,
+      user_type,
+      email_verified: false,
+      last_login: new Date(),
+      is_blocked: false,
+      preferences: [],
+      roles: [role],
+      company_name: null,
+      website: null,
+      tax_id: null,
+    };
+
+    // Create user
+    const newUser = await this.userService.create(userData);
+    newUser.roles = [role];
+    //  Generate tokens
+    // const { access_token, refresh_token } = await this.generateTokens({
+    //   user_id: newUser.id,
+    //   user_type: newUser.user_type,
+    //   email: newUser.email_id,
+    // });
+
+    const userWithRoles = await this.userService.findOneById(newUser.id, {
+  relations: ['roles'],
+});
+
+const { access_token, refresh_token } = await this.generateTokens({
+  user_id: newUser.id,
+  user_type: newUser.user_type,
+  email: newUser.email_id,
+  roles: userWithRoles.roles?.map(r => ({
+    name: r.name,
+    role_type: r.role_type,
+  })) || [],
+});
+
+    const { password, ...userResponse } = newUser;
+
+    return {
+      ...userResponse,
+      access_token,
+      refresh_token,
+    };
+  } catch (error) {
+    logger.error('Signup_Error:', error);
+    throw error;
+  }
+}
+
 
 
 
@@ -91,8 +125,22 @@ export class AuthService {
         ...(device_token && { device_token }),
     });
 
-    const { access_token, refresh_token } = await this.generateTokens({ user_id: user.id }, remember_me);
+    //const { access_token, refresh_token } = await this.generateTokens({ user_id: user.id }, remember_me);
     
+    const userWithRoles = await this.userService.findOneById(user.id, {
+  relations: ['roles'],
+});
+
+const { access_token, refresh_token } = await this.generateTokens({
+  user_id: user.id,
+  user_type: user.user_type,
+  email: user.email_id,
+  roles: userWithRoles.roles?.map(r => ({
+    name: r.name,
+    role_type: r.role_type,
+  })) || [],
+}, remember_me);
+
     const { password: _, ...userResponse } = user;
 
     logger.info(`Login_Success: ${email_id}`);

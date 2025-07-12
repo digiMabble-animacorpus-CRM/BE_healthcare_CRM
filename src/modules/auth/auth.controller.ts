@@ -52,6 +52,63 @@ async login(@Body() reqBody: any) {
   }
 }
 
+async signupByRole(reqBody: any, userType: 'staff' | 'branch-admin' | 'super-admin') {
+  try {
+    console.log(`Encrypted body for ${userType}:`, reqBody);
+
+    let decryptedObject;
+    if (reqBody.data) {
+      const decryptedString = AES.decrypt(reqBody.data);
+      decryptedObject = JSON.parse(decryptedString);
+      console.log('Decrypted body:', decryptedString, decryptedObject);
+    } else {
+      decryptedObject = reqBody;
+    }
+
+    const dto = plainToClass(SignupAdminDto, decryptedObject);
+    await validateOrReject(dto);
+
+    const data = await this.authService.signup(dto, userType);
+
+    return HandleResponse.buildSuccessObj(201, `Signup successful as ${userType}`, data);
+  } catch (error) {
+    console.error(`Signup ${userType} Error:`, error);
+
+    if (error instanceof HttpException) throw error;
+
+    throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@Post('signup-staff')
+@ApiOperation({ summary: 'Signup as staff (plain JSON or encrypted)' })
+@ApiBody({ type: SignupAdminDto })
+@ApiResponse({ status: 201, description: 'Signup successful' })
+async signupStaff(@Body() reqBody: any) {
+  console.log('signup-staff endpoint hit');
+  return this.signupByRole(reqBody, 'staff');
+}
+
+
+// signup for branch-admin
+@Post('signup-branch-admin')
+@ApiOperation({ summary: 'Signup as branch admin (plain JSON or encrypted)' })
+@ApiBody({ type: SignupAdminDto })
+@ApiResponse({ status: 201, description: 'Signup successful' })
+async signupBranchAdmin(@Body() reqBody: any) {
+  return this.signupByRole(reqBody, 'branch-admin');
+}
+
+// signup for super-admin
+@Post('signup-super-admin')
+@ApiOperation({ summary: 'Signup as super admin (plain JSON or encrypted)' })
+@ApiBody({ type: SignupAdminDto })
+@ApiResponse({ status: 201, description: 'Signup successful' })
+async signupSuperAdmin(@Body() reqBody: any) {
+  console.log('/signup-super-admin HIT');
+  return this.signupByRole(reqBody, 'super-admin');
+}
+
 
   @Post('signup-admin')
 @ApiOperation({ summary: 'Signup as admin (plain JSON only)' })

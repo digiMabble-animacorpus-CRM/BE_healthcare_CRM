@@ -23,7 +23,8 @@ import { LeadsModule } from './modules/leads/leads.module';
 import { LocationModule } from './modules/location/location.module';
 import { SocialLinks } from './modules/social-links/entities/social-links.entity';
 import { TherapistsModule } from './modules/therapist/therapists.module';
-
+import { StaffModule } from './modules/StaffType/staff.module';
+import { SeederModule } from './seeds/seeder.module';
 config();
 
 console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
@@ -65,6 +66,8 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     LocationModule,
     SocialLinks,
     TherapistsModule,
+    StaffModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [AppService],

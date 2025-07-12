@@ -11,7 +11,7 @@ export class CreateTherapistTable1751880326563 implements MigrationInterface {
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE "therapists" DROP CONSTRAINT "FK_6cfff69940a4e0e77727da0f07c"`);
-        await queryRunner.query(`ALTER TABLE "users" ALTER COLUMN "preferences" SET DEFAULT ARRAY[]`);
+        await queryRunner.query(`ALTER TABLE "users" ALTER COLUMN "preferences" SET DEFAULT ARRAY[]::text[]`);
         await queryRunner.query(`DROP TABLE "therapists"`);
     }
 

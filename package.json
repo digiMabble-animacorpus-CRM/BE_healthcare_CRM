@@ -24,7 +24,7 @@
     "start:seeder": "ts-node -r tsconfig-paths/register src/seeds/run-seeder.ts",
     "migration:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./data-source.ts",
     "migration:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate",
-    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d ./data-source.ts"
+    "migration:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d ./data-source.ts"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.2",

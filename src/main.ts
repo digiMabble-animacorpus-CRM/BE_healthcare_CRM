@@ -36,6 +36,7 @@ const corsOption = Object.freeze({
 
 async function bootstrap() {
   require('dotenv').config();
+  console.log(' JWTKEY Loaded:', process.env.JWTKEY);
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   /*-------- security headers --------*/
   // app.enableCors({ origin: '*', methods: ALLOWED_METHODS }); //need to change enable allowed cors url only
@@ -70,6 +71,11 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   await app.listen(Number(process.env.USER_PORT||8080));
+  app.use((req, res, next) => {
+  console.log(`[Incoming Request] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 
   process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error?.message);

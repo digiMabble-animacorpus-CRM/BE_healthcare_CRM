@@ -151,7 +151,7 @@ export abstract class BaseService<T> {
    * Bulk create multiple records.
    */
   async bulkCreate(data: Partial<T>[]): Promise<T[]> {
-    const entities = this.repository.create(data as DeepPartial<T[]>);
+    const entities = this.repository.create(data as DeepPartial<T>[]);
     return this.repository.save(entities);
   }
 

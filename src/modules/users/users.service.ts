@@ -92,7 +92,7 @@
 // }
 
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { Not, Repository } from 'typeorm';
+import { Not, Repository ,FindOneOptions } from 'typeorm';
 import { BaseService } from 'src/base.service';
 import { VerifyOtpDto } from '../auth/dto/verify-otp.dto';
 import { UpdateUserDto } from './dto/user.dto';
@@ -128,10 +128,16 @@ export class UsersService extends BaseService<User> {
   /**
    * Find a user by ID.
    */
-  async findOneById(id: string | number): Promise<User | null> {
-    return await super.findOne(id);
-  }
-
+  // async findOneById(id: string | number): Promise<User | null> {
+  //   return await super.findOne(id);
+  // }
+async findOneById(id: string | number, options?: FindOneOptions<User>): Promise<User | null> {
+  const userId = typeof id === 'string' ? parseInt(id, 10) : id;
+  return await this.repository.findOne({
+    where: { id: userId },
+    ...(options || {}),
+  });
+}
   /**
    * Find a user by email.
    */
@@ -282,6 +288,14 @@ export class UsersService extends BaseService<User> {
     user.logo = logo;
     return this.userRepository.save(user);
   }
+
+  async findOneByRole(roleName: string): Promise<User | undefined> {
+  return this.userRepository
+    .createQueryBuilder('user')
+    .leftJoinAndSelect('user.roles', 'role')
+    .where('role.name = :roleName', { roleName })
+    .getOne();
+}
 
 
 

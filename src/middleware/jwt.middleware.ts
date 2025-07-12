@@ -16,6 +16,9 @@ export class JwtMiddleware implements NestMiddleware {
       '/api/v1/auth/reset-password',
       '/api/v1/auth/refresh',
       '/api/v1/auth/signup',
+      '/api/v1/auth/signup-staff',
+      '/api/v1/auth/signup-branch-admin',
+      '/api/v1/auth/signup-super-admin',
     ];
     // console.log('req.baseUrl', req.baseUrl);
     if (excludedRoutes.includes(req.baseUrl)) {
