@@ -20,12 +20,15 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Staff } from 'src/modules/StaffType/entities/staff.entity';
+import { Token } from 'src/modules/users/entities/token.entity';
 @Module({
   imports: [
     PassportModule,
     AddressesModule,
     UsersModule,
     StaffModule,
+    TypeOrmModule.forFeature([Role, Staff, Token]),
     forwardRef(() => AgentsModule),
     // JwtModule.register({
     //   secret: process.env.JWTKEY,

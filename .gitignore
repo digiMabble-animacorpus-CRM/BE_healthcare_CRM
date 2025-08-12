@@ -49,3 +49,5 @@ src/core/database/database.config.ts
 .gitlab-ci.yml
 Notes
 .vscode
+
+src/core/database/config/firebase/anima-crm-firebase-adminsdk-fbsvc-0dc3cdc78d.json

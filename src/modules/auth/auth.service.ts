@@ -12,6 +12,8 @@ import { MailUtils } from 'src/core/utils/mailUtils';
 import Encryption from 'src/core/utils/encryption';
 import { AddressesService } from '../addresses/addresses.service';
 import { SignupAdminDto } from './dto/signup.dto';
+import { Staff } from 'src/modules/StaffType/entities/staff.entity';
+import { Token } from 'src/modules/users/entities/token.entity';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +23,11 @@ export class AuthService {
     private readonly addressesService: AddressesService,
      @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
+       @InjectRepository(Staff)
+    private readonly staffRepository: Repository<Staff>,
+
+    @InjectRepository(Token)
+    private readonly tokenRepo: Repository<Token>,
   ) { }
 
 
@@ -58,6 +65,7 @@ async signup(signupData: SignupAdminDto, user_type: 'admin' | 'branch-admin' | '
       tax_id: null,
     };
 
+    
     // Create user
     const newUser = await this.userService.create(userData);
     newUser.roles = [role];
@@ -93,7 +101,12 @@ const { access_token, refresh_token } = await this.generateTokens({
     logger.error('Signup_Error:', error);
     throw error;
   }
+
+  
 }
+
+
+
 
 
 
@@ -195,35 +208,67 @@ const { access_token, refresh_token } = await this.generateTokens({
     }
   }
 
-  async forgotPassword(email_id: string) {
-    const user: User = await this.userService.findOneByEmail(email_id);
 
-    if (!user) {
-      logger.warn(`Forgot password attempt for non-existent email: ${email_id}`);
-      throw new NotFoundException(Errors.USER_NOT_EXISTS);
-    }
 
-    try {
-      logger.debug(`User found: ${user.email_id}`);
-      const resetToken = await this.generateToken({
+async forgotPassword(email_id: string) {
+  const user: User = await this.userService.findOneByEmail(email_id);
+
+  if (!user) {
+    logger.warn(`Forgot password attempt for non-existent email: ${email_id}`);
+    throw new NotFoundException(Errors.USER_NOT_EXISTS);
+  }
+
+  try {
+    logger.debug(`User found: ${user.email_id}`);
+
+    //  Generate existing token
+    const resetToken = await this.generateToken(
+      {
         user_id: user.id,
         email: user.email_id,
         purpose: 'password_reset'
-      }, true);
-  logger.debug(`Token generated: ${resetToken}`);
-      await this.userService.createPasswordResetToken(email_id, resetToken);
-logger.debug(`Token saved to DB`);
-      const resetUrl = `${process.env.FRONTEND_BASE_URL}/auth/reset-password?token=${resetToken}`;
-    logger.debug(`Reset URL: ${resetUrl}`);
-      await MailUtils.sendPasswordResetEmail(email_id, resetUrl);
-       logger.debug(`Email sent`);
-      return { message: 'If a user with that email exists, a password reset link has been sent.' };
-    } catch (error) {
-      logger.error(`Error processing password reset for ${email_id}: ${error.message}`);
-       logger.error(error.stack); 
-      throw new HttpException('An unexpected error occurred while processing your request.', HttpStatus.INTERNAL_SERVER_ERROR);
+      },
+      true
+    );
+    logger.debug(`Token generated: ${resetToken}`);
+
+    //  Save token in your old way (unchanged)
+    await this.userService.createPasswordResetToken(email_id, resetToken);
+    logger.debug(`Token saved to DB (old logic)`);
+
+    //  NEW: Also save token in Token entity for staff linkage
+    const staffEntity = await this.staffRepository.findOne({
+      where: { email: user.email_id },
+    });
+    if (staffEntity) {
+      const tokenEntity = this.tokenRepo.create({
+        user_email: user.email_id,
+        token: resetToken,
+        type: 'password_reset',
+        expires_at: new Date(Date.now() + 15 * 60 * 1000),
+        staff: staffEntity
+      });
+      await this.tokenRepo.save(tokenEntity);
+      logger.debug(`Token saved in Token entity for staff`);
     }
+
+    //  Continue as before
+    const resetUrl = `${process.env.FRONTEND_BASE_URL}/auth/reset-password?token=${resetToken}`;
+    logger.debug(`Reset URL: ${resetUrl}`);
+
+    await MailUtils.sendPasswordResetEmail(email_id, resetUrl);
+    logger.debug(`Email sent`);
+
+    return { message: 'If a user with that email exists, a password reset link has been sent.' };
+  } catch (error) {
+    logger.error(`Error processing password reset for ${email_id}: ${error.message}`);
+    logger.error(error.stack);
+    throw new HttpException(
+      'An unexpected error occurred while processing your request.',
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
   }
+}
 
   async resetPassword(token: string, password: string) {
     const { valid, email } = await this.userService.verifyToken(token, 'password_reset');

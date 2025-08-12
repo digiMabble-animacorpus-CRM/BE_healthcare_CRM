@@ -1,7 +1,7 @@
-import { Controller, Body, Post, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Body, Post, HttpException, HttpStatus,BadRequestException,UnauthorizedException ,NotFoundException} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags,ApiOperation,ApiBody,ApiResponse} from '@nestjs/swagger';
-import { EC200, EC204, EC500, EM100, EM106, EM127, EM141, EM149 } from 'src/core/constants';
+import { EC200, EC204, EC500, EM100, EM106, EM127, EM141, EM149 ,EC400} from 'src/core/constants';
 import HandleResponse from 'src/core/utils/handle_response';
 import { DeleteDto, LoginDto, userlogoutDto } from './dto/login-dto';
 import { ForgotPasswordDto, ResetPasswordDto } from './dto/password-reset.dto';
@@ -9,48 +9,59 @@ import { SignupAdminDto } from './dto/signup.dto';
 import { AES } from 'src/core/utils//encryption.util';
 import { plainToClass } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { UsersService } from 'src/modules/users/users.service';
+// import { Public } from 'src/common/decorators/public.decorator';
+import { Logger } from '@nestjs/common';
+
+const logger = new Logger('AuthController');
 
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  private readonly logger = new Logger(AuthController.name);
+
+  constructor(private authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
 @Post('login')
-@ApiOperation({ summary: 'Login with email and password (plain JSON only)' })
+@ApiOperation({ summary: 'Login with email and password (AES encrypted or plain JSON)' })
 @ApiBody({ type: LoginDto })
 @ApiResponse({ status: 200, description: 'Login success. Returns JWT tokens.' })
 @ApiResponse({ status: 400, description: 'Validation failed or bad request' })
 @ApiResponse({ status: 401, description: 'Invalid credentials' })
 async login(@Body() reqBody: any) {
   try {
-    console.log('Encrypted login body:', reqBody);
+    this.logger.debug(' Encrypted login request received:');
+    this.logger.debug('Object:', reqBody);
 
-    // 1. Decrypt the data (support both encrypted and plain input)
     let decryptedObject;
+
     if (reqBody.data) {
-      // Encrypted input from frontend
-      const decryptedString = AES.decrypt(reqBody.data); // Your decrypt method
-      decryptedObject = JSON.parse(decryptedString);
-      console.log('Decrypted login body:', decryptedString, decryptedObject);
+      // AES-encrypted body from frontend
+      const decrypted = AES.decrypt(reqBody.data); // Already returns an object
+      decryptedObject = typeof decrypted === 'string' ? JSON.parse(decrypted) : decrypted;
+      this.logger.debug(' Decrypted login body:', decryptedObject);
     } else {
-      // Plain input (e.g., Postman testing)
+      // Plain JSON (for Postman testing)
       decryptedObject = reqBody;
-      console.log('Plain login body:', decryptedObject);
+      this.logger.debug(' Plain login body:', decryptedObject);
     }
 
-    // 2. Transform to DTO and validate
     const dto = plainToClass(LoginDto, decryptedObject);
     await validateOrReject(dto);
 
-    // 3. Login logic
     const data = await this.authService.loginWithEmail(dto);
     return HandleResponse.buildSuccessObj(EC200, EM106, data);
 
   } catch (error) {
-    console.error('Login error:', error);
+    this.logger.error(' Login failed:');
+    this.logger.error(error);
     return HandleResponse.buildErrObj(error.status || 500, EM100, error);
   }
 }
+
 
 async signupByRole(reqBody: any, userType: 'staff' | 'branch-admin' | 'super-admin') {
   try {
@@ -91,6 +102,7 @@ async signupStaff(@Body() reqBody: any) {
 
 
 // signup for branch-admin
+
 @Post('signup-branch-admin')
 @ApiOperation({ summary: 'Signup as branch admin (plain JSON or encrypted)' })
 @ApiBody({ type: SignupAdminDto })
@@ -100,6 +112,7 @@ async signupBranchAdmin(@Body() reqBody: any) {
 }
 
 // signup for super-admin
+
 @Post('signup-super-admin')
 @ApiOperation({ summary: 'Signup as super admin (plain JSON or encrypted)' })
 @ApiBody({ type: SignupAdminDto })
@@ -212,4 +225,47 @@ async signupAdmin(@Body() reqBody: any) {
       return HandleResponse.buildErrObj(EC500 || error.status, error?.message || EM100, error);
     }
   }
+
+
+@Post('verify-email')
+async verifyEmail(@Body() body: VerifyOtpDto) {
+  const { email_id, otp } = body;
+
+  console.log(' Incoming verify-email body:', body);
+
+  const result = await this.usersService.verifyToken(otp, 'email_verification');
+  console.log(' Token check result:', result);
+
+  if (!result.valid) {
+    console.log(' Token is invalid or expired');
+    throw new UnauthorizedException('Invalid or expired verification token');
+  }
+
+  if (result.email !== email_id) {
+    console.log(' Token email mismatch:', result.email, email_id);
+    throw new UnauthorizedException('Token does not match provided email');
+  }
+
+  const user = await this.usersService.findOneByEmail(email_id);
+  if (!user) {
+    console.log(' User not found for email:', email_id);
+    throw new NotFoundException('User not found');
+  }
+
+  if (user.email_verified) {
+    console.log(' Email already verified');
+    return { message: 'Email is already verified' };
+  }
+
+  user.email_verified = true;
+  await this.usersService.update(user.id, user);
+
+  await this.usersService.deleteTokensByEmailAndType(email_id, 'email_verification');
+
+  console.log(' Email verification successful for:', email_id);
+  return { message: 'Email verified successfully' };
+}
+
+
+
 }

@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    console.log('🔐 JWT payload:', payload);
+    console.log('JWT payload:', payload);
 
     const userId = payload.user_id;
     if (!userId) {
@@ -33,7 +33,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
 
     if (!user) {
-      console.error('❌ User not found');
+      console.error(' User not found');
       throw new UnauthorizedException('User not found');
     }
 
@@ -47,13 +47,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       role_type: r.role_type,
     })) || [];
 
-    console.log('✅ User validated:', {
+    console.log(' User validated:', {
       user_id: user.id,
       email: user.email_id,
       user_type: user.user_type,
     });
-    console.log('🔐 Roles:', roleMeta);
-    console.log('🔑 Permissions:', userPermissions);
+    console.log(' Roles:', roleMeta);
+    console.log(' Permissions:', userPermissions);
 
     // Staff enrichment
     if (user.user_type === 'staff') {

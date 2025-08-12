@@ -12,6 +12,7 @@ import User from '../BE_healthcare_CRM/src/modules/users/entities/user.entity';
 import { SocialLinks } from '../BE_healthcare_CRM/src/modules/social-links/entities/social-links.entity';
 import { Menu } from 'src/modules/menus/entities/menu.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
+import { Token } from 'src/modules/users/entities/token.entity';
 // import any other entities
 
 export const AppDataSource = new DataSource({
@@ -32,6 +33,7 @@ export const AppDataSource = new DataSource({
     SocialLinks,
     Menu,
     Branch,
+    Token,
     // `${__dirname}/src/modules/**/entities/*.entity{.ts,.js}`
   ],
   migrations: ['src/database/migrations/*.ts'],

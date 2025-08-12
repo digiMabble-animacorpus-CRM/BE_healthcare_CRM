@@ -3,9 +3,10 @@ import {
   NotFoundException,
   ConflictException,
   HttpException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, FindManyOptions,DeepPartial } from 'typeorm';
+import { In, Repository, FindManyOptions,DeepPartial ,Between, ILike,} from 'typeorm';
 import { Staff } from './entities/staff.entity';
 import { Address } from '../addresses/entities/address.entity';
 import { Branch } from '../branches/entities/branch.entity';
@@ -19,6 +20,14 @@ import { EC500, EM100 } from 'src/core/constants';
 import { Errors } from 'src/core/constants/error_enums';
 import { Status } from './entities/staff.entity';
 import { Permission } from '../permissions/entities/permission.entity';
+import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
+import { MailUtils } from 'src/core/utils/mailUtils';
+import { Token } from '../users/entities/token.entity';
+import User  from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
+import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class StaffService extends BaseService<Staff> {
   protected repository: Repository<Staff>;
@@ -34,14 +43,23 @@ export class StaffService extends BaseService<Staff> {
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
+    @InjectRepository(Token)
+  private readonly tokenRepository: Repository<Token>, 
+  private readonly MailUtils: MailUtils,    
+   private readonly userService: UsersService, 
   ) {
     super(staffRepository.manager);
     this.repository = staffRepository;
   }
 
-async create(dto: CreateStaffDto): Promise<Staff> {
+async createStaff(dto: CreateStaffDto, currentUser:any): Promise<Staff> {
   try {
     logger.info(`Staff_Create_Entry: ${JSON.stringify(dto)}`);
+
+    if (currentUser.user_type !== 'super-admin' && currentUser.user_type !== 'branch-admin') {
+       logger.warn(`Unauthorized staff creation attempt by: ${currentUser?.email}`);
+      throw new ForbiddenException('Only super-admin can create staff');
+    }
 
     // Check for existing staff
     const exists = await this.staffRepository.findOne({ where: { email: dto.email } });
@@ -132,7 +150,6 @@ async create(dto: CreateStaffDto): Promise<Staff> {
         logger.warn(`Permission not found in DB: ${perm.action} on ${perm.resource}`);
       }
     }
-
     const staffData: DeepPartial<Staff> = {
       name: dto.name,
       phone_number: dto.phone_number,
@@ -166,6 +183,57 @@ async create(dto: CreateStaffDto): Promise<Staff> {
     const savedStaff = await this.staffRepository.save(staff);
     logger.debug(`Staff saved: ID = ${savedStaff.id}`);
 
+// Create matching user record for this staff
+const existingUser = await this.userService.findOneByEmail(savedStaff.email);
+if (!existingUser) {
+  logger.debug(`Creating linked user for staff email: ${savedStaff.email}`);
+
+  const roleForUser = await this.roleRepository.findOne({ where: { id: +dto.role_id } });
+  const tempPassword = await bcrypt.hash(uuidv4(), 10);
+
+const userData: Partial<User> = {
+  name: savedStaff.name,
+  email_id: savedStaff.email,
+  password: tempPassword, // temporary hashed password
+  user_type: 'staff',
+  email_verified: false,
+  last_login: null,
+  is_blocked: false,
+  preferences: [],
+  roles: [roleForUser],
+  company_name: null,
+  website: null,
+  tax_id: null,
+};
+
+
+  await this.userService.create(userData);
+} else {
+  logger.warn(`User already exists for staff email: ${savedStaff.email}`);
+}
+
+//  Continue your existing token + email flow
+const token = uuidv4();
+
+const tokenEntity = this.tokenRepository.create({
+  user_email: savedStaff.email,
+  token,
+  type: 'password_reset',
+  staff: savedStaff,
+  expires_at: moment().add(1, 'day').toDate(),
+});
+
+await this.tokenRepository.save(tokenEntity);
+
+// Send verification email with the same style as forgot passwords
+const verifyLink = `${process.env.FRONTEND_BASE_URL}/auth/reset-password?token=${token}`;
+logger.debug(`Verify URL: ${verifyLink}`);
+
+await MailUtils.sendEmailVerificationLink(savedStaff.email, verifyLink);
+
+
+
+
     const result = await this.staffRepository.findOne({
       where: { id: savedStaff.id },
       relations: ['address', 'role', 'branches', 'selected_branch', 'permissions'],
@@ -181,86 +249,171 @@ async create(dto: CreateStaffDto): Promise<Staff> {
 
 
 
+async findAllWithFilters(filterDto?: StaffFilterDto): Promise<{ data: any[]; total: number }> {
+  try {
+    logger.info('Staff_FindAll_Entry');
 
-  async findAll(options?: FindManyOptions<Staff>): Promise<Staff[]> {
-    try {
-      logger.info('Staff_FindAll_Entry');
-      const staffs = await this.staffRepository.find({
-        where: {
-          ...(options?.where || {}),
-          is_deleted: false,
-        },
-        relations: ['address', 'role', 'branches', 'selected_branch'],
-        order: { created_at: 'DESC' },
-        ...options,
-      });
-      logger.info(`Staff_FindAll_Exit: Found ${staffs.length} records`);
-      return staffs;
-    } catch (error) {
-      logger.error(`Staff_FindAll_Error: ${JSON.stringify(error.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    const {
+      page = '1',
+      limit = '10',
+      searchText,
+      branch,
+      fromDate,
+      toDate,
+    } = filterDto || {};
+
+    const take = parseInt(limit, 10);
+    const skip = (parseInt(page, 10) - 1) * take;
+
+    const queryBuilder = this.staffRepository.createQueryBuilder('staff')
+      .leftJoinAndSelect('staff.address', 'address')
+      .leftJoinAndSelect('staff.role', 'role')
+      .leftJoinAndSelect('staff.branches', 'branches')
+      .leftJoinAndSelect('staff.selected_branch', 'selected_branch')
+      .leftJoinAndSelect('staff.permissions', 'permissions')
+      .where('staff.is_deleted = false');
+
+    //  Search filter
+    if (searchText) {
+  const search = `%${searchText.toLowerCase()}%`;
+  queryBuilder.andWhere(
+    `(LOWER(staff.name) LIKE :search OR LOWER(staff.phone_number) LIKE :search OR LOWER(staff.email) LIKE :search OR LOWER(branches.name) LIKE :search)`,
+    { search }
+  );
+}
+
+
+    //  Branch filter
+    if (branch) {
+      queryBuilder.andWhere('branches.name = :branch', { branch });
     }
+
+    //  From Date
+    if (fromDate) {
+      queryBuilder.andWhere('DATE(staff.created_at) >= :fromDate', { fromDate });
+    }
+
+    //  To Date
+    if (toDate) {
+      queryBuilder.andWhere('DATE(staff.created_at) <= :toDate', { toDate });
+    }
+
+    queryBuilder.orderBy('staff.created_at', 'DESC');
+    queryBuilder.skip(skip).take(take);
+
+    const [staffs, total] = await queryBuilder.getManyAndCount();
+
+    //  Format response
+    const enrichedStaffs = staffs.map((staff) => ({
+      ...staff,
+      branchesDetailed: staff.branches?.map((b) => ({ code: b.name })) || [],
+      selectedBranch: staff.selected_branch ? { code: staff.selected_branch.name } : null,
+      address: staff.address
+        ? {
+            street: staff.address.street,
+            city: staff.address.city,
+            state: staff.address.state,
+            zipcode: staff.address.zip_code,
+          }
+        : null,
+      role: staff.role ? { name: staff.role.name } : null,
+      permissions: staff.permissions?.map((perm) => ({
+        action: perm.action,
+        resource: perm.resource,
+      })) || [],
+      phone_number: staff.phone_number,
+    }));
+
+    logger.info(`Staff_FindAll_Exit: Found ${enrichedStaffs.length} records`);
+
+    return {
+      data: enrichedStaffs,
+      total,
+    };
+  } catch (error) {
+    logger.error(`Staff_FindAll_Error: ${JSON.stringify(error.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
+
+
 
   async searchWithFilters(dto: StaffFilterDto): Promise<{ data: Staff[]; total: number }> {
-    const { page = '1', limit = '10', searchText, branch, fromDate, toDate } = dto;
+  const { page = '1', limit = '10', searchText, branch, fromDate, toDate } = dto;
 
-    try {
-      const query = this.staffRepository.createQueryBuilder('staff')
-        .leftJoinAndSelect('staff.address', 'address')
-        .leftJoinAndSelect('staff.role', 'role')
-        .leftJoinAndSelect('staff.branches', 'branches')
-        .leftJoinAndSelect('staff.selected_branch', 'selected_branch')
-        .where('staff.is_deleted = :isDeleted', { isDeleted: false });
+  try {
+    const query = this.staffRepository
+      .createQueryBuilder('staff')
+      .leftJoinAndSelect('staff.address', 'address')
+      .leftJoinAndSelect('staff.role', 'role')
+      .leftJoinAndSelect('staff.branches', 'branches')
+      .leftJoinAndSelect('staff.selected_branch', 'selected_branch')
+      .where('staff.is_deleted = false');
 
-      if (searchText) {
-        query.andWhere(
-          `(staff.name ILIKE :search OR staff.email ILIKE :search OR staff.phone_number ILIKE :search)`,
-          { search: `%${searchText}%` },
-        );
-      }
-
-      if (branch) {
-        query.andWhere('selected_branch.id = :branch', { branch });
-      }
-
-      if (fromDate && toDate) {
-        query.andWhere('DATE(staff.created_at) BETWEEN :fromDate AND :toDate', {
-          fromDate,
-          toDate,
-        });
-      }
-
-      const [data, total] = await query
-        .orderBy('staff.created_at', 'DESC')
-        .skip((+page - 1) * +limit)
-        .take(+limit)
-        .getManyAndCount();
-
-      return { data, total };
-    } catch (error) {
-      logger.error(`Staff_Filter_Error: ${JSON.stringify(error.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    if (searchText) {
+      query.andWhere(
+        `(staff.name ILIKE :search OR staff.email ILIKE :search OR staff.phone_number ILIKE :search)`,
+        { search: `%${searchText}%` },
+      );
     }
-  }
 
-  async findOne(id: number): Promise<Staff> {
-    try {
-      logger.info(`Staff_FindOne_Entry: id=${id}`);
-      const staff = await this.staffRepository.findOne({
-        where: { id, is_deleted: false },
-        relations: ['address', 'role', 'branches', 'selected_branch'],
+    if (branch) {
+      query.andWhere('selected_branch.id = :branch', { branch });
+    }
+
+    if (fromDate && toDate) {
+      query.andWhere('DATE(staff.created_at) BETWEEN :fromDate AND :toDate', {
+        fromDate,
+        toDate,
       });
-
-      if (!staff) throw new NotFoundException(Errors.NO_RECORD_FOUND);
-
-      logger.info(`Staff_FindOne_Exit: ${JSON.stringify(staff)}`);
-      return staff;
-    } catch (error) {
-      logger.error(`Staff_FindOne_Error: ${JSON.stringify(error.message || error)}`);
-      throw new HttpException(EM100, EC500);
     }
+
+    const [data, total] = await query
+      .orderBy('staff.created_at', 'DESC')
+      .skip((+page - 1) * +limit)
+      .take(+limit)
+      .getManyAndCount();
+
+    return { data, total };
+  } catch (error) {
+    logger.error(`Staff_Filter_Error: ${JSON.stringify(error.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
+
+// staff.service.ts
+
+async findOne(id: number): Promise<Staff> {
+  logger.info(` [StaffService] findOne() called with ID: ${id}`);
+
+  try {
+    logger.debug(`[StaffService] Querying staffRepository.findOne for id=${id} and is_deleted=false`);
+
+    const staff = await this.staffRepository.findOne({
+      where: { id, is_deleted: false },
+      relations: ['address', 'role', 'branches', 'selected_branch'], // Uncomment if needed
+    });
+
+    if (!staff) {
+      logger.warn(` [StaffService] No staff found in DB for id=${id}`);
+      throw new NotFoundException(Errors.NO_RECORD_FOUND);
+    }
+
+    logger.info(` [StaffService] Staff record fetched: ${JSON.stringify(staff)}`);
+    return staff;
+
+  } catch (error) {
+    logger.error(` [StaffService] Error fetching staff by ID: ${error.message || error}`);
+    throw new HttpException(error.message || EM100, error.status || EC500);
+  }
+}
+
+
+
+
+
 
 async updateStaff(id: number, dto: UpdateStaffDto): Promise<Staff> {
   try {
@@ -270,70 +423,83 @@ async updateStaff(id: number, dto: UpdateStaffDto): Promise<Staff> {
       where: { id },
       relations: ['address', 'role', 'branches', 'selected_branch', 'permissions'],
     });
+
     if (!staff) throw new NotFoundException('Staff not found');
 
+    // Update Address
     if (dto.address) {
       Object.assign(staff.address, dto.address);
     }
 
-    if (dto.branches) {
-      staff.branches = await this.branchRepository.findBy({ id: In(dto.branches) });
+    //  Update Branches
+    if (dto.branches?.length) {
+      staff.branches = await this.branchRepository.findBy({
+        id: In(dto.branches.map((b) => +b)),
+      });
     }
 
+    //  Update Role
     if (dto.role_id) {
       const role = await this.roleRepository.findOneBy({ id: dto.role_id });
       if (!role) throw new NotFoundException('Invalid role ID');
       staff.role = role;
     }
 
+    //  Update Selected Branch
     if (dto.selected_branch) {
-      const selectedBranch = await this.branchRepository.findOneBy({ id: dto.selected_branch });
+      const selectedBranch = await this.branchRepository.findOneBy({
+        id: dto.selected_branch,
+      });
       if (!selectedBranch) throw new NotFoundException('Invalid selected branch ID');
       staff.selected_branch = selectedBranch;
     }
 
-  const permissionConditions = dto.permissions.map(p => ({
-  action: p.action,
-  resource: p.resource,
-}));
+    //  Update Permissions (only if provided)
+    if (dto.permissions?.length) {
+      const permissionConditions = dto.permissions.map((p) => ({
+        action: p.action,
+        resource: p.resource,
+      }));
 
-const permissionEntities = await this.permissionRepository.find({
-  where: permissionConditions,
-});
-    if (dto.permissions) {
+      const permissionEntities = await this.permissionRepository.find({
+        where: permissionConditions,
+      });
+
       staff.permissions = permissionEntities;
     }
 
-    // Safely update other fields
+    //  Update core fields (only if provided)
     Object.assign(staff, {
-      name: dto.name ?? staff.name,
-      phone_number: dto.phone_number ?? staff.phone_number,
-      email: dto.email ?? staff.email,
-      gender: dto.gender ?? staff.gender,
-      languages: dto.languages ?? staff.languages,
-      description: dto.description ?? staff.description,
-      dob: dto.dob ?? staff.dob,
-      access_level: dto.access_level ?? staff.access_level,
-      specialization: dto.specialization ?? staff.specialization,
-      experience: dto.experience ?? staff.experience,
-      education: dto.education ?? staff.education,
-      registration_number: dto.registration_number ?? staff.registration_number,
-      certification_files: dto.certification_files ?? staff.certification_files,
-      availability: dto.availability ?? staff.availability,
-      tags: dto.tags ?? staff.tags,
-      status: dto.status ?? staff.status,
-      login_details: dto.login_details ?? staff.login_details,
+      ...(dto.name && { name: dto.name }),
+      ...(dto.phone_number && { phone_number: dto.phone_number }),
+      ...(dto.email && { email: dto.email }),
+      ...(dto.gender && { gender: dto.gender }),
+      ...(dto.languages && { languages: dto.languages }),
+      ...(dto.description && { description: dto.description }),
+      ...(dto.dob && { dob: dto.dob }),
+      ...(dto.access_level && { access_level: dto.access_level }),
+      ...(dto.specialization && { specialization: dto.specialization }),
+      ...(dto.experience && { experience: dto.experience }),
+      ...(dto.education && { education: dto.education }),
+      ...(dto.registration_number && { registration_number: dto.registration_number }),
+      ...(dto.certification_files && { certification_files: dto.certification_files }),
+      ...(dto.availability && { availability: dto.availability }),
+      ...(dto.tags && { tags: dto.tags }),
+      ...(dto.status && { status: dto.status }),
+      ...(dto.login_details && { login_details: dto.login_details }),
     });
 
     const updated = await this.staffRepository.save(staff);
 
     logger.info(`Staff_Update_Exit: ${JSON.stringify(updated)}`);
     return updated;
+
   } catch (error) {
     logger.error(`Staff_Update_Error: ${JSON.stringify(error.message || error)}`);
-    throw new HttpException(EM100, EC500);
+    throw new HttpException(error.message || EM100, error.status || EC500);
   }
 }
+
 
 
   async removeStaff(id: number): Promise<void> {

@@ -8,13 +8,14 @@ import {
   ManyToOne,
   OneToOne,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { BaseModel } from 'src/core/database/BaseModel';
 import { Address } from 'src/modules/addresses/entities/address.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { Permission } from 'src/modules/permissions/entities/permission.entity';
 import { Role } from 'src/modules/roles/entities/role.entity';
-
+import  { Token }  from 'src/modules/users/entities/token.entity'; 
 export enum AccessLevel {
   STAFF = 'staff',
   BRANCH_ADMIN = 'branch-admin',
@@ -83,7 +84,7 @@ export class Staff extends BaseModel {
   role: Role;
 
   @Column({ type: 'enum', enum: AccessLevel })
-  access_level: AccessLevel;
+  access_level: string;
 
   @ManyToMany(() => Branch)
   @JoinTable({
@@ -94,8 +95,8 @@ export class Staff extends BaseModel {
   branches: Branch[];
 
   @ManyToOne(() => Branch, { eager: true })
-@JoinColumn({ name: 'selected_branch' })
-selected_branch: Branch;
+  @JoinColumn({ name: 'selected_branch' })
+  selected_branch: Branch;
 
 
   @Column({ nullable: true })
@@ -142,4 +143,7 @@ selected_branch: Branch;
 
   @Column({ nullable: true })
   updated_by: number;
+
+@OneToMany(() => Token, token => token.staff)
+  tokens: Token[];
 }

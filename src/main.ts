@@ -15,6 +15,7 @@ import { logger } from './core/utils/logger';
 import * as bodyParser from 'body-parser';
 import { GlobalExceptionFilter } from './core/utils/customValidation';
 import { GlobalErrorHandler } from './core/utils/globalErrorHandler';
+import { AES } from 'src/core/utils//encryption.util';
 
 
 const limiter = rateLimit({
@@ -38,11 +39,28 @@ async function bootstrap() {
   require('dotenv').config();
   console.log(' JWTKEY Loaded:', process.env.JWTKEY);
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.headers['content-type']?.includes('application/json') && req.body?.data) {
+    try {
+      const decrypted = AES.decrypt(req.body.data);
+      req.body = JSON.parse(decrypted);
+    } catch (error) {
+      console.error('AES decryption failed:', error.message);
+      return res.status(400).json({ message: 'Invalid encrypted request body' });
+    }
+  }
+  next();
+});
   /*-------- security headers --------*/
   // app.enableCors({ origin: '*', methods: ALLOWED_METHODS }); //need to change enable allowed cors url only
   app.enableCors(corsOption);
   app.useGlobalPipes(new ValidationPipe({
-    whitelist: true
+    whitelist: true,
+    transform: true,
+  transformOptions: {
+    enableImplicitConversion: true,
+  },
   }));
   app.getHttpAdapter().getInstance().set('trust proxy', false);
   // process.env.NODE_ENV == PRODUCTION ? app.use(helmet()) : "";

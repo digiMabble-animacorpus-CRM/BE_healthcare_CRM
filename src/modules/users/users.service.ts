@@ -101,7 +101,7 @@ import { logger } from 'src/core/utils/logger';
 import User from 'src/modules/users/entities/user.entity';
 import moment from 'moment';
 import { InjectRepository } from '@nestjs/typeorm';
-import Token from './entities/token.entity';
+import { Token } from './entities/token.entity';
 import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
 import { Address } from '../addresses/entities/address.entity';
 
@@ -297,6 +297,24 @@ async findOneById(id: string | number, options?: FindOneOptions<User>): Promise<
     .getOne();
 }
 
+/**
+ * Create an email verification token for a user
+ */
+// async createEmailVerificationToken(email: string, token: string): Promise<Token> {
+//   // Delete any previous verification tokens for this user
+//   await this.deleteTokensByEmailAndType(email, 'email_verification');
+
+//   const tokenData = {
+//     user_email: email,
+//     token: token,
+//     type: 'email_verification',
+//     created_at: moment().utc().toDate(),
+//     expires_at: moment().add(10, 'minutes').utc().toDate(),
+//   };
+
+//   const newToken = this.tokenRepository.create(tokenData);
+//   return await this.tokenRepository.save(newToken);
+// }
 
 
 }

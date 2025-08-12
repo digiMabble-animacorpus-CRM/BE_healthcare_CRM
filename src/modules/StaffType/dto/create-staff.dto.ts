@@ -118,8 +118,9 @@ export class CreateStaffDto {
   @ApiProperty({ enum: AccessLevel })
   @IsNotEmpty()
   @IsEnum(AccessLevel)
-  access_level: AccessLevel;
+  access_level: string;
 
+  
   @ApiProperty({ example: [1, 2] })
   @IsArray()
   @IsNumber({}, { each: true })

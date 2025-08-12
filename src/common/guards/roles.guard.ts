@@ -16,49 +16,49 @@ export class RolesGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    console.log('🛡️ RolesGuard checking roles...');
-    console.log('🔐 Required Roles:', requiredRoles);
+    console.log(' RolesGuard checking roles...');
+    console.log(' Required Roles:', requiredRoles);
 
     if (!requiredRoles || requiredRoles.length === 0) {
       return true;
     }
 
     const { user } = context.switchToHttp().getRequest();
-    console.log('👤 request.user:', user);
+    console.log(' request.user:', user);
 
     if (!user) {
-      console.log('❌ No user found in request');
+      console.log(' No user found in request');
       return false;
     }
 
-    // ✅ Check roles array
+    //  Check roles array
     if (Array.isArray(user.roles)) {
       const matched = user.roles.some(
         (role) =>
           requiredRoles.includes(role.role_type) ||
           requiredRoles.includes(role.name),
       );
-      console.log('📌 Matched from roles array:', matched);
+      console.log(' Matched from roles array:', matched);
       if (matched) return true;
     } else {
-      console.log('❗ user.roles is missing or not an array:', user.roles);
+      console.log(' user.roles is missing or not an array:', user.roles);
     }
 
-    // ✅ Check user_type
+    //  Check user_type
     if (user.user_type) {
       const matched = requiredRoles.includes(user.user_type);
-      console.log('📌 Matched from user_type:', matched);
+      console.log(' Matched from user_type:', matched);
       if (matched) return true;
     }
 
-    // ✅ Check single flat role_type (optional support)
+    //  Check single flat role_type (optional support)
     if (user.role_type) {
       const matched = requiredRoles.includes(user.role_type);
-      console.log('📌 Matched from role_type:', matched);
+      console.log(' Matched from role_type:', matched);
       if (matched) return true;
     }
 
-    console.log('❌ Access denied. No role matched.');
+    console.log('Access denied. No role matched.');
     return false;
   }
 }
