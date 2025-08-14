@@ -65,48 +65,20 @@ export class StaffController {
 @Roles('super-admin', 'branch-admin')
 @ApiOperation({ summary: 'Create a new staff' })
 @ApiBody({ type: CreateStaffDto })
-async create(@Body() reqBody: any, @Req() req)  {
-  console.log(' Incoming staff body:', reqBody);
- console.log(' Current user role:', req.user?.user_type);
+async create(@Body() body: CreateStaffDto, @Req() req) {
+  logger.debug('Incoming staff body:', body);
+  logger.debug('Current user role:', req.user?.user_type);
+
   try {
-    //  Step 1: Decrypt if "data" field exists
-    const decryptedPayload = reqBody.data
-      ? AES.decrypt(reqBody.data)
-      : reqBody;
+    // Step 1: Validate DTO (ensures no partial/bad data)
+    await validateOrReject(body);
 
-    //  Step 2: Ensure it's a valid object
-    if (typeof decryptedPayload !== 'object' || Array.isArray(decryptedPayload)) {
-      throw new BadRequestException('Decrypted payload must be a valid object');
-    }
+    // Step 2: Pass to service
+    const createdStaff = await this.staffService.createStaff(body, req.user);
 
-    //  Step 3: Normalize optional fields
-    if (decryptedPayload.address?.zipcode && !decryptedPayload.address.zip_code) {
-      decryptedPayload.address.zip_code = decryptedPayload.address.zipcode;
-    }
-
-    //  Step 4: Provide defaults if needed
-    decryptedPayload.certification_files ??= [];
-    decryptedPayload.availability ??= [];
-    decryptedPayload.permissions ??= [];
-
-    //  Step 5: Validate DTO
-    const dto = plainToInstance(CreateStaffDto, decryptedPayload, {
-      enableImplicitConversion: true,
-    });
-    await validateOrReject(dto);
-
-    if (!dto.access_level) {
-      throw new BadRequestException('Access level is required');
-    }
-
-    const accessLevel = dto.access_level.toLowerCase();
-
-    //  Step 6: Save to DB
-    const data = await this.staffService.createStaff({ ...dto, access_level: accessLevel }, req.user);
-
-    return HandleResponse.buildSuccessObj(EC201, EM104, data);
+    return HandleResponse.buildSuccessObj(EC201, EM104, createdStaff);
   } catch (error) {
-    console.error(' Staff Create Error:', error);
+    logger.error('Staff Create Error:', error);
     return HandleResponse.buildErrObj(
       error.status || EC500,
       EM100,
@@ -116,55 +88,57 @@ async create(@Body() reqBody: any, @Req() req)  {
 }
 
 
-
 @Get()
 @Permissions('read:staff')
 @Roles('super-admin', 'branch-admin')
 @ApiOperation({ summary: 'Get all staff' })
-@ApiQuery({ name: 'data', required: true, description: 'Encrypted filters' })
-async findAll(@Query('data') encryptedData: string) {
+@ApiQuery({ name: 'page', required: false, description: 'Page number' })
+@ApiQuery({ name: 'limit', required: false, description: 'Items per page' })
+@ApiQuery({ name: 'branch', required: false, description: 'Branch ID' })
+@ApiQuery({ name: 'from', required: false, description: 'Start date' })
+@ApiQuery({ name: 'to', required: false, description: 'End date' })
+@ApiQuery({ name: 'search', required: false, description: 'Search text' })
+async findAll(
+  @Query('page') page: string,
+  @Query('limit') limit: string,
+  @Query('branch') branch?: string,
+  @Query('from') from?: string,
+  @Query('to') to?: string,
+  @Query('search') search?: string,
+) {
   try {
     //  Decrypt the input query
-    const decryptedStr = CryptoJS.AES.decrypt(encryptedData, process.env.AES_SECRET_KEY).toString(CryptoJS.enc.Utf8);
-    const decrypted = JSON.parse(decryptedStr);
 
-    const page = parseInt(decrypted.page, 10) || 1;
-    const limit = parseInt(decrypted.limit, 10) || 10;
-    const { branch, from, to, search } = decrypted;
+    // const where: any = { is_deleted: false };
 
-    const where: any = { is_deleted: false };
+    // if (branch) {
+    //   where.selected_branch = { id: branch };
+    // }
 
-    if (branch) {
-      where.selected_branch = { id: branch };
-    }
+    // if (from && to) {
+    //   where.created_at = Between(new Date(from), new Date(to));
+    // }
 
-    if (from && to) {
-      where.created_at = Between(new Date(from), new Date(to));
-    }
-
-    if (search) {
-      where.name = ILike(`%${search}%`);
-    }
+    // if (search) {
+    //   where.name = ILike(`%${search}%`);
+    // }
 
    const filterDto: StaffFilterDto = {
-  page: page.toString(),
-  limit: limit.toString(),
-  searchText: search,
-  branch,
-  fromDate: from,
-  toDate: to,
-};
+      page: page || '1',
+      limit: limit || '10',
+      searchText: search,
+      branch,
+      fromDate: from,
+      toDate: to,
+    };
 
 const { data, total } = await this.staffService.findAllWithFilters(filterDto);
 
-    const response = {
-      data,
+      return {
+      status: true,
       totalCount: total,
+      data,
     };
-
-    //  Encrypt the response
-    const encryptedResponse = CryptoJS.AES.encrypt(JSON.stringify(response), process.env.AES_SECRET_KEY).toString();
-    return encryptedResponse;
 
   } catch (error) {
     console.error('StaffController Decrypt Error:', error);
@@ -178,27 +152,20 @@ const { data, total } = await this.staffService.findAllWithFilters(filterDto);
 @UseGuards(AuthGuard('jwt'), PermissionGuard, RolesGuard)
 @Permissions('read:staff')
 @Roles('super-admin', 'branch-admin')
-@ApiOperation({ summary: 'Get staff by ID (AES Encrypted)' })
-@ApiParam({ name: 'id', type: String, description: 'AES Encrypted Staff ID' })
-async findOne(@Param('id') encryptedId: string) {
+@ApiOperation({ summary: 'Get staff by ID' })
+@ApiParam({ name: 'id', type: Number, description: 'Staff ID' })
+async findOne(@Param('id') id: string) {
   try {
-    logger.debug(` Encrypted ID received: ${encryptedId}`);
+    logger.debug(` Staff ID received: ${id}`);
 
-    // Normalize input (replace URL-encoded chars)
-    const normalizedId = decodeURIComponent(encryptedId).replace(/ /g, '+');
-
-    // Decrypt using AES utility
-    const decrypted = AES.decrypt(normalizedId);
-    logger.debug(` Decrypted ID: ${decrypted}`);
-
-    const id = Number(decrypted);
-    if (!id || isNaN(id)) {
-      logger.warn(` Invalid ID after decryption: "${decrypted}"`);
-      throw new BadRequestException('Invalid decrypted staff ID');
+    const numericId = Number(id);
+    if (!numericId || isNaN(numericId)) {
+      logger.warn(` Invalid staff ID: "${id}"`);
+      throw new BadRequestException('Invalid staff ID');
     }
 
-    logger.debug(` Searching for staff with ID: ${id}`);
-    const staff = await this.staffService.findOne(id);
+    logger.debug(` Searching for staff with ID: ${numericId}`);
+    const staff = await this.staffService.findOne(numericId);
 
     if (!staff) {
       throw new NotFoundException('Staff not found');

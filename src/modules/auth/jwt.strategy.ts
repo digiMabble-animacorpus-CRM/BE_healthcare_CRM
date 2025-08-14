@@ -69,7 +69,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         roles: user.roles || [],
         permissions: userPermissions,
         staff_id: staff.id,
-        selected_branch: staff.selected_branch?.id || null,
+        selected_branch: staff.selectedBranch?.id || null,
       };
     }
 

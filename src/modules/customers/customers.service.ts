@@ -24,51 +24,40 @@ export class CustomersService extends BaseService<Customer> {
     this.repository = customerRepository;
   }
 
-  async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
-    try {
-      logger.info(`Customer_Create_Entry: ${JSON.stringify(createCustomerDto)}`);
+async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
+  try {
+    logger.info(`Customer_Create_Entry: ${JSON.stringify(createCustomerDto)}`);
 
-      // Check if email already exists
-      const existingCustomer = await this.customerRepository.findOne({
-        where: { email: createCustomerDto.email },
-      });
+    // Check if email already exists
+    const existingCustomer = await this.customerRepository.findOne({
+      where: { email: createCustomerDto.email },
+    });
 
-      if (existingCustomer) {
-        logger.error(`Customer_Create_Error: Email already exists - ${createCustomerDto.email}`);
-        throw new ConflictException(Errors.EMAIL_ID_ALREADY_EXISTS);
-      }
+    if (existingCustomer) {
+      logger.error(`Customer_Create_Error: Email already exists - ${createCustomerDto.email}`);
+      throw new ConflictException(Errors.EMAIL_ID_ALREADY_EXISTS);
+    }
 
-      // Create address first
-      const address = this.addressRepository.create(createCustomerDto.address);
-      const savedAddress = await this.addressRepository.save(address);
-
-   
-          // Create customer with saved address
+    // Create customer directly using DTO fields
     const customer = this.customerRepository.create({
       ...createCustomerDto,
-      status: createCustomerDto.status ?? 'new', // Set default manually
-      address: savedAddress,
+      status: (createCustomerDto.status as 'new' | 'old') ?? 'new', // Default to 'new' if not provided
     });
-      // Save customer
 
-      const savedCustomer = await this.customerRepository.save(customer);
+    // Save customer
+    const savedCustomer = await this.customerRepository.save(customer);
 
-      // Reload with relations
-      const result = await this.customerRepository.findOne({
-        where: { id: savedCustomer.id },
-        relations: ['address'],
-      });
-
-      logger.info(`Customer_Create_Exit: ${JSON.stringify(result)}`);
-      return result;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      logger.error(`Customer_Create_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    logger.info(`Customer_Create_Exit: ${JSON.stringify(savedCustomer)}`);
+    return savedCustomer;
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw error;
     }
+    logger.error(`Customer_Create_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
 
   async findAll(options?: FindManyOptions<Customer>): Promise<Customer[]> {
   try {
@@ -163,34 +152,27 @@ async findAllWithPaginationCustomer(
 }
 
 
-  async updateCustomer(id: number, updateCustomerDto: UpdateCustomerDto): Promise<Customer> {
-    try {
-      logger.info(`Customer_Update_Entry: id=${id}, data=${JSON.stringify(updateCustomerDto)}`);
+async updateCustomer(id: number, updateCustomerDto: UpdateCustomerDto): Promise<Customer> {
+  try {
+    logger.info(`Customer_Update_Entry: id=${id}, data=${JSON.stringify(updateCustomerDto)}`);
 
-      const customer = await this.findOne(id);
+    await this.customerRepository.update(id, {
+      ...updateCustomerDto,
+      status: updateCustomerDto.status as 'new' | 'old' | undefined,
+    });
 
-      // Update address if provided
-      if (updateCustomerDto.address) {
-        await this.addressRepository.update(customer.address.id, updateCustomerDto.address);
-      }
-
-      // Update customer
-      await this.customerRepository.update(id, {
-        ...updateCustomerDto,
-        address: undefined, // Exclude address from customer update
-      });
-
-      const updatedCustomer = await this.findOne(id);
-      logger.info(`Customer_Update_Exit: ${JSON.stringify(updatedCustomer)}`);
-      return updatedCustomer;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      logger.error(`Customer_Update_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    const updatedCustomer = await this.findOne(id);
+    logger.info(`Customer_Update_Exit: ${JSON.stringify(updatedCustomer)}`);
+    return updatedCustomer;
+  } catch (error) {
+    if (error instanceof HttpException) {
+      throw error;
     }
+    logger.error(`Customer_Update_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
 
   async removeCustomer(id: number): Promise<void> {
     try {

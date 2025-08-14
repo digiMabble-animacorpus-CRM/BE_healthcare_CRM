@@ -58,7 +58,7 @@ export class Staff extends BaseModel {
   name: string;
 
   @Column()
-  phone_number: string;
+  phoneNumber: string;
 
   @Column({ unique: true })
   email: string;
@@ -70,7 +70,7 @@ export class Staff extends BaseModel {
   languages: string[];
 
   @OneToOne(() => Address, { cascade: true, eager: true })
-  @JoinColumn({ name: 'address_id' })
+  @JoinColumn({ name: 'address' })
   address: Address;
 
   @Column({ nullable: true })
@@ -80,24 +80,23 @@ export class Staff extends BaseModel {
   dob: string;
 
   @ManyToOne(() => Role, { eager: true })
-  @JoinColumn({ name: 'role_id' })
+  @JoinColumn({ name: 'roleId' })
   role: Role;
 
-  @Column({ type: 'enum', enum: AccessLevel })
-  access_level: string;
+  @Column({ name: 'accessLevel', type: 'enum', enum: AccessLevel })
+  accessLevel: string;
 
   @ManyToMany(() => Branch)
   @JoinTable({
-    name: 'staff_branches',
-    joinColumn: { name: 'staff_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'branch_id', referencedColumnName: 'id' },
+    name: 'staffBranches',
+    joinColumn: { name: 'staffId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'branchId', referencedColumnName: 'id' },
   })
   branches: Branch[];
 
   @ManyToOne(() => Branch, { eager: true })
-  @JoinColumn({ name: 'selected_branch' })
-  selected_branch: Branch;
-
+  @JoinColumn({ name: 'selectedBranch' })
+  selectedBranch: Branch;
 
   @Column({ nullable: true })
   specialization: string;
@@ -109,10 +108,10 @@ export class Staff extends BaseModel {
   education: string;
 
   @Column({ nullable: true })
-  registration_number: string;
+  registrationNumber: string;
 
   @Column('jsonb', { nullable: true })
-  certification_files: CertificationFile[];
+  certificationFiles: CertificationFile[];
 
   @Column('jsonb', { nullable: true })
   availability: AvailabilitySlot[];
@@ -129,21 +128,109 @@ export class Staff extends BaseModel {
 
   @ManyToMany(() => Permission, { eager: true })
   @JoinTable({
-    name: 'staff_permissions',
-    joinColumn: { name: 'staff_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'permission_id', referencedColumnName: 'id' },
+    name: 'staffPermissions',
+    joinColumn: { name: 'staffId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'permissionId', referencedColumnName: 'id' },
   })
   permissions: Permission[];
 
   @Column('jsonb')
-  login_details: LoginDetails;
+  loginDetails: LoginDetails;
 
   @Column()
-  created_by: number;
+  createdBy: number;
 
   @Column({ nullable: true })
-  updated_by: number;
+  updatedBy: number;
 
-@OneToMany(() => Token, token => token.staff)
+  @OneToMany(() => Token, token => token.staff)
   tokens: Token[];
+
+  // 📌 Additional columns from CSV file:
+  @Column({ nullable: true })
+  photo: string;
+
+  @Column({ nullable: true })
+  lastName: string;
+
+  @Column({ nullable: true })
+  firstName: string;
+
+  @Column({ nullable: true })
+  jobTitle: string;
+
+  @Column({ nullable: true })
+  targetAudience: string;
+
+  @Column({ nullable: true })
+  specialization1: string;
+
+  @Column({ nullable: true })
+  consultations: string;
+
+  @Column({ nullable: true })
+  contactEmail: string;
+
+  @Column({ nullable: true })
+  contactPhone: string;
+
+  @Column({ nullable: true })
+  schedule: string;
+
+  @Column({ nullable: true })
+  about: string;
+
+  @Column({ nullable: true })
+  paymentMethods: string;
+
+  @Column({ nullable: true })
+  degreesAndTraining: string;
+
+  @Column({ nullable: true })
+  website: string;
+
+  @Column({ nullable: true })
+  faq: string;
+
+  @Column({ nullable: true })
+  agendaLinks: string;
+
+  @Column({ nullable: true })
+  importedTable2: string;
+
+  @Column({ nullable: true })
+  field27: string;
+
+  @Column({ nullable: true })
+  importedTable22: string;
+
+  @Column({ nullable: true })
+  teamNamur1: string;
+
+  @Column({ nullable: true })
+  importedTable23: string;
+
+  @Column({ nullable: true })
+  teamNamur2: string;
+
+  @Column({ nullable: true })
+  sites: string;
+
+  @Column({ nullable: true })
+  specialization2: string;
+
+  @Column({ nullable: true })
+  rosaLink: string;
+
+  @Column({ nullable: true })
+  googleAgendaLink: string;
+
+  @Column({ nullable: true })
+  appointmentStart: string;
+
+  @Column({ nullable: true })
+  appointmentEnd: string;
+
+  @Column({ nullable: true })
+  appointmentAlert: string;
 }
