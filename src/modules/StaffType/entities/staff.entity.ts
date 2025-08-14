@@ -16,6 +16,7 @@ import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { Permission } from 'src/modules/permissions/entities/permission.entity';
 import { Role } from 'src/modules/roles/entities/role.entity';
 import  { Token }  from 'src/modules/users/entities/token.entity'; 
+import User from 'src/modules/users/entities/user.entity'; // Adjust the import path as necessary
 export enum AccessLevel {
   STAFF = 'staff',
   BRANCH_ADMIN = 'branch-admin',
@@ -145,6 +146,14 @@ export class Staff extends BaseModel {
 
   @OneToMany(() => Token, token => token.staff)
   tokens: Token[];
+
+@OneToOne(() => User, (user) => user.staff, {
+  cascade: true,
+  onDelete: 'CASCADE',
+})
+@JoinColumn({ name: 'user_id' })
+user: User;
+
 
   // 📌 Additional columns from CSV file:
   @Column({ nullable: true })

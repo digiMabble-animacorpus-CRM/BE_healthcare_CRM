@@ -193,31 +193,15 @@ async findOne(@Param('id') id: string) {
 @Roles('super-admin', 'branch-admin')
 @ApiOperation({ summary: 'Update a staff member by encrypted ID (AES)' })
 @ApiParam({ name: 'id', type: String, description: 'AES Encrypted Staff ID' })
-async update(@Param('id') encryptedId: string, @Body() reqBody: any) {
+async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateStaffDto) {
   try {
-    //  Step 1: Decrypt the encrypted ID from URL
-    const normalizedId = decodeURIComponent(encryptedId).replace(/ /g, '+');
-    const decryptedId = AES.decrypt(normalizedId);
-    const id = Number(decryptedId);
+    // Validate input
+    await validateOrReject(body);
 
-    if (!id || isNaN(id)) {
-      throw new BadRequestException('Invalid decrypted staff ID');
-    }
-
-    //  Step 2: Decrypt the body if encrypted
-    const decryptedBody = reqBody?.data
-      ? AES.decrypt(reqBody.data)
-      : reqBody;
-
-    //  Step 3: Transform + Validate
-    const dto = plainToClass(UpdateStaffDto, decryptedBody);
-    await validateOrReject(dto);
-
-    //  Step 4: Update
-    const data = await this.staffService.updateStaff(id, dto);
+    const data = await this.staffService.updateStaff(id, body);
     return HandleResponse.buildSuccessObj(EC200, EM116, data);
   } catch (error) {
-    console.error(' Staff Update Error:', error);
+    console.error('Staff Update Error:', error);
     return HandleResponse.buildErrObj(
       error.status || EC500,
       EM100,
@@ -233,16 +217,16 @@ async update(@Param('id') encryptedId: string, @Body() reqBody: any) {
   @Roles('super-admin') // Only super-admin can delete
   @ApiOperation({ summary: 'Soft delete staff' })
   @ApiParam({ name: 'id', type: Number })
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    try {
-      await this.staffService.removeStaff(id);
-      return HandleResponse.buildSuccessObj(EC204, EM127, null);
-    } catch (error) {
-      return HandleResponse.buildErrObj(
-        error.status || EC500,
-        EM100,
-        error.message || error,
-      );
-    }
+async remove(@Param('id', ParseIntPipe) id: number) {
+  try {
+    await this.staffService.removeStaff(id);
+    return HandleResponse.buildSuccessObj(EC204, EM127, null);
+  } catch (error) {
+    return HandleResponse.buildErrObj(
+      error.status || EC500,
+      EM100,
+      error.message || error,
+    );
   }
+}
 }

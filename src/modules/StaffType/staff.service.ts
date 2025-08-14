@@ -6,7 +6,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, FindManyOptions,DeepPartial ,Between, ILike,} from 'typeorm';
+import { In, Repository, FindManyOptions,DeepPartial ,Between, ILike, DataSource} from 'typeorm';
 import { Staff } from './entities/staff.entity';
 import { Address } from '../addresses/entities/address.entity';
 import { Branch } from '../branches/entities/branch.entity';
@@ -28,6 +28,7 @@ import User  from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 
+
 @Injectable()
 export class StaffService extends BaseService<Staff> {
   protected repository: Repository<Staff>;
@@ -44,9 +45,12 @@ export class StaffService extends BaseService<Staff> {
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
     @InjectRepository(Token)
-  private readonly tokenRepository: Repository<Token>, 
-  private readonly MailUtils: MailUtils,    
-   private readonly userService: UsersService, 
+    private readonly tokenRepository: Repository<Token>, 
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly MailUtils: MailUtils,    
+    private readonly userService: UsersService, 
+    private readonly dataSource: DataSource,
   ) {
     super(staffRepository.manager);
     this.repository = staffRepository;
@@ -98,7 +102,27 @@ async createStaff(dto: CreateStaffDto, currentUser: any): Promise<Staff> {
       )
     ).then(res => res.filter(Boolean) as Permission[]);
 
-    // Create staff entity
+
+  // Ensure matching user exists
+    let user = await this.userService.findOneByEmail(dto.email);
+    if (!user) {
+      const tempPassword = await bcrypt.hash(uuidv4(), 10);
+      user = await this.userService.create({
+        name: dto.name,
+        email_id: dto.email,
+        password: tempPassword,
+        user_type: 'staff',
+        roles: [role],
+        email_verified: false,
+        is_blocked: false,
+        preferences: [],
+      });
+      logger.debug(`User created for staff: user_id=${user.id}`);
+    } else {
+      logger.debug(`Existing user linked: user_id=${user.id}`);
+    }
+
+    // Create staff entity and link user
     const staffData: DeepPartial<Staff> = {
       ...dto,
       createdBy: dto.createdBy ? +dto.createdBy : currentUser.id,
@@ -108,28 +132,15 @@ async createStaff(dto: CreateStaffDto, currentUser: any): Promise<Staff> {
       selectedBranch,
       branches: branchEntities,
       permissions: permissionEntities,
+      user: { id: user.id }, // ✅ Proper relation link
     };
+
 
     const savedStaff = await this.staffRepository.save(
       this.staffRepository.create(staffData)
     );
 
-    // Create matching user
-    const existingUser = await this.userService.findOneByEmail(savedStaff.email);
-    if (!existingUser) {
-      const tempPassword = await bcrypt.hash(uuidv4(), 10);
-      await this.userService.create({
-        name: savedStaff.name,
-        email_id: savedStaff.email,
-        password: tempPassword,
-        user_type: 'staff',
-        roles: [role],
-        email_verified: false,
-        is_blocked: false,
-        preferences: [],
-      });
-    }
-
+  
     // Create token for password reset
     const token = uuidv4();
     await this.tokenRepository.save(this.tokenRepository.create({
@@ -329,132 +340,119 @@ async updateStaff(id: number, dto: UpdateStaffDto): Promise<Staff> {
 
     const staff = await this.staffRepository.findOne({
       where: { id },
-      relations: ['address', 'role', 'branches', 'selected_branch', 'permissions'],
+      relations: ['address', 'role', 'branches', 'selectedBranch', 'permissions'],
     });
 
     if (!staff) throw new NotFoundException('Staff not found');
 
-    // Update Address
-     if (dto.address) {
-        if (staff.address) Object.assign(staff.address, dto.address);
-        else staff.address = this.addressRepository.create(dto.address);
+    // Update address if provided
+    if (dto.address) {
+      if (staff.address) {
+        Object.assign(staff.address, dto.address);
+      } else {
+        staff.address = this.addressRepository.create(dto.address);
       }
+    }
 
-
-    //  Update Branches
+    // Update branches
     if (dto.branches?.length) {
       staff.branches = await this.branchRepository.findBy({
-        id: In(dto.branches.map((b) => +b)),
+        id: In(dto.branches.map(Number)),
       });
     }
 
-    //  Update Role
+    // Update role
     if (dto.roleId) {
       const role = await this.roleRepository.findOneBy({ id: dto.roleId });
       if (!role) throw new NotFoundException('Invalid role ID');
       staff.role = role;
     }
 
-    //  Update Selected Branch
+    // Update selected branch
     if (dto.selectedBranch) {
-      const selectedBranch = await this.branchRepository.findOneBy({
-        id: dto.selectedBranch,
-      });
-      if (!selectedBranch) throw new NotFoundException('Invalid selected branch ID');
-      staff.selectedBranch = selectedBranch;
+      const branch = await this.branchRepository.findOneBy({ id: dto.selectedBranch });
+      if (!branch) throw new NotFoundException('Invalid selected branch ID');
+      staff.selectedBranch = branch;
     }
 
-    //  Update Permissions (only if provided)
+    // Update permissions
     if (dto.permissions?.length) {
-      const permissionConditions = dto.permissions.map((p) => ({
-        action: p.action,
-        resource: p.resource,
-      }));
-
       const permissionEntities = await this.permissionRepository.find({
-        where: permissionConditions,
+        where: dto.permissions.map((p) => ({ action: p.action, resource: p.resource })),
       });
-
       staff.permissions = permissionEntities;
     }
 
-    //  Update core fields (only if provided)
-    Object.assign(staff, {
-      ...(dto.name && { name: dto.name }),
-      ...(dto.phoneNumber && { phone_number: dto.phoneNumber }),
-      ...(dto.email && { email: dto.email }),
-      ...(dto.gender && { gender: dto.gender }),
-      ...(dto.languages && { languages: dto.languages }),
-      ...(dto.description && { description: dto.description }),
-      ...(dto.dob && { dob: dto.dob }),
-      ...(dto.accessLevel && { access_level: dto.accessLevel }),
-      ...(dto.specialization && { specialization: dto.specialization }),
-      ...(dto.experience && { experience: dto.experience }),
-      ...(dto.education && { education: dto.education }),
-      ...(dto.registrationNumber && { registration_number: dto.registrationNumber }),
-      ...(dto.certificationFiles && { certification_files: dto.certificationFiles }),
-      ...(dto.availability && { availability: dto.availability }),
-      ...(dto.tags && { tags: dto.tags }),
-      ...(dto.status && { status: dto.status }),
-      ...(dto.loginDetails && { login_details: dto.loginDetails }),
-
-      ...(dto.photo !== undefined && { photo: dto.photo }),
-        ...(dto.lastName !== undefined && { lastName: dto.lastName }),
-        ...(dto.firstName !== undefined && { firstName: dto.firstName }),
-        ...(dto.jobTitle !== undefined && { jobTitle: dto.jobTitle }),
-        ...(dto.targetAudience !== undefined && { targetAudience: dto.targetAudience }),
-        ...(dto.specialization1 !== undefined && { specialization1: dto.specialization1 }),
-        ...(dto.consultations !== undefined && { consultations: dto.consultations }),
-        ...(dto.contactEmail !== undefined && { contactEmail: dto.contactEmail }),
-        ...(dto.contactPhone !== undefined && { contactPhone: dto.contactPhone }),
-        ...(dto.schedule !== undefined && { schedule: dto.schedule }),
-        ...(dto.about !== undefined && { about: dto.about }),
-        ...(dto.paymentMethods !== undefined && { paymentMethods: dto.paymentMethods }),
-        ...(dto.degreesAndTraining !== undefined && { degreesAndTraining: dto.degreesAndTraining }),
-        ...(dto.website !== undefined && { website: dto.website }),
-        ...(dto.faq !== undefined && { faq: dto.faq }),
-        ...(dto.agendaLinks !== undefined && { agendaLinks: dto.agendaLinks }),
-        ...(dto.importedTable2 !== undefined && { importedTable2: dto.importedTable2 }),
-        ...(dto.field27 !== undefined && { field27: dto.field27 }),
-        ...(dto.importedTable22 !== undefined && { importedTable22: dto.importedTable22 }),
-        ...(dto.teamNamur1 !== undefined && { teamNamur1: dto.teamNamur1 }),
-        ...(dto.importedTable23 !== undefined && { importedTable23: dto.importedTable23 }),
-        ...(dto.teamNamur2 !== undefined && { teamNamur2: dto.teamNamur2 }),
-        ...(dto.sites !== undefined && { sites: dto.sites }),
-        ...(dto.specialization2 !== undefined && { specialization2: dto.specialization2 }),
-        ...(dto.rosaLink !== undefined && { rosaLink: dto.rosaLink }),
-        ...(dto.googleAgendaLink !== undefined && { googleAgendaLink: dto.googleAgendaLink }),
-        ...(dto.appointmentStart !== undefined && { appointmentStart: dto.appointmentStart }),
-        ...(dto.appointmentEnd !== undefined && { appointmentEnd: dto.appointmentEnd }),
-        ...(dto.appointmentAlert !== undefined && { appointmentAlert: dto.appointmentAlert }),
-    });
+    // Update other fields directly from DTO (entity & DTO must align)
+    Object.assign(staff, dto);
 
     const updated = await this.staffRepository.save(staff);
 
     logger.info(`Staff_Update_Exit: ${JSON.stringify(updated)}`);
     return updated;
-
   } catch (error) {
-    logger.error(`Staff_Update_Error: ${JSON.stringify(error.message || error)}`);
+    logger.error(`Staff_Update_Error: ${error.message || error}`);
     throw new HttpException(error.message || EM100, error.status || EC500);
   }
 }
 
 
 
-  async removeStaff(id: number): Promise<void> {
-    try {
-      logger.info(`Staff_Remove_Entry: id=${id}`);
-      await this.staffRepository.update(id, {
+
+
+
+
+
+async removeStaff(id: number): Promise<void> {
+  try {
+    logger.info(`Staff_SoftDelete_Entry: id=${id}`);
+
+    // Fetch staff with relation to user
+    const staff = await this.staffRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+
+    logger.debug(`Fetched staff: ${JSON.stringify(staff)}`);
+
+    if (!staff) {
+      throw new NotFoundException(`Staff with id=${id} not found`);
+    }
+
+    // Determine userId (from relation or FK column)
+    const userId = staff.user?.id || (staff as any).user_id;
+    logger.debug(`Linked userId: ${userId}`);
+
+    await this.dataSource.transaction(async (manager) => {
+      // Soft delete staff
+      const staffUpdateResult = await manager.getRepository(Staff).update(id, {
         is_deleted: true,
         is_active: false,
       });
-      logger.info(`Staff_Remove_Exit: Soft deleted staff with id=${id}`);
-    } catch (error) {
-      logger.error(`Staff_Remove_Error: ${JSON.stringify(error.message || error)}`);
-      throw new HttpException(EM100, EC500);
-    }
+      logger.debug(`Staff update result: ${JSON.stringify(staffUpdateResult)}`);
+
+      // Soft delete linked user (if exists)
+      if (userId) {
+        const userUpdateResult = await manager.getRepository(User).update(userId, {
+          is_deleted: true,
+          is_active: false,
+        });
+        logger.debug(`User update result: ${JSON.stringify(userUpdateResult)}`);
+      } else {
+        logger.warn(`No linked user found for staff id=${id}`);
+      }
+    });
+
+    logger.info(
+      `Staff_SoftDelete_Exit: Soft deleted staff (id=${id})` +
+      (userId ? ` & linked user (id=${userId})` : ' (no linked user)')
+    );
+  } catch (error) {
+    logger.error(`Staff_SoftDelete_Error: ${error.message || error}`);
+    throw new HttpException(error.message || EM100, error.status || EC500);
   }
+}
+
 
 
 
