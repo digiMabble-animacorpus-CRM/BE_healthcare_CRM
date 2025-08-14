@@ -77,7 +77,7 @@ export class CreateStaffDto {
   @Matches(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/, {
     message: 'Please provide a valid phone number',
   })
-  phone_number: string;
+  phoneNumber: string;
 
   @ApiProperty({ example: 'john.smith@example.com' })
   @IsNotEmpty()
@@ -113,12 +113,12 @@ export class CreateStaffDto {
   @ApiProperty({ example: 1 })
   @IsNotEmpty()
   @IsNumber()
-  role_id: number;
+  roleId: number;
 
   @ApiProperty({ enum: AccessLevel })
   @IsNotEmpty()
   @IsEnum(AccessLevel)
-  access_level: string;
+  accessLevel: string;
 
   
   @ApiProperty({ example: [1, 2] })
@@ -129,12 +129,12 @@ export class CreateStaffDto {
   @ApiProperty({ example: 1 })
   @IsNotEmpty()
   @IsNumber()
-  selected_branch: number;
+  selectedBranch: number;
 
   @IsOptional()
 @IsString()
 @ApiProperty({ example: 'Main Branch', required: false })
-selected_branch_name?: string;
+selectedBranchName?: string;
 
 
   @ApiProperty({ required: false })
@@ -155,13 +155,13 @@ selected_branch_name?: string;
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  registration_number?: string;
+  registrationNumber?: string;
 
   @ApiProperty({ type: [CertificationFileDto], required: false })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CertificationFileDto)
-  certification_files?: CertificationFileDto[];
+  certificationFiles?: CertificationFileDto[];
 
   @ApiProperty({ type: [AvailabilitySlotDto], required: false })
   @IsOptional()
@@ -197,7 +197,7 @@ selected_branch_name?: string;
   })
   @IsOptional()
   @IsObject()
-  login_details?: {
+  loginDetails?: {
     otpVerified: boolean;
     lastLogin?: string;
     loginCount?: number;
@@ -207,5 +207,37 @@ selected_branch_name?: string;
   @ApiProperty({ example: 101 })
   @IsOptional()
   @IsNumber()
-  created_by?: number;
+  createdBy?: number;
+
+
+  @IsOptional() @IsString() photo?: string;
+  @IsOptional() @IsString() lastName?: string;
+  @IsOptional() @IsString() firstName?: string;
+  @IsOptional() @IsString() jobTitle?: string;
+  @IsOptional() @IsString() targetAudience?: string;
+  @IsOptional() @IsString() specialization1?: string;
+  @IsOptional() @IsString() consultations?: string;
+  @IsOptional() @IsString() contactEmail?: string;
+  @IsOptional() @IsString() contactPhone?: string;
+  @IsOptional() @IsString() schedule?: string;
+  @IsOptional() @IsString() about?: string;
+  @IsOptional() @IsString() paymentMethods?: string;
+  @IsOptional() @IsString() degreesAndTraining?: string;
+  @IsOptional() @IsString() website?: string;
+  @IsOptional() @IsString() faq?: string;
+  @IsOptional() @IsString() agendaLinks?: string;
+  @IsOptional() @IsString() importedTable2?: string;
+  @IsOptional() @IsString() field27?: string;
+  @IsOptional() @IsString() importedTable22?: string;
+  @IsOptional() @IsString() teamNamur1?: string;
+  @IsOptional() @IsString() importedTable23?: string;
+  @IsOptional() @IsString() teamNamur2?: string;
+  @IsOptional() @IsString() sites?: string;
+  @IsOptional() @IsString() specialization2?: string;
+  @IsOptional() @IsString() rosaLink?: string;
+  @IsOptional() @IsString() googleAgendaLink?: string;
+  @IsOptional() @IsString() appointmentStart?: string;
+  @IsOptional() @IsString() appointmentEnd?: string;
+  @IsOptional() @IsString() appointmentAlert?: string;
+
 }

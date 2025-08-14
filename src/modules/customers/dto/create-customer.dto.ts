@@ -18,7 +18,7 @@ export class CreateCustomerDto {
   @IsString()
   @MinLength(2)
   @Matches(/^[a-zA-Z\s]+$/, { message: 'customerName must contain only letters and spaces' })
-  customer_name: string;
+  name: string;
 
   @ApiProperty({ example: 'john.doe@example.com' })
   @IsNotEmpty()
@@ -31,55 +31,95 @@ export class CreateCustomerDto {
   @Matches(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/, {
     message: 'Please provide a valid phone number',
   })
-  phone_number: string;
+  number: string;
 
-  @ApiProperty({ example: 5, required: false })
-  @IsOptional()
-  @IsNumber()
-  view_properties?: number;
-
-  @ApiProperty({ example: 2, required: false })
-  @IsOptional()
-  @IsNumber()
-  own_properties?: number;
-
-  @ApiProperty({ example: 150000.50, required: false })
-  @IsOptional()
-  @IsNumber()
-  invest_property?: number;
-
-  @ApiProperty({ example: 'new', enum: ['new', 'worked'], required: false })
+    @ApiProperty({ example: 'Customer description', required: false })
   @IsOptional()
   @IsString()
-  @IsIn(['new', 'worked'])
-  status?: string;
+  description?: string;
 
-  @ApiProperty({ example: 'https://example.com/profile_url.png', required: false })
+    @ApiProperty({ example: '123 Main Street', required: false })
   @IsOptional()
   @IsString()
-  customer_image_url?: string;
+  address?: string;
 
-  @ApiProperty({ type: CreateAddressDto })
-  @IsNotEmpty()
-  @Type(() => CreateAddressDto)
-  address: CreateAddressDto;
-
-  @ApiProperty({ example: 'Main Branch', required: false })
+    @ApiProperty({ example: '10001', required: false })
   @IsOptional()
   @IsString()
-  branch?: string;
+  zipCode?: string;
+
+   @ApiProperty({ example: 'New York', required: false })
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @ApiProperty({ example: 'USA', required: false })
+  @IsOptional()
+  @IsString()
+  country?: string;
 
   @ApiProperty({ example: 'Male', required: false })
   @IsOptional()
   @IsString()
   gender?: string;
 
-  @ApiProperty({ example: '1990-05-15', required: false })
+
+    @ApiProperty({ example: 'English', required: false })
+  @IsOptional()
+  @IsString()
+  language?: string;
+
+   @ApiProperty({ example: ['tag1', 'tag2'], required: false, type: [String] })
+  @IsOptional()
+  @IsString({ each: true })
+  tags?: string[];
+
+  
+  @ApiProperty({ example: 'new', enum: ['new', 'old'], required: false })
+  @IsOptional()
+  @IsString()
+  @IsIn(['new', 'old'])
+  status?: 'new' | 'old';
+
+   @ApiProperty({ example: '2025-08-14T12:00:00Z', required: false })
+  @IsOptional()
+  lastUpdated?: string;
+
+  @ApiProperty({ example: 'https://example.com/profile_url.png', required: false })
+  @IsOptional()
+  @IsString()
+  customer_image_url?: string;
+
+  @ApiProperty({ example: 'Main Branch', required: false })
+  @IsOptional()
+  @IsString()
+  branch?: string;
+
+   @ApiProperty({ example: '1990-05-15', required: false })
   @IsOptional()
   dob?: Date;
 
-  @ApiProperty({ example: 'Instagram', required: false })
+    @ApiProperty({ example: 'Instagram', required: false })
   @IsOptional()
   @IsString()
   source?: string;
+
+
+
+  // @ApiProperty({ example: 5, required: false })
+  // @IsOptional()
+  // @IsNumber()
+  // view_properties?: number;
+
+  // @ApiProperty({ example: 2, required: false })
+  // @IsOptional()
+  // @IsNumber()
+  // own_properties?: number;
+
+  // @ApiProperty({ example: 150000.50, required: false })
+  // @IsOptional()
+  // @IsNumber()
+  // invest_property?: number;
+
+
 }
