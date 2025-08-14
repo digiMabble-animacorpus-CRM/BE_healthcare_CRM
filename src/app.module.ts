@@ -25,7 +25,7 @@ import { SocialLinks } from './modules/social-links/entities/social-links.entity
 import { TherapistsModule } from './modules/therapist/therapists.module';
 import { StaffModule } from './modules/StaffType/staff.module';
 import { SeederModule } from './seeds/seeder.module';
-import { FirebaseModule } from './core/database/config/firebase/firebase.module';
+// import { FirebaseModule } from './core/database/config/firebase/firebase.module';
 import { TokenModule } from './modules/users/token.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -45,7 +45,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
           password: DBconfig.password,
           database: DBconfig.database,
           entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
-          synchronize: false,
+          synchronize: true,
           logging: true,
           ssl: DBconfig.ssl,
         }
@@ -58,21 +58,21 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     AuthModule,
     UsersModule,
     AddressesModule,
-    PropertiesModule,
-    CompanyProfileModule,
+    // PropertiesModule,
+    // CompanyProfileModule,
     CustomersModule,
-    OrdersModule,
-    AgentsModule,
-    MenusModule,
+    // OrdersModule,
+    // AgentsModule,
+    // MenusModule,
     PermissionsModule,
     RolesModule,
-    LeadsModule,
+    // LeadsModule,
     LocationModule,
     SocialLinks,
     TherapistsModule,
     StaffModule,
     SeederModule,
-    FirebaseModule, 
+    // FirebaseModule, 
     TokenModule,
   ],
   controllers: [AppController],
