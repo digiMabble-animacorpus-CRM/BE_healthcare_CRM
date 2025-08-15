@@ -117,7 +117,6 @@ export class AppointmentsService extends BaseService<Appointment> {
             qb.where('customer.name ILIKE :search')
               .orWhere('customer.email ILIKE :search')
               .orWhere('therapist.name ILIKE :search')
-              .orWhere('a.purposeOfVisit::text ILIKE :search')
               .orWhere('a.department::text ILIKE :search');
           })
         );

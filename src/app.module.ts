@@ -47,10 +47,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
           entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
           synchronize: true,
           logging: true,
-           ssl: {
-        rejectUnauthorized: false,
-      },        
-    }
+        }
     ),
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
