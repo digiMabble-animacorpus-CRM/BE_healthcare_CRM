@@ -9,19 +9,13 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "7000:7000"
     command: node dist/src/main
     restart: always
     networks:
       - app_network
-    environment:
-      DATABASE_HOST: postgres_db
-      DATABASE_PORT: 5432
-      DATABASE_NAME: postgres
-      DATABASE_USER: postgres
-      DATABASE_PASSWORD: re_ai@2025
 
-  postgres_db:
+  healthcare-db:
     image: postgres:16
     volumes:
       - postgres_db_data:/var/lib/postgresql/data
@@ -30,10 +24,8 @@ services:
       - "5432:5432"
     expose:
       - 5432
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: re_ai@2025
+    env_file:
+      - .env
     networks:
       - app_network
 
@@ -41,7 +33,7 @@ volumes:
   postgres_db_data:
     driver: local
     labels:
-      - "io.vendure.create.name=my-shop"
+      - "io.vendure.create.name=healthcare-shop"
 
 networks:
   app_network:
