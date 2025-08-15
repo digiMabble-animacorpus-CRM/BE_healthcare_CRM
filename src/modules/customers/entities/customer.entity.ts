@@ -1,32 +1,66 @@
 import { BaseModel } from 'src/core/database/BaseModel';
-import { Address } from 'src/modules/addresses/entities/address.entity';
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column } from 'typeorm';
 
-@Entity({ name: 'customers' })
-export class Customer extends BaseModel {
-  @Column({ type: 'varchar', length: 100 })
-  customer_name: string;
+@Entity({ name: 'patients' })
+export class Patient  {
 
-  @Column({ type: 'varchar', length: 150, unique: true })
-  email: string;
+     @Column({ type: 'uuid', primary: true })
+  id: string;
 
-  @Column({ type: 'varchar', length: 15 })
-  phone_number: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  firstname?: string;
 
-  @Column({ type: 'int', nullable: true, default: 0 })
-  view_properties: number;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  middlename?: string;
 
-  @Column({ type: 'int', nullable: true, default: 0 })
-  own_properties: number;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  lastname?: string;
 
-  @Column({ type: 'float', nullable: true, default: 0 })
-  invest_property: number;
+  @Column({ type: 'text', nullable: true })
+  ssin?: string;
 
-  @ManyToOne(() => Address, { nullable: false, cascade: true, eager: true })
-  @JoinColumn({ name: 'address_id' })
-  address: Address;
+  @Column({ type: 'text', nullable: true })
+  legalgender?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  customer_image_url?: string;
+  @Column({ type: 'text', nullable: true })
+  language?: string;
 
+  @Column({ type: 'date', nullable: true })
+  birthdate?: Date;
+
+  @Column({ type: 'text', nullable: true })
+  primarypatientrecordid?: string;
+
+  @Column({ type: 'text', nullable: true })
+  note?: string;
+
+  @Column({ type: 'text', nullable: true })
+  status?: string;
+
+  @Column({ type: 'text', nullable: true })
+  mutualitynumber?: string;
+
+  @Column({ type: 'text', nullable: true })
+  mutualityregistrationnumber?: string;
+
+  @Column({ type: 'text', nullable: true })
+  emails?: string;
+
+  @Column({ type: 'text', nullable: true })
+  country?: string;
+
+  @Column({ type: 'text', nullable: true })
+  city?: string;
+
+  @Column({ type: 'text', nullable: true })
+  street?: string;
+
+  @Column('text', { array: true, nullable: true })
+  phones?: string[];
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  zipcode?: string;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  number?: string;
 }

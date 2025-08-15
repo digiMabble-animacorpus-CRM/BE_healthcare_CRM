@@ -1,16 +1,16 @@
 import { BaseModel } from 'src/core/database/BaseModel';
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import Property from 'src/modules/properties/entities/property.entity';
-import { Customer } from 'src/modules/customers/entities/customer.entity';
+import { Patient } from 'src/modules/customers/entities/customer.entity';
 
 @Entity({ name: 'orders' })
 export default class Order extends BaseModel {
   @Column({ type: 'int', unique: true })
   order_id: number;
 
-  @ManyToOne(() => Customer, { nullable: false, eager: true })
+  @ManyToOne(() => Patient, { nullable: false, eager: true })
   @JoinColumn({ name: 'customer_id' })
-  customer: Customer;
+  customer: Patient;
 
   @ManyToOne(() => Property, { nullable: false, eager: true })
   @JoinColumn({ name: 'property_id' })

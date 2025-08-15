@@ -1,8 +1,11 @@
 import { config } from 'dotenv';
+import * as fs from 'fs';
 
 import { IDatabaseConfig } from './core/interfaces/dbConfig.interface';
 
 config();
+
+
 
 export const databaseConfig: IDatabaseConfig = Object.freeze({
   local: {
@@ -12,7 +15,8 @@ export const databaseConfig: IDatabaseConfig = Object.freeze({
     host: process.env.DB_HOST_LOCAL,
     port: process.env.DB_PORT_LOCAL,
     dialect: process.env.DB_DIALECT_LOCAL,
-    frontEndBaseUrl: process.env.FRONTEND_FORGET_URL_LOCAL
+    frontEndBaseUrl: process.env.FRONTEND_FORGET_URL_LOCAL,
+    ssl: false,
   },
   development: {
     username: process.env.DB_USER_DEV,
@@ -39,7 +43,8 @@ export const databaseConfig: IDatabaseConfig = Object.freeze({
     host: process.env.DB_HOST_DEV,
     port: process.env.DB_PORT_DEV,
     dialect: process.env.DB_DIALECT_DEV,
-    frontEndBaseUrl: process.env.FRONTEND_FORGET_URL_DEV
+    frontEndBaseUrl: process.env.FRONTEND_FORGET_URL_DEV,
+    ssl: { rejectUnauthorized: false },
     // username: process.env.DB_USER_PROD,
     // password: process.env.DB_PASSWORD_PROD,
     // database: process.env.DB_NAME_PROD,
@@ -50,5 +55,12 @@ export const databaseConfig: IDatabaseConfig = Object.freeze({
   }
 });
 
-const env = process.env.NODE_ENV || 'development';
+// const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV && databaseConfig[process.env.NODE_ENV]
+  ? process.env.NODE_ENV
+  : 'development';
+console.log('Current Environment:', env);
+if (!databaseConfig[env].password) {
+  throw new Error(`❌ Missing DB password for environment: ${env}`);
+}
 export const DBconfig = databaseConfig[env];

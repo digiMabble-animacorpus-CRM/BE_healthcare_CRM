@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult, Brackets } from 'typeorm';
 import { BaseService } from 'src/base.service';
 import Property from 'src/modules/properties/entities/property.entity';
-import { Customer } from 'src/modules/customers/entities/customer.entity';
+import { Patient } from 'src/modules/customers/entities/customer.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { logger } from 'src/core/utils/logger';
@@ -17,7 +17,7 @@ export class OrdersService extends BaseService<Order> {
   constructor(
     @InjectRepository(Order) private readonly orderRepository: Repository<Order>,
     @InjectRepository(Property) private readonly propertyRepository: Repository<Property>,
-    @InjectRepository(Customer) private readonly customerRepository: Repository<Customer>,
+    @InjectRepository(Patient) private readonly customerRepository: Repository<Patient>,
   ) {
     super(orderRepository.manager);
     this.repository = orderRepository;
@@ -37,9 +37,9 @@ export class OrdersService extends BaseService<Order> {
     throw new HttpException(EM100, EC500);
   }
 
-  private async validateRelations(customerId: number, propertyId: number): Promise<{ customer: Customer, property: Property }> {
+  private async validateRelations(customerId: number, propertyId: number): Promise<{ customer: Patient, property: Property }> {
     const [customer, property] = await Promise.all([
-      this.customerRepository.findOne({ where: { id: customerId, is_deleted: false } }),
+      this.customerRepository.findOne({ where: { id: customerId.toString(),  } }),
       this.propertyRepository.findOne({ where: { id: propertyId, is_deleted: false } })
     ]);
 
@@ -141,8 +141,8 @@ export class OrdersService extends BaseService<Order> {
 
       if (updateOrderDto.customer_id || updateOrderDto.property_id) {
         const { customer, property } = await this.validateRelations(
-          updateOrderDto.customer_id || existingOrder.customer.id,
-          updateOrderDto.property_id || existingOrder.property.id
+          Number(updateOrderDto.customer_id ?? existingOrder.customer.id),
+          Number(updateOrderDto.property_id ?? existingOrder.property.id)
         );
 
         if (updateOrderDto.customer_id) {
