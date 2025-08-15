@@ -5,7 +5,7 @@ import { UsersService } from './users.service';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import User from './entities/user.entity';
-import Token from './entities/token.entity';
+import { Token } from './entities/token.entity';
 import { Address } from '../addresses/entities/address.entity';
 
 @Module({

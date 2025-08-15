@@ -14,6 +14,9 @@ export class Role extends BaseModel {
   @Column({ type: 'boolean', default: false })
   is_default: boolean;
 
+    @Column({ type: 'varchar', length: 100, nullable: true }) 
+  role_type: string;
+
   @ManyToMany(() => Permission, permission => permission.roles)
   @JoinTable({
     name: 'role_permissions',

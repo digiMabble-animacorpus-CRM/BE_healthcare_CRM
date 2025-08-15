@@ -22,6 +22,13 @@ import { PermissionsModule } from './modules/permissions/permissions.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { LocationModule } from './modules/location/location.module';
 import { SocialLinks } from './modules/social-links/entities/social-links.entity';
+import { TherapistsModule } from './modules/therapist/therapists.module';
+import { StaffModule } from './modules/StaffType/staff.module';
+import { SeederModule } from './seeds/seeder.module';
+// import { FirebaseModule } from './core/database/config/firebase/firebase.module';
+import { TokenModule } from './modules/users/token.module';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 config();
 
 console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
@@ -40,6 +47,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
           entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
           synchronize: false,
           logging: true,
+          ssl: DBconfig.ssl,
         }
     ),
     ConfigModule.forRoot({ isGlobal: true }),
@@ -61,9 +69,19 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     LeadsModule,
     LocationModule,
     SocialLinks,
+    TherapistsModule,
+    StaffModule,
+    SeederModule,
+    TokenModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    //   {
+    //   provide: APP_GUARD,
+    //   useClass: JwtAuthGuard, 
+    // },
+  ],
+
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

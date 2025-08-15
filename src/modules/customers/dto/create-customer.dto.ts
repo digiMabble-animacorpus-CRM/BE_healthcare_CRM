@@ -1,60 +1,112 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MinLength, IsNumber, IsUrl, IsIn } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  IsDateString,
+  IsArray,
+} from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateAddressDto } from 'src/modules/addresses/dto/create-address.dto';
 
+export class CreatePatientDto {
 
-
-export class CreateCustomerDto {
-  @ApiProperty({ example: 'John Doe', description: 'Customer name (min 2 chars, letters and spaces only)' })
-  @IsNotEmpty()
+  @ApiProperty({ example: 'John' })
+  @IsOptional()
   @IsString()
-  @MinLength(2)
-  @Matches(/^[a-zA-Z\s]+$/, { message: 'customerName must contain only letters and spaces' })
-  customer_name: string;
+  firstname?: string;
+
+  @ApiProperty({ example: 'Middle' })
+  @IsOptional()
+  @IsString()
+  middlename?: string;
+
+  @ApiProperty({ example: 'Doe' })
+  @IsOptional()
+  @IsString()
+  lastname?: string;
+
+  @ApiProperty({ example: '94060768059' })
+  @IsOptional()
+  @IsString()
+  ssin?: string;
+
+  @ApiProperty({ example: 'M' })
+  @IsOptional()
+  @IsString()
+  legalgender?: string;
+
+  @ApiProperty({ example: 'en' })
+  @IsOptional()
+  @IsString()
+  language?: string;
+
+  @ApiProperty({ example: 'primary_record_123' })
+  @IsOptional()
+  @IsString()
+  primarypatientrecordid?: string;
+
+  @ApiProperty({ example: 'Some note about the patient' })
+  @IsOptional()
+  @IsString()
+  note?: string;
+
+  @ApiProperty({ example: 'ACTIVE' })
+  @IsOptional()
+  @IsString()
+  status?: string;
+
+  @ApiProperty({ example: '12345' })
+  @IsOptional()
+  @IsString()
+  mutualitynumber?: string;
+
+  @ApiProperty({ example: '67890' })
+  @IsOptional()
+  @IsString()
+  mutualityregistrationnumber?: string;
 
   @ApiProperty({ example: 'john.doe@example.com' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
-  email: string;
+  emails?: string;
 
-  @ApiProperty({ example: '+1234567890' })
-  @IsNotEmpty()
-  @IsString()
-  @Matches(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/, {
-    message: 'Please provide a valid phone number',
-  })
-  phone_number: string;
-
-  @ApiProperty({ example: 5, required: false })
-  @IsOptional()
-  @IsNumber()
-  view_properties?: number;
-
-  @ApiProperty({ example: 2, required: false })
-  @IsOptional()
-  @IsNumber()
-  own_properties?: number;
-
-  @ApiProperty({ example: 150000.50, required: false })
-  @IsOptional()
-  @IsNumber()
-  invest_property?: number;
-
-  @ApiProperty({ example: 'Active', enum: ['Active', 'Inactive', 'Prospect'] })
-  @IsNotEmpty()
-  @IsString()
-  @IsIn(['Active', 'Inactive', 'Prospect'])
-  status: string;
-
-  @ApiProperty({ example: 'https://example.com/profile_url.png', required: false })
+  @ApiProperty({ example: 'BE' })
   @IsOptional()
   @IsString()
-  customer_image_url?: string;
+  country?: string;
 
+  @ApiProperty({ example: 'Brussels' })
+  @IsOptional()
+  @IsString()
+  city?: string;
 
-  @ApiProperty({ type: CreateAddressDto })
-  @IsNotEmpty()
-  @Type(() => CreateAddressDto)
-  address: CreateAddressDto;
+  @ApiProperty({ example: 'Rue du Comté' })
+  @IsOptional()
+  @IsString()
+  street?: string;
+
+  @ApiProperty({ example: '10' })
+  @IsOptional()
+  @IsString()
+  number?: string;
+
+  @ApiProperty({ example: '5140' })
+  @IsOptional()
+  @IsString()
+  zipcode?: string;
+
+  
+
+  @ApiProperty({ example: '1994-06-07' })
+  @IsOptional()
+  @IsDateString()
+  birthdate?: string;
+
+  @ApiProperty({ example: ['+32491079736'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  phones?: string[];
 }
