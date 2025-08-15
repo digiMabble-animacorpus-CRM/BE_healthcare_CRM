@@ -38,17 +38,27 @@ async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
       throw new ConflictException(Errors.EMAIL_ID_ALREADY_EXISTS);
     }
 
-    // Create customer directly using DTO fields
+    // Create and save address first
+    const address = this.addressRepository.create(createCustomerDto.address);
+    const savedAddress = await this.addressRepository.save(address);
+
+    // Create customer with linked address
     const customer = this.customerRepository.create({
       ...createCustomerDto,
-      status: (createCustomerDto.status as 'new' | 'old') ?? 'new', // Default to 'new' if not provided
+      status: (createCustomerDto.status as 'new' | 'old') ?? 'new',
+      address: savedAddress,
     });
 
-    // Save customer
     const savedCustomer = await this.customerRepository.save(customer);
 
-    logger.info(`Customer_Create_Exit: ${JSON.stringify(savedCustomer)}`);
-    return savedCustomer;
+    // Return with address relation populated
+    const result = await this.customerRepository.findOne({
+      where: { id: savedCustomer.id },
+      relations: ['address'],
+    });
+
+    logger.info(`Customer_Create_Exit: ${JSON.stringify(result)}`);
+    return result;
   } catch (error) {
     if (error instanceof HttpException) {
       throw error;
@@ -156,8 +166,17 @@ async updateCustomer(id: number, updateCustomerDto: UpdateCustomerDto): Promise<
   try {
     logger.info(`Customer_Update_Entry: id=${id}, data=${JSON.stringify(updateCustomerDto)}`);
 
+    const customer = await this.findOne(id);
+
+    // Update address if provided
+    if (updateCustomerDto.address) {
+      await this.addressRepository.update(customer.address.id, updateCustomerDto.address);
+    }
+
+    // Update customer (excluding address object itself)
     await this.customerRepository.update(id, {
       ...updateCustomerDto,
+      address: undefined,
       status: updateCustomerDto.status as 'new' | 'old' | undefined,
     });
 
@@ -172,6 +191,7 @@ async updateCustomer(id: number, updateCustomerDto: UpdateCustomerDto): Promise<
     throw new HttpException(EM100, EC500);
   }
 }
+
 
 
   async removeCustomer(id: number): Promise<void> {

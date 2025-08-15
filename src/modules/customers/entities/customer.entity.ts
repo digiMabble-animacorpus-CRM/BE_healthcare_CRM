@@ -16,55 +16,47 @@ export class Customer extends BaseModel {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
-  zipCode?: string;
+  // @Column({ type: 'varchar', length: 20, nullable: true })
+  // zipCode?: string;
 
-   @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   language?: string;
 
-  @Column("simple-array", { nullable: true })
+  @Column('simple-array', { nullable: true })
   tags?: string[];
 
-   @Column({ type: 'varchar', length: 50, nullable: true })
-  city?: string;
+  // @Column({ type: 'varchar', length: 50, nullable: true })
+  // city?: string;
 
+  // @Column({ type: 'varchar', length: 50, nullable: true })
+  // country?: string;
 
-    @Column({ type: 'varchar', length: 50, nullable: true })
-  country?: string;
+  @Column({
+    type: 'enum',
+    enum: ['new', 'old'],
+    default: 'new',
+  })
+  status: 'new' | 'old';
 
-@Column({
-  type: 'enum',
-  enum: ['new', 'old'],
-  default: 'new',
-})
-status: 'new' | 'old';
-
-
-    @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   lastUpdated?: string;
 
-    @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   branch?: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   source?: string;
 
-   @Column({ type: 'varchar', length: 10, nullable: true })
+  @Column({ type: 'varchar', length: 10, nullable: true })
   gender?: string;
 
-
-
-  //  NEW: Date of birth field (used for calculating age)
   @Column({ type: 'date', nullable: true })
   dob?: Date;
 
- 
-  // @ManyToOne(() => Address, { nullable: false, cascade: true, eager: true })
-  // @JoinColumn({ name: 'address' })
-  // address: Address;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-address?: string;
+  // Use relation instead of plain string for address
+  @ManyToOne(() => Address, { nullable: false, cascade: true, eager: true })
+  @JoinColumn({ name: 'address_id' })
+  address: Address;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   customer_image_url?: string;
