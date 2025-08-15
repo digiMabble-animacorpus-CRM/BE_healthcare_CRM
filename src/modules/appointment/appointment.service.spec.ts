@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { OrdersService } from './orders.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import Order from './entities/orders.entity';
+import Order from './entities/appointment.entity';
+import { AppointmentsService } from './appointment.service';
 
 const mockOrderRepository = () => ({
   create: jest.fn(),
@@ -14,17 +14,17 @@ const mockOrderRepository = () => ({
 });
 
 describe('OrdersService', () => {
-  let service: OrdersService;
+  let service: AppointmentsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        OrdersService,
+        AppointmentsService,
         { provide: getRepositoryToken(Order), useFactory: mockOrderRepository },
       ],
     }).compile();
 
-    service = module.get<OrdersService>(OrdersService);
+    service = module.get<AppointmentsService>(AppointmentsService);
   });
 
   it('should be defined', () => {

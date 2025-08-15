@@ -14,7 +14,7 @@ import { AddressesModule } from './modules/addresses/addresses.module';
 import { PropertiesModule } from './modules/properties/properties.module';
 import { CompanyProfileModule } from './modules/company-profile/company-profile.module';
 import { CustomersModule } from './modules/customers/customers.module';
-import { OrdersModule } from './modules/orders/orders.module';
+import { AppointmentsModule } from './modules/appointment/appointment.module';
 import { AgentsModule } from './modules/agents/agents.module';
 import { MenusModule } from './modules/menus/menus.module';
 import { RolesModule } from './modules/roles/roles.module';
@@ -47,8 +47,10 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
           entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
           synchronize: true,
           logging: true,
-          ssl: DBconfig.ssl,
-        }
+           ssl: {
+        rejectUnauthorized: false,
+      },        
+    }
     ),
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
@@ -61,6 +63,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     // PropertiesModule,
     // CompanyProfileModule,
     CustomersModule,
+    AppointmentsModule,
     // OrdersModule,
     // AgentsModule,
     // MenusModule,
