@@ -238,7 +238,7 @@ async forgotPassword(email_id: string) {
 
     //  NEW: Also save token in Token entity for staff linkage
     const staffEntity = await this.staffRepository.findOne({
-      where: { email: user.email_id },
+      where: { contactEmail: user.email_id },
     });
     if (staffEntity) {
       const tokenEntity = this.tokenRepo.create({

@@ -51,28 +51,28 @@ export class PermissionsService {
 
 
 
-  async getEffectivePermissions(staff: Staff): Promise<Permission[]> {
-    const staffPermissions = staff.permissions || [];
-    const rolePermissions = staff.role?.permissions || [];
+  // async getEffectivePermissions(staff: Staff): Promise<Permission[]> {
+  //   const staffPermissions = staff.permissions || [];
+  //   const rolePermissions = staff.role?.permissions || [];
 
-    const combined = [...staffPermissions, ...rolePermissions];
-    const uniqueMap = new Map<string, Permission>();
+  //   const combined = [...staffPermissions, ...rolePermissions];
+  //   const uniqueMap = new Map<string, Permission>();
 
-    for (const perm of combined) {
-      const key = `${perm.action}:${perm.resource}`;
-      if (!uniqueMap.has(key)) uniqueMap.set(key, perm);
-    }
+  //   for (const perm of combined) {
+  //     const key = `${perm.action}:${perm.resource}`;
+  //     if (!uniqueMap.has(key)) uniqueMap.set(key, perm);
+  //   }
 
-    return Array.from(uniqueMap.values());
-  }
+  //   return Array.from(uniqueMap.values());
+  // }
 
-  async hasPermission(
-    staff: Staff,
-    action: string,
-    resource: string,
-  ): Promise<boolean> {
-    const permissions = await this.getEffectivePermissions(staff);
-    return permissions.some(p => p.action === action && p.resource === resource);
-  }
+  // async hasPermission(
+  //   staff: Staff,
+  //   action: string,
+  //   resource: string,
+  // ): Promise<boolean> {
+  //   const permissions = await this.getEffectivePermissions(staff);
+  //   return permissions.some(p => p.action === action && p.resource === resource);
+  // }
   
 }

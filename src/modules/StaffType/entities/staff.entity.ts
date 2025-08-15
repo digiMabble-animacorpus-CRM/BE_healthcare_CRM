@@ -9,6 +9,7 @@ import {
   OneToOne,
   UpdateDateColumn,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseModel } from 'src/core/database/BaseModel';
 import { Address } from 'src/modules/addresses/entities/address.entity';
@@ -53,193 +54,157 @@ export interface LoginDetails {
   deviceInfo?: string;
 }
 
-@Entity('staff')
-export class Staff extends BaseModel {
-  @Column()
-  name: string;
-
-  @Column()
-  phoneNumber: string;
-
-  @Column({ unique: true })
-  email: string;
-
-  @Column({ type: 'enum', enum: Gender })
-  gender: Gender;
-
-  @Column('text', { array: true })
-  languages: string[];
-
-  @OneToOne(() => Address, { cascade: true, eager: true })
-  @JoinColumn({ name: 'address' })
-  address: Address;
-
-  @Column({ nullable: true })
-  description: string;
-
-  @Column({ nullable: true })
-  dob: string;
-
-  @ManyToOne(() => Role, { eager: true })
-  @JoinColumn({ name: 'roleId' })
-  role: Role;
-
-  @Column({ name: 'accessLevel', type: 'enum', enum: AccessLevel })
-  accessLevel: string;
-
-  @ManyToMany(() => Branch)
-  @JoinTable({
-    name: 'staffBranches',
-    joinColumn: { name: 'staffId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'branchId', referencedColumnName: 'id' },
-  })
-  branches: Branch[];
-
-  @ManyToOne(() => Branch, { eager: true })
-  @JoinColumn({ name: 'selectedBranch' })
-  selectedBranch: Branch;
-
-  @Column({ nullable: true })
-  specialization: string;
-
-  @Column({ nullable: true })
-  experience: string;
-
-  @Column({ nullable: true })
-  education: string;
-
-  @Column({ nullable: true })
-  registrationNumber: string;
-
-  @Column('jsonb', { nullable: true })
-  certificationFiles: CertificationFile[];
-
-  @Column('jsonb', { nullable: true })
-  availability: AvailabilitySlot[];
-
-  @Column('text', { array: true, nullable: true })
-  tags: string[];
-
-  @Column({
-    type: 'enum',
-    enum: Status,
-    default: Status.ACTIVE,
-  })
-  status: Status;
-
-  @ManyToMany(() => Permission, { eager: true })
-  @JoinTable({
-    name: 'staffPermissions',
-    joinColumn: { name: 'staffId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'permissionId', referencedColumnName: 'id' },
-  })
-  permissions: Permission[];
-
-  @Column('jsonb')
-  loginDetails: LoginDetails;
-
-  @Column()
-  createdBy: number;
-
-  @Column({ nullable: true })
-  updatedBy: number;
-
-  @OneToMany(() => Token, token => token.staff)
-  tokens: Token[];
-
-@OneToOne(() => User, (user) => user.staff, {
-  cascade: true,
-  onDelete: 'CASCADE',
-})
-@JoinColumn({ name: 'user_id' })
-user: User;
+@Entity('therapists')
+export class Staff {
+  @Column({ name: '_key', type: 'int', primary: true })
+_key: number;
 
 
-  // 📌 Additional columns from CSV file:
-  @Column({ nullable: true })
+  @Column({ name: 'id_pro', type: 'integer', nullable: true })
+  idPro: number;
+
+  @Column({ name: 'photo', type: 'text', nullable: true })
   photo: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'last_name', type: 'varchar', length: 255, nullable: true })
   lastName: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'first_name', type: 'varchar', length: 255, nullable: true })
   firstName: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'full_name', type: 'varchar', length: 255, nullable: true })
+  fullName: string;
+
+  @Column({ name: 'job_title', type: 'varchar', length: 255, nullable: true })
   jobTitle: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'target_audience', type: 'text', nullable: true })
   targetAudience: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'specialization_1', type: 'varchar', length: 255, nullable: true })
   specialization1: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'about_me', type: 'text', nullable: true })
+  aboutMe: string;
+
+  @Column({ name: 'consultations', type: 'text', nullable: true })
   consultations: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'center_address', type: 'text', nullable: true })
+  centerAddress: string;
+
+  @Column({ name: 'center_email', type: 'varchar', length: 255, nullable: true })
+  centerEmail: string;
+
+  @Column({ name: 'center_phone_number', type: 'varchar', length: 20, nullable: true })
+  centerPhoneNumber: string;
+
+  @Column({ name: 'contact_email', type: 'varchar', length: 255, nullable: true })
   contactEmail: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'contact_phone', type: 'varchar', length: 20, nullable: true })
   contactPhone: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'schedule', type: 'text', nullable: true })
   schedule: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'about', type: 'text', nullable: true })
   about: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'spoken_languages', type: 'text', nullable: true })
+  spokenLanguages: string;
+
+  @Column({ name: 'payment_methods', type: 'text', nullable: true })
   paymentMethods: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'degrees_and_training', type: 'text', nullable: true })
   degreesAndTraining: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'specializations', type: 'text', nullable: true })
+  specializations: string;
+
+  @Column({ name: 'website', type: 'varchar', length: 255, nullable: true })
   website: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'faq', type: 'text', nullable: true })
   faq: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'agenda_links', type: 'text', nullable: true })
   agendaLinks: string;
 
-  @Column({ nullable: true })
-  importedTable2: string;
+  @Column({ name: 'availability', type: 'text', nullable: true })
+  availability: string;
 
-  @Column({ nullable: true })
-  field27: string;
-
-  @Column({ nullable: true })
-  importedTable22: string;
-
-  @Column({ nullable: true })
-  teamNamur1: string;
-
-  @Column({ nullable: true })
-  importedTable23: string;
-
-  @Column({ nullable: true })
-  teamNamur2: string;
-
-  @Column({ nullable: true })
-  sites: string;
-
-  @Column({ nullable: true })
+  @Column({ name: 'specialization_2', type: 'varchar', length: 255, nullable: true })
   specialization2: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'rosa_link', type: 'varchar', length: 255, nullable: true })
   rosaLink: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'google_agenda_link', type: 'varchar', length: 255, nullable: true })
   googleAgendaLink: string;
 
-  @Column({ nullable: true })
-  appointmentStart: string;
+  @Column({ name: 'appointment_start', type: 'timestamp', nullable: true })
+  appointmentStart: Date;
 
-  @Column({ nullable: true })
-  appointmentEnd: string;
+  @Column({ name: 'appointment_end', type: 'timestamp', nullable: true })
+  appointmentEnd: Date;
 
-  @Column({ nullable: true })
-  appointmentAlert: string;
+  @Column({ name: 'appointment_alert', type: 'integer', nullable: true })
+  appointmentAlert: number;
+
+  // === Relationships from your original Staff entity ===
+
+  // @OneToOne(() => Address, { cascade: true, eager: true })
+  // @JoinColumn({ name: 'address' })
+  // address: Address;
+
+  // @ManyToOne(() => Role, { eager: true })
+  // @JoinColumn({ name: 'roleId' })
+  // role: Role;
+
+  // @Column({ name: 'accessLevel', type: 'enum', enum: AccessLevel })
+  // accessLevel: string;
+
+  // @ManyToMany(() => Branch)
+  // @JoinTable({
+  //   name: 'staffBranches',
+  //   joinColumn: { name: 'staffId', referencedColumnName: 'id' },
+  //   inverseJoinColumn: { name: 'branchId', referencedColumnName: 'id' },
+  // })
+  // branches: Branch[];
+
+  // @ManyToOne(() => Branch, { eager: true })
+  // @JoinColumn({ name: 'selectedBranch' })
+  // selectedBranch: Branch;
+
+  // @ManyToMany(() => Permission, { eager: true })
+  // @JoinTable({
+  //   name: 'staffPermissions',
+  //   joinColumn: { name: 'staffId', referencedColumnName: 'id' },
+  //   inverseJoinColumn: { name: 'permissionId', referencedColumnName: 'id' },
+  // })
+  // permissions: Permission[];
+
+  // @Column('jsonb', { name: 'certification_files', nullable: true })
+  // certificationFiles: CertificationFile[];
+
+  // @Column('jsonb', { name: 'login_details' })
+  // loginDetails: LoginDetails;
+
+  // @Column({ name: 'created_by' })
+  // createdBy: number;
+
+  // @Column({ name: 'updated_by', nullable: true })
+  // updatedBy: number;
+
+  // @OneToMany(() => Token, token => token.staff)
+  // tokens: Token[];
+
+  // @OneToOne(() => User, (user) => user.staff, {
+  //   cascade: true,
+  //   onDelete: 'CASCADE',
+  // })
+  // @JoinColumn({ name: 'user_id' })
+  // user: User;
 }

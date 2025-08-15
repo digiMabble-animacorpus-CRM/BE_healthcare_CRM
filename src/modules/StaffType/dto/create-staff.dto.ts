@@ -13,10 +13,13 @@ import {
   Matches,
   MinLength,
   ValidateNested,
+  IsUrl,
+  IsInt,
+  IsDate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateAddressDto } from 'src/modules/addresses/dto/create-address.dto';
-import { AccessLevel, Gender, Status } from '../entities/staff.entity'; // import enums from entity
+import { AccessLevel, Gender, Status } from '../entities/staff.entity';
 
 export class CertificationFileDto {
   @ApiProperty()
@@ -61,183 +64,200 @@ export class PermissionDto {
   enabled: boolean;
 }
 
-
 export class CreateStaffDto {
-  @ApiProperty({ example: 'John Smith' })
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(2)
-  @Matches(/^[a-zA-Z\s]+$/, {
-    message: 'Name must contain only letters and spaces',
-  })
-  name: string;
-
-  @ApiProperty({ example: '+1234567890' })
-  @IsNotEmpty()
-  @Matches(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/, {
-    message: 'Please provide a valid phone number',
-  })
-  phoneNumber: string;
-
-  @ApiProperty({ example: 'john.smith@example.com' })
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @ApiProperty({ enum: Gender })
-  @IsNotEmpty()
-  @IsEnum(Gender)
-  gender: Gender;
-
-  @ApiProperty({ example: ['english', 'french'], isArray: true })
-  @IsArray()
-  @IsString({ each: true })
-  languages: string[];
-
-  @ApiProperty({ type: CreateAddressDto, required: false })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => CreateAddressDto)
-  address?: CreateAddressDto;
-
-  @ApiProperty({ example: 'Experienced therapist', required: false })
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @ApiProperty({ example: '1985-06-15', required: false })
-  @IsOptional()
-  @IsDateString()
-  dob?: string;
-
   @ApiProperty({ example: 1 })
-  @IsNotEmpty()
-  @IsNumber()
-  roleId: number;
+  @IsInt()
+  _key: number;
 
-  @ApiProperty({ enum: AccessLevel })
-  @IsNotEmpty()
-  @IsEnum(AccessLevel)
-  accessLevel: string;
-
-  
-  @ApiProperty({ example: [1, 2] })
-  @IsArray()
-  @IsNumber({}, { each: true })
-  branches: number[];
-
-  @ApiProperty({ example: 1 })
-  @IsNotEmpty()
-  @IsNumber()
-  selectedBranch: number;
-
+  @ApiProperty({ required: false, example: 123 })
   @IsOptional()
-@IsString()
-@ApiProperty({ example: 'Main Branch', required: false })
-selectedBranchName?: string;
+  @IsInt()
+  id_pro?: number;
 
-
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, example: '2025-08-15T10:00:00Z', description: 'ISO 8601 start datetime' })
   @IsOptional()
-  @IsString()
-  specialization?: string;
+  @Type(() => Date)
+  @IsDate()
+  appointment_start?: Date;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, example: '2025-08-15T12:00:00Z', description: 'ISO 8601 end datetime' })
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  appointment_end?: Date;
+
+  @ApiProperty({ required: false, example: 30, description: 'Alert time in minutes before appointment' })
+  @IsOptional()
+  @IsInt()
+  appointment_alert?: number;
+
+  @ApiProperty({ required: false, example: 'John Doe' })
   @IsOptional()
   @IsString()
-  experience?: string;
+  full_name?: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, example: 'Therapist' })
   @IsOptional()
   @IsString()
-  education?: string;
+  job_title?: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, example: 'Adults, Teens' })
   @IsOptional()
   @IsString()
-  registrationNumber?: string;
+  target_audience?: string;
 
-  @ApiProperty({ type: [CertificationFileDto], required: false })
+  @ApiProperty({ required: false, example: 'Psychotherapy' })
   @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => CertificationFileDto)
-  certificationFiles?: CertificationFileDto[];
+  @IsString()
+  specialization_1?: string;
 
-  @ApiProperty({ type: [AvailabilitySlotDto], required: false })
+  @ApiProperty({ required: false, example: 'I provide individual therapy sessions.' })
   @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => AvailabilitySlotDto)
-  availability?: AvailabilitySlotDto[];
+  @IsString()
+  about_me?: string;
 
-  @ApiProperty({ example: ['stress', 'anxiety'], required: false })
+  @ApiProperty({ required: false, example: 'Consultations available Mon-Fri 10am-5pm' })
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  tags?: string[];
+  @IsString()
+  consultations?: string;
 
-  @ApiProperty({ example: Status.ACTIVE, enum: Status, required: false })
+  @ApiProperty({ required: false, example: '123 Main St, City' })
   @IsOptional()
-  @IsEnum(Status)
-  status?: Status;
+  @IsString()
+  center_address?: string;
 
-  @IsArray()
-  @ApiProperty({ type: [PermissionDto], required: false })
+  @ApiProperty({ required: false, example: 'center@example.com' })
   @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => PermissionDto)
-  permissions?: PermissionDto[];
+  @IsString()
+  center_email?: string;
 
-  @ApiProperty({
-    required: false,
-    example: {
-      otpVerified: true,
-      lastLogin: '2025-07-07T14:00:00Z',
-      loginCount: 2,
-    },
-  })
+  @ApiProperty({ required: false, example: '+1234567890' })
   @IsOptional()
-  @IsObject()
-  loginDetails?: {
-    otpVerified: boolean;
-    lastLogin?: string;
-    loginCount?: number;
-    deviceInfo?: string;
-  };
+  @IsString()
+  center_phone_number?: string;
 
-  @ApiProperty({ example: 101 })
+  @ApiProperty({ required: false, example: 'contact@example.com' })
   @IsOptional()
-  @IsNumber()
-  createdBy?: number;
+  @IsString()
+  contact_email?: string;
 
+  @ApiProperty({ required: false, example: '+0987654321' })
+  @IsOptional()
+  @IsString()
+  contact_phone?: string;
 
-  @IsOptional() @IsString() photo?: string;
-  @IsOptional() @IsString() lastName?: string;
-  @IsOptional() @IsString() firstName?: string;
-  @IsOptional() @IsString() jobTitle?: string;
-  @IsOptional() @IsString() targetAudience?: string;
-  @IsOptional() @IsString() specialization1?: string;
-  @IsOptional() @IsString() consultations?: string;
-  @IsOptional() @IsString() contactEmail?: string;
-  @IsOptional() @IsString() contactPhone?: string;
-  @IsOptional() @IsString() schedule?: string;
-  @IsOptional() @IsString() about?: string;
-  @IsOptional() @IsString() paymentMethods?: string;
-  @IsOptional() @IsString() degreesAndTraining?: string;
-  @IsOptional() @IsString() website?: string;
-  @IsOptional() @IsString() faq?: string;
-  @IsOptional() @IsString() agendaLinks?: string;
-  @IsOptional() @IsString() importedTable2?: string;
-  @IsOptional() @IsString() field27?: string;
-  @IsOptional() @IsString() importedTable22?: string;
-  @IsOptional() @IsString() teamNamur1?: string;
-  @IsOptional() @IsString() importedTable23?: string;
-  @IsOptional() @IsString() teamNamur2?: string;
-  @IsOptional() @IsString() sites?: string;
-  @IsOptional() @IsString() specialization2?: string;
-  @IsOptional() @IsString() rosaLink?: string;
-  @IsOptional() @IsString() googleAgendaLink?: string;
-  @IsOptional() @IsString() appointmentStart?: string;
-  @IsOptional() @IsString() appointmentEnd?: string;
-  @IsOptional() @IsString() appointmentAlert?: string;
+  @ApiProperty({ required: false, example: 'Mon-Fri 9am-5pm' })
+  @IsOptional()
+  @IsString()
+  schedule?: string;
 
+  @ApiProperty({ required: false, example: 'About the therapist...' })
+  @IsOptional()
+  @IsString()
+  about?: string;
+
+  @ApiProperty({ required: false, example: 'English, Spanish' })
+  @IsOptional()
+  @IsString()
+  spoken_languages?: string;
+
+  @ApiProperty({ required: false, example: 'Cash, Card, Insurance' })
+  @IsOptional()
+  @IsString()
+  payment_methods?: string;
+
+  @ApiProperty({ required: false, example: 'MA Psychology, PhD Counselling' })
+  @IsOptional()
+  @IsString()
+  degrees_and_training?: string;
+
+  @ApiProperty({ required: false, example: 'Psychotherapy, CBT' })
+  @IsOptional()
+  @IsString()
+  specializations?: string;
+
+  @ApiProperty({ required: false, example: 'https://example.com' })
+  @IsOptional()
+  @IsString()
+  website?: string;
+
+  @ApiProperty({ required: false, example: 'FAQ content here' })
+  @IsOptional()
+  @IsString()
+  faq?: string;
+
+  @ApiProperty({ required: false, example: 'https://calendar.example.com' })
+  @IsOptional()
+  @IsString()
+  agenda_links?: string;
+
+  @ApiProperty({ required: false, example: 'Imported value 1' })
+  @IsOptional()
+  @IsString()
+  imported_table_2?: string;
+
+  @ApiProperty({ required: false, example: 'Field 27 value' })
+  @IsOptional()
+  @IsString()
+  field_27?: string;
+
+  @ApiProperty({ required: false, example: 'Imported value 2' })
+  @IsOptional()
+  @IsString()
+  imported_table_2_2?: string;
+
+  @ApiProperty({ required: false, example: 'Team Namur 1' })
+  @IsOptional()
+  @IsString()
+  team_namur_1?: string;
+
+  @ApiProperty({ required: false, example: 'Imported value 3' })
+  @IsOptional()
+  @IsString()
+  imported_table_2_3?: string;
+
+  @ApiProperty({ required: false, example: 'Team Namur 2' })
+  @IsOptional()
+  @IsString()
+  team_namur_2?: string;
+
+  @ApiProperty({ required: false, example: 'Site information' })
+  @IsOptional()
+  @IsString()
+  sites?: string;
+
+  @ApiProperty({ required: false, example: 'Available Mon-Fri' })
+  @IsOptional()
+  @IsString()
+  availability?: string;
+
+  @ApiProperty({ required: false, example: 'Specialization 2' })
+  @IsOptional()
+  @IsString()
+  specialization_2?: string;
+
+  @ApiProperty({ required: false, example: 'https://rosa-link.com' })
+  @IsOptional()
+  @IsString()
+  rosa_link?: string;
+
+  @ApiProperty({ required: false, example: 'https://google-agenda-link.com' })
+  @IsOptional()
+  @IsString()
+  google_agenda_link?: string;
+
+  @ApiProperty({ required: false, example: 'https://photo.example.com/photo.jpg' })
+  @IsOptional()
+  @IsString()
+  photo?: string;
+
+  @ApiProperty({ required: false, example: 'Doe' })
+  @IsOptional()
+  @IsString()
+  last_name?: string;
+
+  @ApiProperty({ required: false, example: 'John' })
+  @IsOptional()
+  @IsString()
+  first_name?: string;
 }

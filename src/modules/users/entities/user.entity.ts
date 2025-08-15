@@ -166,8 +166,8 @@ export default class User extends BaseModel {
 })
 permissions: Permission[];
 
-@OneToOne(() => Staff, (staff) => staff.user)
-staff: Staff;
+// @OneToOne(() => Staff, (staff) => staff.user)
+// staff: Staff;
 
 
 }

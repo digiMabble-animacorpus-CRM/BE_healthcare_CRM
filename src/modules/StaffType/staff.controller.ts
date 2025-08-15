@@ -19,6 +19,7 @@ import {
   ApiOperation,
   ApiBody,
   ApiQuery,
+  ApiResponse,
   ApiParam,
 } from '@nestjs/swagger';
 import { StaffService } from './staff.service';
@@ -51,182 +52,82 @@ import { Between, ILike, FindManyOptions } from 'typeorm';
 import { Staff } from './entities/staff.entity';
 import { logger } from 'src/core/utils/logger';
 
-
-
 @ApiTags('Staff')
-@UseGuards(AuthGuard('jwt'),PermissionGuard, RolesGuard) //  Apply both guards globally
+@UseGuards(AuthGuard('jwt'), PermissionGuard, RolesGuard) // Protect all routes
 @Controller('staff')
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 
-@Post()
-@UseGuards(AuthGuard('jwt'), PermissionGuard, RolesGuard)
-@Permissions('create:staff')
-@Roles('super-admin', 'branch-admin')
-@ApiOperation({ summary: 'Create a new staff' })
-@ApiBody({ type: CreateStaffDto })
-async create(@Body() body: CreateStaffDto, @Req() req) {
-  logger.debug('Incoming staff body:', body);
-  logger.debug('Current user role:', req.user?.user_type);
-
-  try {
-    // Step 1: Validate DTO (ensures no partial/bad data)
-    await validateOrReject(body);
-
-    // Step 2: Pass to service
-    const createdStaff = await this.staffService.createStaff(body, req.user);
-
-    return HandleResponse.buildSuccessObj(EC201, EM104, createdStaff);
-  } catch (error) {
-    logger.error('Staff Create Error:', error);
-    return HandleResponse.buildErrObj(
-      error.status || EC500,
-      EM100,
-      error.message || error,
-    );
+  // CREATE
+  @Post()
+  @Permissions('create:staff')
+  @Roles('super-admin', 'branch-admin')
+  @ApiOperation({ summary: 'Create a new staff member' })
+  @ApiBody({ type: CreateStaffDto })
+  @ApiResponse({ status: 201, description: 'Staff created successfully', type: Staff })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async create(@Body() dto: CreateStaffDto): Promise<Staff> {
+    return this.staffService.create(dto);
   }
+
+  // GET ALL
+  @Get()
+  @Permissions('read:staff')
+  @Roles('super-admin', 'branch-admin')
+  @ApiOperation({ summary: 'Get all staff members' })
+  @ApiResponse({ status: 200, description: 'List of staff', type: [Staff] })
+  async findAll(): Promise<Staff[]> {
+    return this.staffService.findAll();
+  }
+
+  // GET BY ID
+  @Get(':key')
+  @Permissions('read:staff')
+  @Roles('super-admin', 'branch-admin')
+  @ApiOperation({ summary: 'Get a staff member by key' })
+  @ApiParam({ name: 'key', type: Number, description: 'Staff key' })
+  @ApiResponse({ status: 200, description: 'Staff found', type: Staff })
+  @ApiResponse({ status: 404, description: 'Staff not found' })
+async findOne(@Param('key', ParseIntPipe) key: number) {
+  return this.staffService.findOne(key);
 }
 
 
-@Get()
-@Permissions('read:staff')
-@Roles('super-admin', 'branch-admin')
-@ApiOperation({ summary: 'Get all staff' })
-@ApiQuery({ name: 'page', required: false, description: 'Page number' })
-@ApiQuery({ name: 'limit', required: false, description: 'Items per page' })
-@ApiQuery({ name: 'branch', required: false, description: 'Branch ID' })
-@ApiQuery({ name: 'from', required: false, description: 'Start date' })
-@ApiQuery({ name: 'to', required: false, description: 'End date' })
-@ApiQuery({ name: 'search', required: false, description: 'Search text' })
-async findAll(
-  @Query('page') page: string,
-  @Query('limit') limit: string,
-  @Query('branch') branch?: string,
-  @Query('from') from?: string,
-  @Query('to') to?: string,
-  @Query('search') search?: string,
-) {
-  try {
-    //  Decrypt the input query
-
-    // const where: any = { is_deleted: false };
-
-    // if (branch) {
-    //   where.selected_branch = { id: branch };
-    // }
-
-    // if (from && to) {
-    //   where.created_at = Between(new Date(from), new Date(to));
-    // }
-
-    // if (search) {
-    //   where.name = ILike(`%${search}%`);
-    // }
-
-   const filterDto: StaffFilterDto = {
-      page: page || '1',
-      limit: limit || '10',
-      searchText: search,
-      branch,
-      fromDate: from,
-      toDate: to,
-    };
-
-const { data, total } = await this.staffService.findAllWithFilters(filterDto);
-
-      return {
-      status: true,
-      totalCount: total,
-      data,
-    };
-
-  } catch (error) {
-    console.error('StaffController Decrypt Error:', error);
-    throw new BadRequestException('Invalid encrypted query or bad format');
+  // PATCH / UPDATE
+  @Patch(':key')
+  @Permissions('update:staff')
+  @Roles('super-admin', 'branch-admin')
+  @ApiOperation({ summary: 'Update a staff member by key' })
+  @ApiParam({ name: 'key', type: Number })
+  @ApiBody({ type: UpdateStaffDto })
+  @ApiResponse({ status: 200, description: 'Staff updated successfully', type: Staff })
+  @ApiResponse({ status: 404, description: 'Staff not found' })
+  async update(
+    @Param('key', ParseIntPipe) key: number,
+    @Body() dto: UpdateStaffDto,
+  ): Promise<Staff> {
+    return this.staffService.update(key, dto);
   }
-}
 
-
-
-@Get(':id')
-@UseGuards(AuthGuard('jwt'), PermissionGuard, RolesGuard)
-@Permissions('read:staff')
-@Roles('super-admin', 'branch-admin')
-@ApiOperation({ summary: 'Get staff by ID' })
-@ApiParam({ name: 'id', type: Number, description: 'Staff ID' })
-async findOne(@Param('id') id: string) {
-  try {
-    logger.debug(` Staff ID received: ${id}`);
-
-    const numericId = Number(id);
-    if (!numericId || isNaN(numericId)) {
-      logger.warn(` Invalid staff ID: "${id}"`);
-      throw new BadRequestException('Invalid staff ID');
-    }
-
-    logger.debug(` Searching for staff with ID: ${numericId}`);
-    const staff = await this.staffService.findOne(numericId);
-
-    if (!staff) {
-      throw new NotFoundException('Staff not found');
-    }
-
-    logger.debug(` Staff fetched: ${JSON.stringify(staff)}`);
-    return HandleResponse.buildSuccessObj(EC200, EM106, staff);
-
-  } catch (error) {
-    logger.error(` Error in findOne: ${error.message}`);
-    return HandleResponse.buildErrObj(
-      error.status || EC500,
-      error.message || EM100,
-      [],
-    );
-  }
-}
-
-
-
-
-@Patch(':id')
-@UseGuards(AuthGuard('jwt'), PermissionGuard, RolesGuard)
-@Permissions('update:staff')
-@Roles('super-admin', 'branch-admin')
-@ApiOperation({ summary: 'Update a staff member by encrypted ID (AES)' })
-@ApiParam({ name: 'id', type: String, description: 'AES Encrypted Staff ID' })
-async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateStaffDto) {
-  try {
-    // Validate input
-    await validateOrReject(body);
-
-    const data = await this.staffService.updateStaff(id, body);
-    return HandleResponse.buildSuccessObj(EC200, EM116, data);
-  } catch (error) {
-    console.error('Staff Update Error:', error);
-    return HandleResponse.buildErrObj(
-      error.status || EC500,
-      EM100,
-      error.message || error,
-    );
-  }
-}
-
-
-  @Delete(':id')
-  @UseGuards(AuthGuard('jwt'),PermissionGuard, RolesGuard)
+  // DELETE BY ID
+  @Delete(':key')
   @Permissions('delete:staff')
-  @Roles('super-admin') // Only super-admin can delete
-  @ApiOperation({ summary: 'Soft delete staff' })
-  @ApiParam({ name: 'id', type: Number })
-async remove(@Param('id', ParseIntPipe) id: number) {
-  try {
-    await this.staffService.removeStaff(id);
-    return HandleResponse.buildSuccessObj(EC204, EM127, null);
-  } catch (error) {
-    return HandleResponse.buildErrObj(
-      error.status || EC500,
-      EM100,
-      error.message || error,
-    );
+  @Roles('super-admin', 'branch-admin')
+  @ApiOperation({ summary: 'Delete a staff member by key' })
+  @ApiParam({ name: 'key', type: Number })
+  @ApiResponse({ status: 200, description: 'Staff deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Staff not found' })
+  async remove(@Param('key', ParseIntPipe) key: number): Promise<{ deleted: boolean }> {
+    return this.staffService.remove(key);
   }
-}
+
+  // DELETE ALL
+  @Delete()
+  @Permissions('delete:staff')
+  @Roles('super-admin', 'branch-admin')
+  @ApiOperation({ summary: 'Delete all staff members' })
+  @ApiResponse({ status: 200, description: 'All staff deleted successfully' })
+  async removeAll(): Promise<{ deleted: boolean }> {
+    return this.staffService.removeAll();
+  }
 }
