@@ -5,7 +5,7 @@ import { BaseService } from 'src/base.service';
 import { Lead } from './entities/lead.entity';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
-import { Customer } from '../customers/entities/customer.entity';
+import { Patient } from '../customers/entities/customer.entity';
 import Property from '../properties/entities/property.entity';
 import { logger } from 'src/core/utils/logger';
 import { EC404, EM119, EC500, EM100 } from 'src/core/constants';
@@ -16,7 +16,7 @@ export class LeadsService extends BaseService<Lead> {
 
     constructor(
         @InjectRepository(Lead) private readonly leadRepository: Repository<Lead>,
-        @InjectRepository(Customer) private readonly customerRepository: Repository<Customer>,
+        @InjectRepository(Patient) private readonly customerRepository: Repository<Patient>,
         @InjectRepository(Property) private readonly propertyRepository: Repository<Property>,
     ) {
         super(leadRepository.manager);
@@ -32,7 +32,7 @@ export class LeadsService extends BaseService<Lead> {
             // Check for duplicate lead
             const existingLead = await this.leadRepository.findOne({
                 where: {
-                    customer: { id: dto.customer_id },
+                    customer: { id: String(dto.customer_id) },
                     interested_property: { id: dto.interested_property_id },
                     is_deleted: false
                 }
@@ -42,7 +42,7 @@ export class LeadsService extends BaseService<Lead> {
                 throw new HttpException('A lead with the same customer, property, and inquiry date already exists', 409);
             }
 
-            const customer = await this.customerRepository.findOne({ where: { id: dto.customer_id } });
+            const customer = await this.customerRepository.findOne({ where: { id: String(dto.customer_id) } });
             if (!customer) {
                 throw new HttpException('Customer not found', 404);
             }
@@ -137,7 +137,7 @@ export class LeadsService extends BaseService<Lead> {
             const updateData: any = { ...dto };
 
             if (dto.customer_id) {
-                const customer = await this.customerRepository.findOne({ where: { id: dto.customer_id } });
+                const customer = await this.customerRepository.findOne({ where: { id: String(dto.customer_id) } });
                 if (!customer) {
                     throw new HttpException('Customer not found', 404);
                 }

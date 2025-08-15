@@ -4,134 +4,109 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  Matches,
-  MinLength,
-  IsIn,
+  IsUUID,
+  IsDateString,
+  IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateAddressDto } from 'src/modules/addresses/dto/create-address.dto';
 
-export class CreateCustomerDto {
-  @ApiProperty({
-    example: 'John Doe',
-    description: 'Customer name (min 2 chars, letters and spaces only)',
-  })
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(2)
-  @Matches(/^[a-zA-Z\s]+$/, {
-    message: 'name must contain only letters and spaces',
-  })
-  name: string;
+export class CreatePatientDto {
 
-  @ApiProperty({ example: 'john.doe@example.com' })
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @ApiProperty({ example: '+1234567890' })
-  @IsNotEmpty()
-  @IsString()
-  @Matches(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/, {
-    message: 'Please provide a valid phone number',
-  })
-  number: string;
-
-  @ApiProperty({ example: 'Customer description', required: false })
+  @ApiProperty({ example: 'John' })
   @IsOptional()
   @IsString()
-  description?: string;
+  firstname?: string;
 
-  // Changed to nested CreateAddressDto like before
-  @ApiProperty({ type: CreateAddressDto })
-  @IsNotEmpty()
-  @Type(() => CreateAddressDto)
-  address: CreateAddressDto;
-
-  // @ApiProperty({ example: '10001', required: false })
-  // @IsOptional()
-  // @IsString()
-  // zipCode?: string;
-
-  // @ApiProperty({ example: 'New York', required: false })
-  // @IsOptional()
-  // @IsString()
-  // city?: string;
-
-  // @ApiProperty({ example: 'USA', required: false })
-  // @IsOptional()
-  // @IsString()
-  // country?: string;
-
-  @ApiProperty({ example: 'Male', required: false })
+  @ApiProperty({ example: 'Middle' })
   @IsOptional()
   @IsString()
-  gender?: string;
+  middlename?: string;
 
-  @ApiProperty({ example: 'English', required: false })
+  @ApiProperty({ example: 'Doe' })
+  @IsOptional()
+  @IsString()
+  lastname?: string;
+
+  @ApiProperty({ example: '94060768059' })
+  @IsOptional()
+  @IsString()
+  ssin?: string;
+
+  @ApiProperty({ example: 'M' })
+  @IsOptional()
+  @IsString()
+  legalgender?: string;
+
+  @ApiProperty({ example: 'en' })
   @IsOptional()
   @IsString()
   language?: string;
 
-  @ApiProperty({
-    example: ['tag1', 'tag2'],
-    required: false,
-    type: [String],
-  })
+  @ApiProperty({ example: 'primary_record_123' })
   @IsOptional()
+  @IsString()
+  primarypatientrecordid?: string;
+
+  @ApiProperty({ example: 'Some note about the patient' })
+  @IsOptional()
+  @IsString()
+  note?: string;
+
+  @ApiProperty({ example: 'ACTIVE' })
+  @IsOptional()
+  @IsString()
+  status?: string;
+
+  @ApiProperty({ example: '12345' })
+  @IsOptional()
+  @IsString()
+  mutualitynumber?: string;
+
+  @ApiProperty({ example: '67890' })
+  @IsOptional()
+  @IsString()
+  mutualityregistrationnumber?: string;
+
+  @ApiProperty({ example: 'john.doe@example.com' })
+  @IsOptional()
+  @IsEmail()
+  emails?: string;
+
+  @ApiProperty({ example: 'BE' })
+  @IsOptional()
+  @IsString()
+  country?: string;
+
+  @ApiProperty({ example: 'Brussels' })
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @ApiProperty({ example: 'Rue du Comté' })
+  @IsOptional()
+  @IsString()
+  street?: string;
+
+  @ApiProperty({ example: '10' })
+  @IsOptional()
+  @IsString()
+  number?: string;
+
+  @ApiProperty({ example: '5140' })
+  @IsOptional()
+  @IsString()
+  zipcode?: string;
+
+  
+
+  @ApiProperty({ example: '1994-06-07' })
+  @IsOptional()
+  @IsDateString()
+  birthdate?: string;
+
+  @ApiProperty({ example: ['+32491079736'] })
+  @IsOptional()
+  @IsArray()
   @IsString({ each: true })
-  tags?: string[];
-
-  @ApiProperty({
-    example: 'new',
-    enum: ['new', 'old'],
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  @IsIn(['new', 'old'])
-  status?: 'new' | 'old';
-
-  @ApiProperty({ example: '2025-08-14T12:00:00Z', required: false })
-  @IsOptional()
-  lastUpdated?: string;
-
-  @ApiProperty({
-    example: 'https://example.com/profile_url.png',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  customer_image_url?: string;
-
-  @ApiProperty({ example: 'Main Branch', required: false })
-  @IsOptional()
-  @IsString()
-  branch?: string;
-
-  @ApiProperty({ example: '1990-05-15', required: false })
-  @IsOptional()
-  dob?: Date;
-
-  @ApiProperty({ example: 'Instagram', required: false })
-  @IsOptional()
-  @IsString()
-  source?: string;
-
-  // @ApiProperty({ example: 5, required: false })
-  // @IsOptional()
-  // @IsNumber()
-  // view_properties?: number;
-
-  // @ApiProperty({ example: 2, required: false })
-  // @IsOptional()
-  // @IsNumber()
-  // own_properties?: number;
-
-  // @ApiProperty({ example: 150000.50, required: false })
-  // @IsOptional()
-  // @IsNumber()
-  // invest_property?: number;
-
-
+  phones?: string[];
 }

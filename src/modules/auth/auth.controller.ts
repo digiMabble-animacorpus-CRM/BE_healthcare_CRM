@@ -92,9 +92,9 @@ async signupByRole(reqBody: any, userType: 'staff' | 'branch-admin' | 'super-adm
 }
 
 @Post('signup-staff')
-@ApiOperation({ summary: 'Signup as staff (plain JSON or encrypted)' })
-@ApiBody({ type: SignupAdminDto })
-@ApiResponse({ status: 201, description: 'Signup successful' })
+// @ApiOperation({ summary: 'Signup as staff (plain JSON or encrypted)' })
+// @ApiBody({ type: SignupAdminDto })
+// @ApiResponse({ status: 201, description: 'Signup successful' })
 async signupStaff(@Body() reqBody: any) {
   console.log('signup-staff endpoint hit');
   return this.signupByRole(reqBody, 'staff');
@@ -104,9 +104,9 @@ async signupStaff(@Body() reqBody: any) {
 // signup for branch-admin
 
 @Post('signup-branch-admin')
-@ApiOperation({ summary: 'Signup as branch admin (plain JSON or encrypted)' })
-@ApiBody({ type: SignupAdminDto })
-@ApiResponse({ status: 201, description: 'Signup successful' })
+// @ApiOperation({ summary: 'Signup as branch admin (plain JSON or encrypted)' })
+// @ApiBody({ type: SignupAdminDto })
+// @ApiResponse({ status: 201, description: 'Signup successful' })
 async signupBranchAdmin(@Body() reqBody: any) {
   return this.signupByRole(reqBody, 'branch-admin');
 }
@@ -124,9 +124,9 @@ async signupSuperAdmin(@Body() reqBody: any) {
 
 
   @Post('signup-admin')
-@ApiOperation({ summary: 'Signup as admin (plain JSON only)' })
-@ApiBody({ type: SignupAdminDto })
-@ApiResponse({ status: 201, description: 'Signup successful' })
+// @ApiOperation({ summary: 'Signup as admin (plain JSON only)' })
+// @ApiBody({ type: SignupAdminDto })
+// @ApiResponse({ status: 201, description: 'Signup successful' })
 @ApiResponse({ status: 400, description: 'Validation failed or data is missing' })
 async signupAdmin(@Body() reqBody: any) {
   try {

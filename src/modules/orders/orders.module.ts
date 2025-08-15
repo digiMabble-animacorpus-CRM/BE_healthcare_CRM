@@ -4,11 +4,11 @@ import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 
 import Property from '../properties/entities/property.entity';
-import { Customer } from '../customers/entities/customer.entity';
+import { Patient } from '../customers/entities/customer.entity';
 import Order from './entities/orders.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, Property, Customer])],
+  imports: [TypeOrmModule.forFeature([Order, Property, Patient])],
   controllers: [OrdersController],
   providers: [OrdersService],
   exports: [OrdersService],
