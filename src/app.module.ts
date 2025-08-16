@@ -29,6 +29,8 @@ import { SeederModule } from './seeds/seeder.module';
 import { TokenModule } from './modules/users/token.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { CalendarsModule } from './modules/calendars/calendars.module';
+import { FunctionDescriptionModule } from './modules/function-description/function-description.module';
 config();
 
 console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
@@ -47,7 +49,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
           entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
           synchronize: true,
           logging: true,
-        }
+    }
     ),
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
@@ -74,6 +76,8 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     SeederModule,
     // FirebaseModule, 
     TokenModule,
+    CalendarsModule,
+    FunctionDescriptionModule,
   ],
   controllers: [AppController],
   providers: [AppService,
