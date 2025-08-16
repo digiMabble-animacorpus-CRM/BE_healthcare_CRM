@@ -1,10 +1,4 @@
-import { 
-  IsOptional, 
-  IsString, 
-  IsNumberString, 
-  IsDateString, 
-  IsEnum 
-} from 'class-validator';
+import { IsOptional, IsString, IsNumberString, IsDateString, IsEnum } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Gender, Status } from '../entities/staff.entity';
 
@@ -170,7 +164,10 @@ export class StaffFilterDto {
   @IsString()
   rosaLink?: string;
 
-  @ApiPropertyOptional({ description: 'Google Agenda Link', example: 'https://calendar.google.com' })
+  @ApiPropertyOptional({
+    description: 'Google Agenda Link',
+    example: 'https://calendar.google.com',
+  })
   @IsOptional()
   @IsString()
   googleAgendaLink?: string;

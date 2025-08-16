@@ -9,10 +9,10 @@ export class CreatePropertyDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: 1 })  // Changed to number example
+  @ApiProperty({ example: 1 }) // Changed to number example
   @IsNotEmpty()
-  @IsNumber()  // Changed to IsNumber validator
-  category: number;  // Changed to number type
+  @IsNumber() // Changed to IsNumber validator
+  category: number; // Changed to number type
 
   @ApiProperty({ example: 'Sale' })
   @IsNotEmpty()
@@ -53,5 +53,4 @@ export class CreatePropertyDto {
   @IsString()
   @IsOptional()
   image: string;
-
 }

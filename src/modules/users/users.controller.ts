@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/user.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -10,8 +20,10 @@ import { AuthGuard } from '@nestjs/passport';
 // @ApiTags('User')
 @Controller('user')
 export class UsersController {
-  constructor(private readonly userService: UsersService,private readonly homeService: HomeService) {}
-
+  constructor(
+    private readonly userService: UsersService,
+    private readonly homeService: HomeService,
+  ) {}
 
   // @Get(':user_id')
   // async profile(@Param('user_id') id: number) {

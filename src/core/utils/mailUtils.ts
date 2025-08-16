@@ -1,42 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { logger } from './logger';
-import nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailUtils {
-
-
   public static async sendEmailVerificationLink(email: string, verificationUrl: string) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'anandmar883@gmail.com',
-        pass: 'juys mnqs xpxv ysnx',
-      },
-    });
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'anandmar883@gmail.com',
+          pass: 'juys mnqs xpxv ysnx',
+        },
+      });
 
-    const mailOptions = {
-      from: process.env.EMAIL_FROM || 'noreply@yourdomain.com',
-      to: email,
-      subject: 'Verify Your Email Address',
-      html: `
+      const mailOptions = {
+        from: process.env.EMAIL_FROM || 'noreply@yourdomain.com',
+        to: email,
+        subject: 'Verify Your Email Address',
+        html: `
         <h2>Welcome!</h2>
         <p>Thank you for signing up. Please verify your email address by clicking the link below:</p>
         <a href="${verificationUrl}">Verify Email</a>
         <p>This link will expire in 10 minutes.</p>
       `,
-    };
+      };
 
-    await transporter.sendMail(mailOptions);
-    logger.info(`Verification email sent to: ${email}`);
-    return true;
-  } catch (error) {
-    logger.error(`Error sending verification email: ${error.message}`);
-    throw new Error('Failed to send verification email');
+      await transporter.sendMail(mailOptions);
+      logger.info(`Verification email sent to: ${email}`);
+      return true;
+    } catch (error) {
+      logger.error(`Error sending verification email: ${error.message}`);
+      throw new Error('Failed to send verification email');
+    }
   }
-}
-
 
   public static async sendOtpEmail(email: string, otp: string) {
     const transporter = nodemailer.createTransport({
@@ -57,15 +54,15 @@ export class MailUtils {
     await transporter.sendMail(mailOptions);
   }
 
-   static async sendPasswordResetEmail(email: string, resetUrl: string) {
+  static async sendPasswordResetEmail(email: string, resetUrl: string) {
     try {
-          const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'anandmar883@gmail.com',
-        pass: 'juys mnqs xpxv ysnx',
-      },
-    });
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'anandmar883@gmail.com',
+          pass: 'juys mnqs xpxv ysnx',
+        },
+      });
       const mailOptions = {
         from: process.env.EMAIL_FROM || 'noreply@yourdomain.com',
         to: email,
@@ -76,9 +73,9 @@ export class MailUtils {
           <a href="${resetUrl}">Reset Password</a>
           <p>This link will expire in 30 Minutes.</p>
           <p>If you didn't request this, please ignore this email.</p>
-        `
+        `,
       };
-      
+
       await transporter.sendMail(mailOptions);
       logger.info(`Password reset email sent to: ${email}`);
       return true;
@@ -87,10 +84,7 @@ export class MailUtils {
       throw new Error('Failed to send password reset email');
     }
   }
-
 }
-
-
 
 export interface MailOptions {
   to: string | string[];

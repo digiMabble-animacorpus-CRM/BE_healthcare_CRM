@@ -5,11 +5,11 @@ env_variables:
   USER_PORT: 8080
   JWTKEY: "asldjfldsjlfsf"
   TOKEN_EXPIRATION: "hour || minutes || 48h"
-  DB_HOST_DEV: /cloudsql/rapid-bricolage-444914-c5:asia-south1:real-estate-agent
+  DB_HOST_DEV: /cloudsql/rapid-bricolage-444914-c5:asia-south1:anima-corpus
   DB_PORT_DEV: 5432
-  DB_USER_DEV: "real-estate-agent"
-  DB_PASSWORD_DEV: "real-estate-agent@2025AppDev"
-  DB_NAME_DEV: "real-estate-agent"
+  DB_USER_DEV: "anima-corpus"
+  DB_PASSWORD_DEV: "anima-corpus@2025AppDev"
+  DB_NAME_DEV: "anima-corpus"
   DB_DIALECT_DEV: "postgres"
   ASSETS_PATH_DEV: "http://localhost:3000"
 manual_scaling:
