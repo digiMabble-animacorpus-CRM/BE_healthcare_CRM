@@ -253,7 +253,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: "15 Place de l'Orneau",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
     dob: "", // Not provided
@@ -295,7 +295,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: "15 Place de l'Orneau",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
     dob: "", // Not provided
@@ -565,7 +565,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: "15 Place de l'Orneau",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
     dob: "", // Not provided
@@ -614,7 +614,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: "15 Place de l'Orneau",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
     dob: "", // Not provided
@@ -690,7 +690,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: "Place de l'Orneau 15",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
     dob: "",
@@ -738,7 +738,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: "Place de l'Orneau 15",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
     dob: "",
@@ -811,7 +811,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: "Place de l'Orneau 15",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
     dob: "",
@@ -878,7 +878,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: "Place de l'Orneau 15",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
     dob: "",
