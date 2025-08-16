@@ -11,29 +11,12 @@ import {
   HttpException,
   BadRequestException,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBody,
-  ApiResponse,
-  ApiQuery,
-  ApiParam,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { TherapistsService } from './therapists.service';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
 import { UpdateTherapistDto } from './dto/update-therapist.dto';
 import HandleResponse from 'src/core/utils/handle_response';
-import {
-  EC200,
-  EC201,
-  EC204,
-  EC500,
-  EM100,
-  EM104,
-  EM106,
-  EM116,
-  EM127,
-} from 'src/core/constants';
+import { EC200, EC201, EC204, EC500, EM100, EM104, EM106, EM116, EM127 } from 'src/core/constants';
 import { PaginationDto } from 'src/core/interfaces/shared.dto';
 import { AES } from 'src/core/utils/encryption.util';
 import { validateOrReject } from 'class-validator';
@@ -66,49 +49,44 @@ export class TherapistsController {
       return HandleResponse.buildSuccessObj(EC201, EM104, data);
     } catch (error) {
       console.error('Therapist create error:', error);
-      return HandleResponse.buildErrObj(
-        error.status || EC500,
-        EM100,
-        error.message || error,
-      );
+      return HandleResponse.buildErrObj(error.status || EC500, EM100, error.message || error);
     }
   }
 
   @Get()
-@ApiOperation({ summary: 'Get all therapists (with optional pagination)' })
-@ApiQuery({ name: 'page', required: false, type: Number })
-@ApiQuery({ name: 'limit', required: false, type: Number })
-@ApiQuery({ name: 'searchText', required: false, type: String })
-@ApiQuery({ name: 'branch', required: false, type: String })
-@ApiQuery({ name: 'fromDate', required: false, type: String })
-@ApiQuery({ name: 'toDate', required: false, type: String })
-async findAll(@Query() queryParams: any) {
-  try {
-    let decryptedObject;
+  @ApiOperation({ summary: 'Get all therapists (with optional pagination)' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'searchText', required: false, type: String })
+  @ApiQuery({ name: 'branch', required: false, type: String })
+  @ApiQuery({ name: 'fromDate', required: false, type: String })
+  @ApiQuery({ name: 'toDate', required: false, type: String })
+  async findAll(@Query() queryParams: any) {
+    try {
+      let decryptedObject;
 
-    if (queryParams.data) {
-      const decryptedString = AES.decrypt(queryParams.data);
-      decryptedObject = JSON.parse(decryptedString);
-    } else {
-      decryptedObject = queryParams;
+      if (queryParams.data) {
+        const decryptedString = AES.decrypt(queryParams.data);
+        decryptedObject = JSON.parse(decryptedString);
+      } else {
+        decryptedObject = queryParams;
+      }
+
+      const dto = plainToClass(TherapistFilterDto, decryptedObject);
+      await validateOrReject(dto);
+
+      if (dto.page && dto.limit) {
+        const { data, total } = await this.therapistsService.searchWithFilters(dto);
+        return HandleResponse.buildSuccessObj(EC200, EM106, { data, total });
+      } else {
+        const data = await this.therapistsService.findAll();
+        return HandleResponse.buildSuccessObj(EC200, EM106, data);
+      }
+    } catch (error) {
+      console.error('FindAll therapists error:', error);
+      return HandleResponse.buildErrObj(error.status || EC500, EM100, error.message || error);
     }
-
-    const dto = plainToClass(TherapistFilterDto, decryptedObject);
-    await validateOrReject(dto);
-
-    if (dto.page && dto.limit) {
-      const { data, total } = await this.therapistsService.searchWithFilters(dto);
-      return HandleResponse.buildSuccessObj(EC200, EM106, { data, total });
-    } else {
-      const data = await this.therapistsService.findAll();
-      return HandleResponse.buildSuccessObj(EC200, EM106, data);
-    }
-  } catch (error) {
-    console.error('FindAll therapists error:', error);
-    return HandleResponse.buildErrObj(error.status || EC500, EM100, error.message || error);
   }
-}
-
 
   @Get(':id')
   @ApiOperation({ summary: 'Get therapist by ID (encrypted or plain)' })
@@ -141,10 +119,7 @@ async findAll(@Query() queryParams: any) {
   @ApiOperation({ summary: 'Update a therapist (encrypted or plain)' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateTherapistDto })
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() reqBody: any,
-  ) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() reqBody: any) {
     try {
       let decryptedObject;
 

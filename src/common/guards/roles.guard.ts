@@ -1,8 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
@@ -34,9 +30,7 @@ export class RolesGuard implements CanActivate {
     //  Check roles array
     if (Array.isArray(user.roles)) {
       const matched = user.roles.some(
-        (role) =>
-          requiredRoles.includes(role.role_type) ||
-          requiredRoles.includes(role.name),
+        (role) => requiredRoles.includes(role.role_type) || requiredRoles.includes(role.name),
       );
       console.log(' Matched from roles array:', matched);
       if (matched) return true;

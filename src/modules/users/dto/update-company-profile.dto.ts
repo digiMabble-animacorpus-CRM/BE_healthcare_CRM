@@ -1,11 +1,5 @@
 // src/modules/users/dto/update-company-profile.dto.ts
-import {
-  IsString,
-  IsOptional,
-  IsEmail,
-  ValidateNested,
-  IsUrl,
-} from 'class-validator';
+import { IsString, IsOptional, IsEmail, ValidateNested, IsUrl } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateAddressDto } from 'src/modules/addresses/dto/create-address.dto';
 

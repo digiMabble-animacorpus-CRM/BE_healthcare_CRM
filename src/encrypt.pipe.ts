@@ -2,8 +2,6 @@ import { ArgumentMetadata, ValidationPipe } from '@nestjs/common';
 // import * as CryptoJS from 'crypto-js'
 
 export class EncryptionPipe extends ValidationPipe {
-
-
   //   'YourSecretKey'; // Replace with your own secret key
 
   async transform(value: any, metadata: ArgumentMetadata) {
@@ -17,7 +15,7 @@ export class EncryptionPipe extends ValidationPipe {
     return super.transform(value, metadata);
   }
   //  async decrypt(input_data: string) {
-  //     let decipher = 
+  //     let decipher =
 
   //   return decipher
   //     }

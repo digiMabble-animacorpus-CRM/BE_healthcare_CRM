@@ -1,18 +1,9 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { EC200, EM100, EM106, EM127 } from 'src/core/constants';
 import HandleResponse from 'src/core/utils/handle_response';
 
 export class BaseController<T> {
-  constructor(private readonly service: any) { }
+  constructor(private readonly service: any) {}
 
   @Post()
   async create(@Body() createDto: T) {

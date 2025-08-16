@@ -8,7 +8,6 @@ import { LocationService } from './location.service';
   imports: [HttpModule],
   controllers: [LocationController],
   providers: [LocationService],
-    exports: [LocationService],
-  
+  exports: [LocationService],
 })
 export class LocationModule {}

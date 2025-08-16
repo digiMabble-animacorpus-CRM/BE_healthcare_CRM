@@ -48,5 +48,3 @@ export class HomeDto {
   @IsNumber()
   lng: number;
 }
-
-
