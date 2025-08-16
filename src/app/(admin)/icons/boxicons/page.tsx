@@ -1,10 +1,10 @@
-import PageTitle from '@/components/PageTitle'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { Card, CardBody } from 'react-bootstrap'
+import PageTitle from "@/components/PageTitle";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Card, CardBody } from "react-bootstrap";
 
-export const metadata: Metadata = { title: 'Box Icons' }
+export const metadata: Metadata = { title: "Box Icons" };
 
 const BoxIcons = () => {
   return (
@@ -374,12 +374,16 @@ const BoxIcons = () => {
       </div>
 
       <div className="my-4 text-center">
-        <Link href="https://boxicons.com/" target="_blank" className="btn btn-primary">
+        <Link
+          href="https://boxicons.com/"
+          target="_blank"
+          className="btn btn-primary"
+        >
           View All Icons
         </Link>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default BoxIcons
+export default BoxIcons;

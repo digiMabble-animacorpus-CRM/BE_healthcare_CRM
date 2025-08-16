@@ -1,10 +1,10 @@
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import AllModals from './components/AllModals'
-import { Col, Row } from 'react-bootstrap'
-import PageTitle from '@/components/PageTitle'
+import UIExamplesList from "@/components/UIExamplesList";
+import type { Metadata } from "next";
+import AllModals from "./components/AllModals";
+import { Col, Row } from "react-bootstrap";
+import PageTitle from "@/components/PageTitle";
 
-export const metadata: Metadata = { title: 'Modals' }
+export const metadata: Metadata = { title: "Modals" };
 
 const Modals = () => {
   return (
@@ -18,19 +18,25 @@ const Modals = () => {
         <Col xl={3}>
           <UIExamplesList
             examples={[
-              { link: '#default', label: 'Default Example' },
-              { link: '#static-backdrop', label: 'Static Backdrop' },
-              { link: '#scrolling-long-content', label: 'Scrolling Long Content' },
-              { link: '#toggle-between-modals', label: 'Toggle Between Modals' },
-              { link: '#optional-sizes', label: 'Optional Sizes' },
-              { link: '#fullscreen-modal', label: 'Fullscreen Modal' },
-              { link: '#modal-alerts', label: 'Modal Based Alerts' },
+              { link: "#default", label: "Default Example" },
+              { link: "#static-backdrop", label: "Static Backdrop" },
+              {
+                link: "#scrolling-long-content",
+                label: "Scrolling Long Content",
+              },
+              {
+                link: "#toggle-between-modals",
+                label: "Toggle Between Modals",
+              },
+              { link: "#optional-sizes", label: "Optional Sizes" },
+              { link: "#fullscreen-modal", label: "Fullscreen Modal" },
+              { link: "#modal-alerts", label: "Modal Based Alerts" },
             ]}
           />
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Modals
+export default Modals;

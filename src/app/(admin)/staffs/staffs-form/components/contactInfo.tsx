@@ -87,9 +87,12 @@ const ContactInfo = () => {
               control={control}
               name="address.country"
               render={({ field }) => (
-                <ChoicesFormInput className="form-control" {...field}
+                <ChoicesFormInput
+                  className="form-control"
+                  {...field}
                   value={field.value}
-                  onChange={(val) => field.onChange(val)} >
+                  onChange={(val) => field.onChange(val)}
+                >
                   <option value="" disabled hidden>
                     Select country
                   </option>
@@ -101,7 +104,8 @@ const ContactInfo = () => {
             />
             {errors.address?.country && (
               <small className="text-danger">
-                {(errors.address.country as any)?.message || "Country is required"}
+                {(errors.address.country as any)?.message ||
+                  "Country is required"}
               </small>
             )}
           </div>
@@ -136,7 +140,8 @@ const ContactInfo = () => {
             />
             {errors.languages && (
               <small className="text-danger">
-                {(errors.languages as any)?.message || "At least one language is required"}
+                {(errors.languages as any)?.message ||
+                  "At least one language is required"}
               </small>
             )}
           </div>

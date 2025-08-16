@@ -1,38 +1,40 @@
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from "apexcharts";
 function generateData(baseval: number, count: number, yrange: any): number[] {
-  let i = 0
-  const series: any = []
+  let i = 0;
+  const series: any = [];
   while (i < count) {
-    const x = Math.floor(Math.random() * (750 - 1 + 1)) + 1
-    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
-    const z = Math.floor(Math.random() * (75 - 15 + 1)) + 15
+    const x = Math.floor(Math.random() * (750 - 1 + 1)) + 1;
+    const y =
+      Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
+    const z = Math.floor(Math.random() * (75 - 15 + 1)) + 15;
 
-    series.push([x, y, z])
-    baseval += 86400000
-    i++
+    series.push([x, y, z]);
+    baseval += 86400000;
+    i++;
   }
-  return series
+  return series;
 }
 
 function generateData1(baseval1: number, count: number, yrange: any): number[] {
-  let i = 0
-  const series: any = []
+  let i = 0;
+  const series: any = [];
   while (i < count) {
     //let x =Math.floor(Math.random() * (750 - 1 + 1)) + 1;;
-    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
-    const z = Math.floor(Math.random() * (75 - 15 + 1)) + 15
+    const y =
+      Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
+    const z = Math.floor(Math.random() * (75 - 15 + 1)) + 15;
 
-    series.push([baseval1, y, z])
-    baseval1 += 86400000
-    i++
+    series.push([baseval1, y, z]);
+    baseval1 += 86400000;
+    i++;
   }
-  return series
+  return series;
 }
 
 export const simpleChartOpts: ApexOptions = {
   chart: {
     height: 380,
-    type: 'bubble',
+    type: "bubble",
     toolbar: {
       show: false,
     },
@@ -42,22 +44,22 @@ export const simpleChartOpts: ApexOptions = {
   },
   series: [
     {
-      name: 'Bubble 1',
-      data: generateData(new Date('23 Oct 2023 GMT').getTime(), 20, {
+      name: "Bubble 1",
+      data: generateData(new Date("23 Oct 2023 GMT").getTime(), 20, {
         min: 10,
         max: 60,
       }),
     },
     {
-      name: 'Bubble 2',
-      data: generateData(new Date('23 Oct 2023 GMT').getTime(), 20, {
+      name: "Bubble 2",
+      data: generateData(new Date("23 Oct 2023 GMT").getTime(), 20, {
         min: 10,
         max: 60,
       }),
     },
     {
-      name: 'Bubble 3',
-      data: generateData(new Date('23 Oct 2023 GMT').getTime(), 20, {
+      name: "Bubble 3",
+      data: generateData(new Date("23 Oct 2023 GMT").getTime(), 20, {
         min: 10,
         max: 60,
       }),
@@ -66,19 +68,19 @@ export const simpleChartOpts: ApexOptions = {
   fill: {
     opacity: 0.8,
     gradient: {
-      type: 'none',
+      type: "none",
     },
   },
-  colors: ['#4697ce', '#7dcc93', '#53389f'],
+  colors: ["#4697ce", "#7dcc93", "#53389f"],
   xaxis: {
     tickAmount: 12,
-    type: 'category',
+    type: "category",
   },
   yaxis: {
     max: 70,
   },
   grid: {
-    borderColor: '#f1f3fa',
+    borderColor: "#f1f3fa",
     padding: {
       bottom: 5,
     },
@@ -86,12 +88,12 @@ export const simpleChartOpts: ApexOptions = {
   legend: {
     offsetY: 7,
   },
-}
+};
 
 export const bubbleChart3DOpts: ApexOptions = {
   chart: {
     height: 380,
-    type: 'bubble',
+    type: "bubble",
     toolbar: {
       show: false,
     },
@@ -101,41 +103,41 @@ export const bubbleChart3DOpts: ApexOptions = {
   },
   series: [
     {
-      name: 'Product 1',
-      data: generateData1(new Date('23 Oct 2023 GMT').getTime(), 20, {
+      name: "Product 1",
+      data: generateData1(new Date("23 Oct 2023 GMT").getTime(), 20, {
         min: 10,
         max: 80,
       }),
     },
     {
-      name: 'Product 2',
-      data: generateData1(new Date('23 Oct 2023 GMT').getTime(), 20, {
+      name: "Product 2",
+      data: generateData1(new Date("23 Oct 2023 GMT").getTime(), 20, {
         min: 10,
         max: 80,
       }),
     },
     {
-      name: 'Product 3',
-      data: generateData1(new Date('23 Oct 2023 GMT').getTime(), 20, {
+      name: "Product 3",
+      data: generateData1(new Date("23 Oct 2023 GMT").getTime(), 20, {
         min: 10,
         max: 80,
       }),
     },
     {
-      name: 'Product 4',
-      data: generateData1(new Date('23 Oct 2023 GMT').getTime(), 20, {
+      name: "Product 4",
+      data: generateData1(new Date("23 Oct 2023 GMT").getTime(), 20, {
         min: 10,
         max: 80,
       }),
     },
   ],
   fill: {
-    type: 'gradient',
+    type: "gradient",
   },
-  colors: ['#4697ce', '#7dcc93', '#e06d94', '#63b7e6'],
+  colors: ["#4697ce", "#7dcc93", "#e06d94", "#63b7e6"],
   xaxis: {
     tickAmount: 12,
-    type: 'datetime',
+    type: "datetime",
 
     labels: {
       rotate: 0,
@@ -148,9 +150,9 @@ export const bubbleChart3DOpts: ApexOptions = {
     offsetY: 7,
   },
   grid: {
-    borderColor: '#f1f3fa',
+    borderColor: "#f1f3fa",
     padding: {
       bottom: 5,
     },
   },
-}
+};

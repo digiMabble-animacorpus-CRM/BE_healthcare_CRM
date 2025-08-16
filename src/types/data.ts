@@ -85,13 +85,13 @@ export type CustomerEnquiriesType = {
   branch: string;
 };
 
-export type AppointmentStatus = 
+export type AppointmentStatus =
   | "scheduled"
   | "completed"
   | "cancelled"
   | "no_show";
 
-export type AppointmentSource = 
+export type AppointmentSource =
   | "phone"
   | "website"
   | "walk_in"
@@ -99,27 +99,26 @@ export type AppointmentSource =
   | "other";
 
 export interface AppointmentType {
-  _id: string;              // Unique appointment ID
-  customerId: string;        // Linked to Customer
-  branchId: string;          // Linked to Branch
-  assignedStaffId?: string;  // Optional assigned staff
+  _id: string; // Unique appointment ID
+  customerId: string; // Linked to Customer
+  branchId: string; // Linked to Branch
+  assignedStaffId?: string; // Optional assigned staff
 
-  date: string;              // YYYY-MM-DD
-  time: string;              // HH:mm (24-hour)
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm (24-hour)
 
-  service?: string;          // Purpose / Service
-  notes?: string;            // Optional notes
+  service?: string; // Purpose / Service
+  notes?: string; // Optional notes
 
   status: AppointmentStatus; // scheduled, completed, cancelled, no_show
-  cancelledReason?: string;  // Reason if cancelled
+  cancelledReason?: string; // Reason if cancelled
 
   source?: AppointmentSource; // How appointment was booked
-  reminderSent?: boolean;     // SMS/Email reminder flag
+  reminderSent?: boolean; // SMS/Email reminder flag
 
-  createdAt: string;         // ISO timestamp
-  updatedAt: string;         // ISO timestamp
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
 }
-
 
 export type BranchType = {
   _id: string;
@@ -268,14 +267,12 @@ export type StaffType = {
     staffId: string;
     updatedAt: string;
   }[];
-
 };
 export type BranchDetails = {
   id: number;
   name: string;
   code: string;
 };
-
 
 export type TherapistType = {
   _id: string;

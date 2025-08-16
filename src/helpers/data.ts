@@ -57,7 +57,7 @@ export const getAllTransaction = async (): Promise<TransactionType[]> => {
   const data = transactionData.map((item) => {
     const user = userData.find((user) => user.id === item.userId);
     const property = propertyData.find(
-      (property) => property.id == item.propertyId
+      (property) => property.id == item.propertyId,
     );
     return {
       ...item,
@@ -145,7 +145,7 @@ export const getAllCustomerEnquiries = async (
   branch?: string,
   from?: string,
   to?: string,
-  search?: string
+  search?: string,
 ): Promise<{ data: CustomerEnquiriesType[]; totalCount: number }> => {
   await sleep();
 
@@ -173,7 +173,7 @@ export const getAllCustomerEnquiries = async (
       (item) =>
         item.name.toLowerCase().includes(lowerSearch) ||
         item.email.toLowerCase().includes(lowerSearch) ||
-        item.number.toLowerCase().includes(lowerSearch)
+        item.number.toLowerCase().includes(lowerSearch),
     );
   }
 
@@ -194,7 +194,7 @@ export const getAllTherapists = async (
   branch?: string,
   from?: string,
   to?: string,
-  search?: string
+  search?: string,
 ): Promise<{ data: TherapistType[]; totalCount: number }> => {
   await sleep();
 
@@ -222,7 +222,7 @@ export const getAllTherapists = async (
       (item) =>
         item.name.toLowerCase().includes(lowerSearch) ||
         item.email.toLowerCase().includes(lowerSearch) ||
-        item.number.toLowerCase().includes(lowerSearch)
+        item.number.toLowerCase().includes(lowerSearch),
     );
   }
 
@@ -238,7 +238,7 @@ export const getAllTherapists = async (
 };
 
 export const getStaffById = async (
-  id?: string
+  id?: string,
 ): Promise<{ data: StaffType[] }> => {
   await sleep();
 
@@ -252,7 +252,7 @@ export const getStaffById = async (
 };
 
 export const getCustomerEnquiriesById = async (
-  id?: string
+  id?: string,
 ): Promise<{ data: CustomerEnquiriesType[] }> => {
   await sleep();
 
@@ -266,7 +266,7 @@ export const getCustomerEnquiriesById = async (
 };
 
 export const getTherapistById = async (
-  id?: string
+  id?: string,
 ): Promise<{ data: TherapistType[] }> => {
   await sleep();
 
@@ -283,7 +283,7 @@ export const getAllReview = async (): Promise<CustomerReviewsType[]> => {
   const data = customerReviewsData.map((item) => {
     const user = userData.find((user) => user.id === item.userId);
     const property = propertyData.find(
-      (property) => property.id == item.propertyId
+      (property) => property.id == item.propertyId,
     );
     return {
       ...item,
@@ -296,7 +296,7 @@ export const getAllReview = async (): Promise<CustomerReviewsType[]> => {
 };
 
 export const getUserById = async (
-  id: UserType["id"]
+  id: UserType["id"],
 ): Promise<UserType | void> => {
   const user = userData.find((user) => user.id === id);
   if (user) {
@@ -335,7 +335,7 @@ export const getAllProjects = async (): Promise<ProjectType[]> => {
 export const getAllTasks = async (): Promise<TodoType[]> => {
   const data = todoData.map((task) => {
     const employee = sellersData.find(
-      (seller) => seller.id === task.employeeId
+      (seller) => seller.id === task.employeeId,
     );
     return {
       ...task,
@@ -353,7 +353,7 @@ export const getAllFriends = async (): Promise<UserType[]> => {
 };
 
 export const serverSideFormValidate = async (
-  data: unknown
+  data: unknown,
 ): Promise<unknown> => {
   const formSchema = yup.object({
     fName: yup

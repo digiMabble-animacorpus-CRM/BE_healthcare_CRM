@@ -102,7 +102,10 @@ const BranchListPage = () => {
                     }}
                   />
                 </div>
-                <Button variant="primary" onClick={() => router.push("/branches/branch-form/create")}>
+                <Button
+                  variant="primary"
+                  onClick={() => router.push("/branches/branch-form/create")}
+                >
                   Add Branch
                 </Button>
               </div>
@@ -120,7 +123,10 @@ const BranchListPage = () => {
                       <tr>
                         <th style={{ width: 20 }}>
                           <div className="form-check">
-                            <input type="checkbox" className="form-check-input" />
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                            />
                           </div>
                         </th>
                         <th>Branch Name</th>
@@ -133,7 +139,10 @@ const BranchListPage = () => {
                         <tr key={idx}>
                           <td>
                             <div className="form-check">
-                              <input type="checkbox" className="form-check-input" />
+                              <input
+                                type="checkbox"
+                                className="form-check-input"
+                              />
                             </div>
                           </td>
                           <td>{branch.name}</td>
@@ -145,14 +154,20 @@ const BranchListPage = () => {
                                 size="sm"
                                 onClick={() => handleEditClick(branch._id)}
                               >
-                                <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
+                                <IconifyIcon
+                                  icon="solar:pen-2-broken"
+                                  className="align-middle fs-18"
+                                />
                               </Button>
                               <Button
                                 variant="soft-danger"
                                 size="sm"
                                 onClick={() => handleDeleteClick(branch._id)}
                               >
-                                <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
+                                <IconifyIcon
+                                  icon="solar:trash-bin-minimalistic-2-broken"
+                                  className="align-middle fs-18"
+                                />
                               </Button>
                             </div>
                           </td>
@@ -167,8 +182,14 @@ const BranchListPage = () => {
             <CardFooter>
               <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-end mb-0">
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                    <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
+                  <li
+                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  >
+                    <Button
+                      variant="link"
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                    >
                       Previous
                     </Button>
                   </li>
@@ -186,8 +207,14 @@ const BranchListPage = () => {
                       </Button>
                     </li>
                   ))}
-                  <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                    <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
+                  <li
+                    className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
+                  >
+                    <Button
+                      variant="link"
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                    >
                       Next
                     </Button>
                   </li>
@@ -198,12 +225,17 @@ const BranchListPage = () => {
         </Col>
       </Row>
 
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this branch? This action cannot be undone.
+          Are you sure you want to delete this branch? This action cannot be
+          undone.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>

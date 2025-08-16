@@ -1,5 +1,5 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { Col, Row } from 'react-bootstrap'
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { Col, Row } from "react-bootstrap";
 
 const Finish = () => {
   return (
@@ -15,7 +15,11 @@ const Finish = () => {
           <p className="w-75 mb-2 mx-auto">Filled Data Successfully.</p>
           <div className="mb-3">
             <div className="form-check d-inline-block">
-              <input type="checkbox" className="form-check-input" id="customCheck1" />
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="customCheck1"
+              />
               <label className="form-check-label" htmlFor="customCheck1">
                 I agree with the Terms and Conditions
               </label>
@@ -24,7 +28,7 @@ const Finish = () => {
         </div>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default Finish
+export default Finish;

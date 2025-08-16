@@ -1,10 +1,10 @@
-import { Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import type { Metadata } from 'next'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllSliders from './components/AllSliders'
-import PageTitle from '@/components/PageTitle'
+import { Card, CardBody, CardTitle, Col, Row } from "react-bootstrap";
+import type { Metadata } from "next";
+import UIExamplesList from "@/components/UIExamplesList";
+import AllSliders from "./components/AllSliders";
+import PageTitle from "@/components/PageTitle";
 
-export const metadata: Metadata = { title: 'Range Slider' }
+export const metadata: Metadata = { title: "Range Slider" };
 
 const Slider = () => {
   return (
@@ -14,16 +14,19 @@ const Slider = () => {
         <Col xl={9}>
           <Card>
             <CardBody>
-              <CardTitle as={'h5'} className="mb-1 anchor" id="overview">
+              <CardTitle as={"h5"} className="mb-1 anchor" id="overview">
                 Overview
                 <a
                   className="btn btn-sm btn-outline-success rounded-2 float-end"
                   href="https://github.com/leongersen/noUiSlider#readme"
-                  target="_blank">
+                  target="_blank"
+                >
                   Official Website
                 </a>
               </CardTitle>
-              <p className="text-muted mb-3">noUiSlider is a lightweight JavaScript range slider.</p>
+              <p className="text-muted mb-3">
+                noUiSlider is a lightweight JavaScript range slider.
+              </p>
             </CardBody>
           </Card>
           <AllSliders />
@@ -31,20 +34,20 @@ const Slider = () => {
         <Col xl={3}>
           <UIExamplesList
             examples={[
-              { link: '#overview', label: 'Overview' },
-              { link: '#basic-range', label: 'Basic Range Slider' },
-              { link: '#vertical-range', label: 'Vertical Range Slider' },
-              { link: '#multi-range', label: 'Multi Elements Range' },
-              { link: '#colorpicker-range', label: 'Colorpicker' },
-              { link: '#value-range', label: 'Value Range Slider' },
-              { link: '#tooltip', label: 'Tooltip' },
-              { link: '#soft-limits', label: 'Soft Limits' },
+              { link: "#overview", label: "Overview" },
+              { link: "#basic-range", label: "Basic Range Slider" },
+              { link: "#vertical-range", label: "Vertical Range Slider" },
+              { link: "#multi-range", label: "Multi Elements Range" },
+              { link: "#colorpicker-range", label: "Colorpicker" },
+              { link: "#value-range", label: "Value Range Slider" },
+              { link: "#tooltip", label: "Tooltip" },
+              { link: "#soft-limits", label: "Soft Limits" },
             ]}
           />
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Slider
+export default Slider;

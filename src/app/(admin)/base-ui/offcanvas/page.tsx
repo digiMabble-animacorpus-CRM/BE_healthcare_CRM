@@ -1,10 +1,10 @@
-import type { Metadata } from 'next'
-import AllOffcanvas from './components/AllOffcanvas'
-import UIExamplesList from '@/components/UIExamplesList'
-import { Col, Row } from 'react-bootstrap'
-import PageTitle from '@/components/PageTitle'
+import type { Metadata } from "next";
+import AllOffcanvas from "./components/AllOffcanvas";
+import UIExamplesList from "@/components/UIExamplesList";
+import { Col, Row } from "react-bootstrap";
+import PageTitle from "@/components/PageTitle";
 
-export const metadata: Metadata = { title: 'Offcanvas' }
+export const metadata: Metadata = { title: "Offcanvas" };
 
 const Offcanvas = () => {
   return (
@@ -17,15 +17,15 @@ const Offcanvas = () => {
         <Col xl={3}>
           <UIExamplesList
             examples={[
-              { label: 'Default Offcanvas', link: '#default' },
-              { label: 'Static Backdrop', link: '#static-backdrop' },
-              { label: 'Offcanvas Position', link: '#offcanvas-position' },
+              { label: "Default Offcanvas", link: "#default" },
+              { label: "Static Backdrop", link: "#static-backdrop" },
+              { label: "Offcanvas Position", link: "#offcanvas-position" },
             ]}
           />
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Offcanvas
+export default Offcanvas;

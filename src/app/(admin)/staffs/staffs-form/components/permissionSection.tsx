@@ -27,7 +27,7 @@ const PermissionsSection = () => {
     setAllRoles(roles);
 
     const permissionSet = new Set(
-      roles.flatMap((r) => r.defaultPermissions || [])
+      roles.flatMap((r) => r.defaultPermissions || []),
     );
 
     // Generate fake permission objects based on roles
@@ -56,16 +56,14 @@ const PermissionsSection = () => {
   // Selected permission keys
   const selectedKeys = useMemo(
     () =>
-      selectedPermissions
-        .filter((p: any) => p.enabled)
-        .map((p: any) => p._id),
-    [selectedPermissions]
+      selectedPermissions.filter((p: any) => p.enabled).map((p: any) => p._id),
+    [selectedPermissions],
   );
 
   // Handlers
   const handleToggle = (key: string) => {
     const updated = selectedPermissions.map((p: any) =>
-      p._id === key ? { ...p, enabled: !p.enabled } : p
+      p._id === key ? { ...p, enabled: !p.enabled } : p,
     );
     setValue("permissions", updated);
   };

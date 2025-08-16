@@ -1,8 +1,6 @@
 import { permissionData } from "@/assets/data/permissionData";
 
-import {
-  PermissionType,
-} from "@/types/data";
+import { PermissionType } from "@/types/data";
 const sleep = (ms = 500) => new Promise((res) => setTimeout(res, ms));
 
 export const getAllPermissions = (): PermissionType[] => {
@@ -12,7 +10,7 @@ export const getAllPermissions = (): PermissionType[] => {
 export const getPermissions = async (
   page: number = 1,
   limit: number = 10,
-  search?: string
+  search?: string,
 ): Promise<{
   data: PermissionType[];
   totalCount: number;
@@ -23,8 +21,8 @@ export const getPermissions = async (
 
   if (search) {
     const lowerSearch = search.toLowerCase();
-    filteredData = filteredData.filter(
-      (item) => item.label.toLowerCase().includes(lowerSearch)
+    filteredData = filteredData.filter((item) =>
+      item.label.toLowerCase().includes(lowerSearch),
     );
   }
 
@@ -38,7 +36,9 @@ export const getPermissions = async (
   };
 };
 
-export const getPermissionById = async (id?: string): Promise<{ data: PermissionType[] }> => {
+export const getPermissionById = async (
+  id?: string,
+): Promise<{ data: PermissionType[] }> => {
   await sleep();
   if (!id) return { data: [] };
   const result = permissionData.filter((p) => p._id === id);

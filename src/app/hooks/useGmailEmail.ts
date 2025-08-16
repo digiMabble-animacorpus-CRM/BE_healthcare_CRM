@@ -1,5 +1,5 @@
 // hooks/useGmailEmails.ts
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 interface Email {
   subject: string;
@@ -14,11 +14,11 @@ export function useGmailEmails() {
   useEffect(() => {
     const fetchEmails = async () => {
       try {
-        const res = await fetch('./api/gmail'); // We'll define this next
+        const res = await fetch("./api/gmail"); // We'll define this next
         const data = await res.json();
         setEmails(data);
       } catch (err) {
-        console.error('Error fetching Gmail emails:', err);
+        console.error("Error fetching Gmail emails:", err);
       } finally {
         setLoading(false);
       }

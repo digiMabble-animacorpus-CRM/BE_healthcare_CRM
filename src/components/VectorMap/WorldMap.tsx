@@ -1,22 +1,27 @@
-'use client'
-import 'jsvectormap'
-import 'jsvectormap/dist/maps/world.js'
+"use client";
+import "jsvectormap";
+import "jsvectormap/dist/maps/world.js";
 
 //components
-import BaseVectorMap from './BaseVectorMap'
+import BaseVectorMap from "./BaseVectorMap";
 
 interface WorldVectorMapProps {
-  width?: string
-  height?: string
-  options?: any
+  width?: string;
+  height?: string;
+  options?: any;
 }
 
 const WorldVectorMap = ({ width, height, options }: WorldVectorMapProps) => {
   return (
     <>
-      <BaseVectorMap width={width} height={height} options={options} type="world" />
+      <BaseVectorMap
+        width={width}
+        height={height}
+        options={options}
+        type="world"
+      />
     </>
-  )
-}
+  );
+};
 
-export default WorldVectorMap
+export default WorldVectorMap;

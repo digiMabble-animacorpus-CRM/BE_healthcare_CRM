@@ -1,28 +1,47 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { getAllProperty } from '@/helpers/data'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button, Card, CardFooter, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { getAllProperty } from "@/helpers/data";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Button,
+  Card,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Row,
+} from "react-bootstrap";
 
 const PropertyList = async () => {
-  const propertyListData = await getAllProperty()
+  const propertyListData = await getAllProperty();
   return (
     <Row>
       <Col xl={12}>
         <Card>
           <CardHeader className="d-flex justify-content-between align-items-center border-bottom">
             <div>
-              <CardTitle as={'h4'} className="mb-0">
+              <CardTitle as={"h4"} className="mb-0">
                 All Properties List
               </CardTitle>
             </div>
             <Dropdown>
               <DropdownToggle
-                as={'a'}
+                as={"a"}
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
                 data-bs-toggle="dropdown"
-                aria-expanded="false">
-                This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+                aria-expanded="false"
+              >
+                This Month{" "}
+                <IconifyIcon
+                  className="ms-1"
+                  width={16}
+                  height={16}
+                  icon="ri:arrow-down-s-line"
+                />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
                 <DropdownItem>Download</DropdownItem>
@@ -37,8 +56,15 @@ const PropertyList = async () => {
                 <tr>
                   <th style={{ width: 20 }}>
                     <div className="form-check">
-                      <input type="checkbox" className="form-check-input" id="customCheck1" />
-                      <label className="form-check-label" htmlFor="customCheck1" />
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="customCheck1"
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="customCheck1"
+                      />
                     </div>
                   </th>
                   <th>Properties Photo &amp; Name</th>
@@ -56,8 +82,15 @@ const PropertyList = async () => {
                   <tr key={idx}>
                     <td>
                       <div className="form-check">
-                        <input type="checkbox" className="form-check-input" id="customCheck2" />
-                        <label className="form-check-label" htmlFor="customCheck2">
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          id="customCheck2"
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="customCheck2"
+                        >
                           &nbsp;
                         </label>
                       </div>
@@ -65,7 +98,11 @@ const PropertyList = async () => {
                     <td>
                       <div className="d-flex align-items-center gap-2">
                         <div>
-                          <Image src={item.image} alt="properties" className="avatar-md rounded border border-light border-3" />
+                          <Image
+                            src={item.image}
+                            alt="properties"
+                            className="avatar-md rounded border border-light border-3"
+                          />
                         </div>
                         <div>
                           <Link href="" className="text-dark fw-medium fs-15">
@@ -77,15 +114,20 @@ const PropertyList = async () => {
                     <td>{item.size}m²</td>
                     <td>Residences</td>
                     <td>
-                      {' '}
+                      {" "}
                       <span
-                        className={`badge bg-${item.type == 'Rent' ? 'success' : item.type == 'Sold' ? 'danger' : 'warning'}-subtle text-${item.type == 'Rent' ? 'success' : item.type == 'Sold' ? 'danger' : 'warning'} py-1 px-2 fs-13`}>
+                        className={`badge bg-${item.type == "Rent" ? "success" : item.type == "Sold" ? "danger" : "warning"}-subtle text-${item.type == "Rent" ? "success" : item.type == "Sold" ? "danger" : "warning"} py-1 px-2 fs-13`}
+                      >
                         {item.type}
                       </span>
                     </td>
                     <td>
                       <p className="mb-0">
-                        <IconifyIcon icon="solar:bed-broken" className="align-middle fs-16" /> {item.beds}
+                        <IconifyIcon
+                          icon="solar:bed-broken"
+                          className="align-middle fs-16"
+                        />{" "}
+                        {item.beds}
                       </p>
                     </td>
                     <td>{item.country}</td>
@@ -93,13 +135,22 @@ const PropertyList = async () => {
                     <td>
                       <div className="d-flex gap-2">
                         <Button variant="light" size="sm">
-                          <IconifyIcon icon="solar:eye-broken" className="align-middle fs-18" />
+                          <IconifyIcon
+                            icon="solar:eye-broken"
+                            className="align-middle fs-18"
+                          />
                         </Button>
                         <Button variant="soft-primary" size="sm">
-                          <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
+                          <IconifyIcon
+                            icon="solar:pen-2-broken"
+                            className="align-middle fs-18"
+                          />
                         </Button>
                         <Button variant="soft-danger" size="sm">
-                          <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
+                          <IconifyIcon
+                            icon="solar:trash-bin-minimalistic-2-broken"
+                            className="align-middle fs-18"
+                          />
                         </Button>
                       </div>
                     </td>
@@ -142,7 +193,7 @@ const PropertyList = async () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default PropertyList
+export default PropertyList;

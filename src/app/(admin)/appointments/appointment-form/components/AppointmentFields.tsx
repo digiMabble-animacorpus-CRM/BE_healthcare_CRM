@@ -21,10 +21,21 @@ export const departments = [
 ];
 
 const timeSlots = [
-  "09:00", "09:30", "10:00", "10:30",
-  "11:00", "11:30", "12:00", "12:30",
-  "14:00", "14:30", "15:00", "15:30",
-  "16:00", "16:30", "17:00"
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "12:00",
+  "12:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
 ];
 
 const AppointmentFields = () => {
@@ -71,7 +82,9 @@ const AppointmentFields = () => {
               {timeSlots.map((slot) => (
                 <Button
                   key={slot}
-                  variant={selectedTime === slot ? "primary" : "outline-primary"}
+                  variant={
+                    selectedTime === slot ? "primary" : "outline-primary"
+                  }
                   size="sm"
                   onClick={() => {
                     setValue("time", slot);
@@ -83,7 +96,9 @@ const AppointmentFields = () => {
               ))}
             </div>
             {errors.time && (
-              <small className="text-danger">{String(errors.time.message)}</small>
+              <small className="text-danger">
+                {String(errors.time.message)}
+              </small>
             )}
           </div>
         </Col>
@@ -96,7 +111,9 @@ const AppointmentFields = () => {
               name="service"
               render={({ field }) => (
                 <ChoicesFormInput className="form-control" {...field}>
-                  <option value="" disabled hidden>Select Service</option>
+                  <option value="" disabled hidden>
+                    Select Service
+                  </option>
                   {services.map((s) => (
                     <option key={s.key} value={s.key}>
                       {s.label}
@@ -106,7 +123,9 @@ const AppointmentFields = () => {
               )}
             />
             {errors.service && (
-              <small className="text-danger">{String(errors.service.message)}</small>
+              <small className="text-danger">
+                {String(errors.service.message)}
+              </small>
             )}
           </div>
         </Col>
@@ -119,7 +138,9 @@ const AppointmentFields = () => {
               name="department"
               render={({ field }) => (
                 <ChoicesFormInput className="form-control" {...field}>
-                  <option value="" disabled hidden>Select Department</option>
+                  <option value="" disabled hidden>
+                    Select Department
+                  </option>
                   {departments.map((d) => (
                     <option key={d.key} value={d.key}>
                       {d.label}
@@ -129,7 +150,9 @@ const AppointmentFields = () => {
               )}
             />
             {errors.department && (
-              <small className="text-danger">{String(errors.department.message)}</small>
+              <small className="text-danger">
+                {String(errors.department.message)}
+              </small>
             )}
           </div>
         </Col>

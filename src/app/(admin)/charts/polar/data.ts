@@ -1,22 +1,22 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from "apexcharts";
 
 export const basicPolarAreaOpts: ApexOptions = {
   series: [14, 23, 21, 17, 15, 10],
   chart: {
     height: 380,
-    type: 'polarArea',
+    type: "polarArea",
   },
   stroke: {
-    colors: ['#fff'],
+    colors: ["#fff"],
   },
   fill: {
     opacity: 0.8,
   },
-  labels: ['Vote A', 'Vote B', 'Vote C', 'Vote D', 'Vote E', 'Vote F'],
+  labels: ["Vote A", "Vote B", "Vote C", "Vote D", "Vote E", "Vote F"],
   legend: {
-    position: 'bottom',
+    position: "bottom",
   },
-  colors: ['#4697ce', '#53389f', '#7f56da', '#ff86c8', '#e06d94', '#63b7e6'],
+  colors: ["#4697ce", "#53389f", "#7f56da", "#ff86c8", "#e06d94", "#63b7e6"],
   responsive: [
     {
       breakpoint: 480,
@@ -25,20 +25,20 @@ export const basicPolarAreaOpts: ApexOptions = {
           width: 200,
         },
         legend: {
-          position: 'bottom',
+          position: "bottom",
         },
       },
     },
   ],
-}
+};
 
 export const monochromePolarAreaOpts: ApexOptions = {
   series: [42, 47, 52, 58, 65],
   chart: {
     height: 380,
-    type: 'polarArea',
+    type: "polarArea",
   },
-  labels: ['Rose A', 'Rose B', 'Rose C', 'Rose D', 'Rose E'],
+  labels: ["Rose A", "Rose B", "Rose C", "Rose D", "Rose E"],
   fill: {
     opacity: 1,
   },
@@ -49,7 +49,7 @@ export const monochromePolarAreaOpts: ApexOptions = {
     show: false,
   },
   legend: {
-    position: 'bottom',
+    position: "bottom",
   },
   plotOptions: {
     polarArea: {
@@ -64,9 +64,9 @@ export const monochromePolarAreaOpts: ApexOptions = {
   theme: {
     monochrome: {
       enabled: true,
-      shadeTo: 'light',
-      color: '#727cf5',
+      shadeTo: "light",
+      color: "#727cf5",
       shadeIntensity: 0.6,
     },
   },
-}
+};

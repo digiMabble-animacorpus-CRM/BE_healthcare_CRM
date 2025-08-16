@@ -1,10 +1,10 @@
-import PageTitle from '@/components/PageTitle'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import { Col, Row } from 'react-bootstrap'
-import AllPieCharts from './components/AllPieCharts'
+import PageTitle from "@/components/PageTitle";
+import UIExamplesList from "@/components/UIExamplesList";
+import type { Metadata } from "next";
+import { Col, Row } from "react-bootstrap";
+import AllPieCharts from "./components/AllPieCharts";
 
-export const metadata: Metadata = { title: 'Pie Charts' }
+export const metadata: Metadata = { title: "Pie Charts" };
 
 const PieCharts = () => {
   return (
@@ -17,19 +17,19 @@ const PieCharts = () => {
         <Col xl={3}>
           <UIExamplesList
             examples={[
-              { link: '#simple_pie', label: 'Simple Pie Chart' },
-              { link: '#simple_donut', label: 'Simple Donut Chart' },
-              { link: '#monochrome', label: 'Monochrome Pie Area' },
-              { link: '#gradient', label: 'Gradient Donut Chart' },
-              { link: '#patterned', label: 'Patterned Donut Chart' },
-              { link: '#image', label: 'Pie Chart with Image fill' },
-              { link: '#update', label: 'Donut Update' },
+              { link: "#simple_pie", label: "Simple Pie Chart" },
+              { link: "#simple_donut", label: "Simple Donut Chart" },
+              { link: "#monochrome", label: "Monochrome Pie Area" },
+              { link: "#gradient", label: "Gradient Donut Chart" },
+              { link: "#patterned", label: "Patterned Donut Chart" },
+              { link: "#image", label: "Pie Chart with Image fill" },
+              { link: "#update", label: "Donut Update" },
             ]}
           />
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default PieCharts
+export default PieCharts;

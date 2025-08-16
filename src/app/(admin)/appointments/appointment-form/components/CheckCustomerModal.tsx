@@ -38,7 +38,8 @@ const CheckCustomerModal = ({
 
         {isCustomerNotFound && (
           <p className="text-danger mt-2">
-            Customer not found. You can create a new customer or check a different email.
+            Customer not found. You can create a new customer or check a
+            different email.
           </p>
         )}
       </Modal.Body>

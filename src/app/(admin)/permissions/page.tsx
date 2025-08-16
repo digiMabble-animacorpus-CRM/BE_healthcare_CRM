@@ -28,7 +28,9 @@ const PermissionsListPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedPermissionId, setSelectedPermissionId] = useState<string | null>(null);
+  const [selectedPermissionId, setSelectedPermissionId] = useState<
+    string | null
+  >(null);
 
   const router = useRouter();
 
@@ -105,7 +107,12 @@ const PermissionsListPage = () => {
                     }}
                   />
                 </div>
-                <Button variant="primary" onClick={() => router.push("/permissions/permission-form/create")}>
+                <Button
+                  variant="primary"
+                  onClick={() =>
+                    router.push("/permissions/permission-form/create")
+                  }
+                >
                   Create New Permission
                 </Button>
               </div>
@@ -128,31 +135,43 @@ const PermissionsListPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {permissions.map((permission: PermissionType, idx: number) => (
-                        <tr key={idx}>
-                          <td>{permission.key}</td>
-                          <td>{permission.label}</td>
-                          <td>{permission.description}</td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <Button
-                                variant="soft-primary"
-                                size="sm"
-                                onClick={() => handleEditPermission(permission._id)}
-                              >
-                                <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
-                              </Button>
-                              <Button
-                                variant="soft-danger"
-                                size="sm"
-                                onClick={() => handleDeletePermission(permission._id)}
-                              >
-                                <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                      {permissions.map(
+                        (permission: PermissionType, idx: number) => (
+                          <tr key={idx}>
+                            <td>{permission.key}</td>
+                            <td>{permission.label}</td>
+                            <td>{permission.description}</td>
+                            <td>
+                              <div className="d-flex gap-2">
+                                <Button
+                                  variant="soft-primary"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleEditPermission(permission._id)
+                                  }
+                                >
+                                  <IconifyIcon
+                                    icon="solar:pen-2-broken"
+                                    className="align-middle fs-18"
+                                  />
+                                </Button>
+                                <Button
+                                  variant="soft-danger"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleDeletePermission(permission._id)
+                                  }
+                                >
+                                  <IconifyIcon
+                                    icon="solar:trash-bin-minimalistic-2-broken"
+                                    className="align-middle fs-18"
+                                  />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ),
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -162,7 +181,9 @@ const PermissionsListPage = () => {
             <CardFooter>
               <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-end mb-0">
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li
+                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  >
                     <Button
                       variant="link"
                       className="page-link"
@@ -185,7 +206,9 @@ const PermissionsListPage = () => {
                       </Button>
                     </li>
                   ))}
-                  <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <li
+                    className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
+                  >
                     <Button
                       variant="link"
                       className="page-link"
@@ -210,7 +233,8 @@ const PermissionsListPage = () => {
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this permission? This action cannot be undone.
+          Are you sure you want to delete this permission? This action cannot be
+          undone.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>

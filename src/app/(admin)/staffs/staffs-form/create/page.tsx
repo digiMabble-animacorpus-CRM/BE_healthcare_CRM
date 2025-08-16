@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
 import { API_BASE_PATH } from "@/context/constants";
-import { encryptAES } from '@/utils/encryption';
-import { toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';
-import type { StaffType } from '@/types/data';
-import StaffForm from '../staffForm';
+import { encryptAES } from "@/utils/encryption";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import type { StaffType } from "@/types/data";
+import StaffForm from "../staffForm";
 
 const CreateStaffPage = () => {
   const router = useRouter();
 
-  const userId = typeof window !== "undefined" ? localStorage.getItem("user_id") : null;
+  const userId =
+    typeof window !== "undefined" ? localStorage.getItem("user_id") : null;
 
   const handleCreate = async (formData: StaffType) => {
     console.log("handleCreate triggered with:", formData);
@@ -25,75 +26,71 @@ const CreateStaffPage = () => {
       return;
     }
 
-const formattedPermissions = formData.permissions
-  .filter((p) => p.enabled) // Only send enabled permissions
-  .map((p) => {
-    // Step 1: Convert _id like "view-patients" to "read:patients"
-    let formattedId = p._id.replace('-', ':');
+    const formattedPermissions = formData.permissions
+      .filter((p) => p.enabled) // Only send enabled permissions
+      .map((p) => {
+        // Step 1: Convert _id like "view-patients" to "read:patients"
+        let formattedId = p._id.replace("-", ":");
 
-    // Step 2: Map frontend-friendly verbs to backend-standard actions
-    if (formattedId.startsWith('view:')) {
-      formattedId = formattedId.replace('view:', 'read:');
-    } else if (formattedId.startsWith('edit:')) {
-      formattedId = formattedId.replace('edit:', 'update:');
-    } else if (formattedId.startsWith('delete:')) {
-      formattedId = formattedId.replace('delete:', 'remove:');
-    }
+        // Step 2: Map frontend-friendly verbs to backend-standard actions
+        if (formattedId.startsWith("view:")) {
+          formattedId = formattedId.replace("view:", "read:");
+        } else if (formattedId.startsWith("edit:")) {
+          formattedId = formattedId.replace("edit:", "update:");
+        } else if (formattedId.startsWith("delete:")) {
+          formattedId = formattedId.replace("delete:", "remove:");
+        }
 
-    // Step 3: Extract action and resource
-    const [action, resource] = formattedId.split(':');
+        // Step 3: Extract action and resource
+        const [action, resource] = formattedId.split(":");
 
-    return {
-      action,
-      resource,
-      enabled: true, //  Required by backend DTO
-    };
-  });
+        return {
+          action,
+          resource,
+          enabled: true, //  Required by backend DTO
+        };
+      });
 
     const payload = {
-  name: formData.name,
-  email: formData.email,
-  phone_number: formData.phoneNumber,
-  gender: formData.gender,
-  dob: formData.dob,
-  description: formData.description,
-  role_id: formData.roleId
-    ? parseInt(formData.roleId.replace(/\D/g, ''))
-    : undefined,
-  access_level:
-    formData.accessLevelId === 'al-001'
-      ? 'staff'
-      : formData.accessLevelId === 'al-002'
-      ? 'branch-admin'
-      : formData.accessLevelId === 'al-003'
-      ? 'super-admin'
-      : undefined,
-  branches: formData.branches.map((b) =>
-    typeof b === 'number' ? b : parseInt(b.id?.replace(/\D/g, ''))
-  ),
-  selected_branch: formData.selectedBranch
-    ? parseInt(formData.selectedBranch.replace(/\D/g, ''))
-    : undefined,
-  address: {
-    street: formData.address.street,
-    city: formData.address.city,
-    zip_code: formData.address.zip_code,
-    country: formData.address.country,
-  },
-  languages: formData.languages,
-  availability: formData.availability || [],
-permissions: formattedPermissions,
+      name: formData.name,
+      email: formData.email,
+      phone_number: formData.phoneNumber,
+      gender: formData.gender,
+      dob: formData.dob,
+      description: formData.description,
+      role_id: formData.roleId
+        ? parseInt(formData.roleId.replace(/\D/g, ""))
+        : undefined,
+      access_level:
+        formData.accessLevelId === "al-001"
+          ? "staff"
+          : formData.accessLevelId === "al-002"
+            ? "branch-admin"
+            : formData.accessLevelId === "al-003"
+              ? "super-admin"
+              : undefined,
+      branches: formData.branches.map((b) =>
+        typeof b === "number" ? b : parseInt(b.id?.replace(/\D/g, "")),
+      ),
+      selected_branch: formData.selectedBranch
+        ? parseInt(formData.selectedBranch.replace(/\D/g, ""))
+        : undefined,
+      address: {
+        street: formData.address.street,
+        city: formData.address.city,
+        zip_code: formData.address.zip_code,
+        country: formData.address.country,
+      },
+      languages: formData.languages,
+      availability: formData.availability || [],
+      permissions: formattedPermissions,
 
-  created_by: Number(userId),
-  login_details: {
-    otpVerified: false,
-  },
-  status: 'active',
-};
-
-
-
-
+      created_by: Number(userId),
+      login_details: {
+        otpVerified: false,
+      },
+      status: "active",
+    };
 
     console.log("Payload before encryption:", payload);
 

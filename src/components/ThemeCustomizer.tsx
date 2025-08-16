@@ -1,14 +1,25 @@
-'use client'
-import { Button, Col, Offcanvas, OffcanvasBody, OffcanvasHeader, Row } from 'react-bootstrap'
+"use client";
+import {
+  Button,
+  Col,
+  Offcanvas,
+  OffcanvasBody,
+  OffcanvasHeader,
+  Row,
+} from "react-bootstrap";
 
-import type { MenuType, OffcanvasControlType, ThemeType } from '@/types/context'
-import { useLayoutContext } from '@/context/useLayoutContext'
-import { toSentenceCase } from '@/utils/change-casing'
-import SimplebarReactClient from './wrappers/SimplebarReactClient'
+import type {
+  MenuType,
+  OffcanvasControlType,
+  ThemeType,
+} from "@/types/context";
+import { useLayoutContext } from "@/context/useLayoutContext";
+import { toSentenceCase } from "@/utils/change-casing";
+import SimplebarReactClient from "./wrappers/SimplebarReactClient";
 
 const ColorScheme = () => {
-  const { theme, changeTheme } = useLayoutContext()
-  const modes: ThemeType[] = ['light', 'dark']
+  const { theme, changeTheme } = useLayoutContext();
+  const modes: ThemeType[] = ["light", "dark"];
   return (
     <div>
       <h5 className="mb-3 font-16 fw-semibold">Color Scheme</h5>
@@ -28,12 +39,12 @@ const ColorScheme = () => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
 const TopbarTheme = () => {
-  const { topbarTheme, changeTopbarTheme } = useLayoutContext()
-  const modes: ThemeType[] = ['light', 'dark']
+  const { topbarTheme, changeTopbarTheme } = useLayoutContext();
+  const modes: ThemeType[] = ["light", "dark"];
   return (
     <div>
       <h5 className="my-3 font-16 fw-semibold">Topbar Color</h5>
@@ -53,15 +64,15 @@ const TopbarTheme = () => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
 const MenuTheme = () => {
   const {
     menu: { theme },
     changeMenu: { theme: changeMenuTheme },
-  } = useLayoutContext()
-  const modes: ThemeType[] = ['light', 'dark']
+  } = useLayoutContext();
+  const modes: ThemeType[] = ["light", "dark"];
   return (
     <div>
       <h5 className="my-3 font-16 fw-semibold">Menu Color</h5>
@@ -81,36 +92,36 @@ const MenuTheme = () => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
 const SidebarSize = () => {
   const {
     menu: { size: menuSize },
     changeMenu: { size: changeMenuSize },
-  } = useLayoutContext()
-  const sizes: { size: MenuType['size']; name: string }[] = [
+  } = useLayoutContext();
+  const sizes: { size: MenuType["size"]; name: string }[] = [
     {
-      name: 'Default',
-      size: 'default',
+      name: "Default",
+      size: "default",
     },
     {
-      name: 'Condensed',
-      size: 'condensed',
+      name: "Condensed",
+      size: "condensed",
     },
     {
-      name: 'Hidden',
-      size: 'hidden',
+      name: "Hidden",
+      size: "hidden",
     },
     {
-      name: 'Small Hover Active',
-      size: 'sm-hover-active',
+      name: "Small Hover Active",
+      size: "sm-hover-active",
     },
     {
-      name: 'Small Hover',
-      size: 'sm-hover',
+      name: "Small Hover",
+      size: "sm-hover",
     },
-  ]
+  ];
 
   return (
     <div>
@@ -125,22 +136,35 @@ const SidebarSize = () => {
             onChange={() => changeMenuSize(size.size)}
             checked={menuSize === size.size}
           />
-          <label className="form-check-label" htmlFor={`leftbar-size-${size.size}`}>
+          <label
+            className="form-check-label"
+            htmlFor={`leftbar-size-${size.size}`}
+          >
             {size.name}
           </label>
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
 const ThemeCustomizer = ({ open, toggle }: OffcanvasControlType) => {
-  const { resetSettings, theme } = useLayoutContext()
+  const { resetSettings, theme } = useLayoutContext();
 
   return (
     <div>
-      <Offcanvas placement="end" show={open} onHide={toggle} className="border-0 rounded-start-4 overflow-hidden" tabIndex={-1}>
-        <OffcanvasHeader closeVariant="white" closeButton className="d-flex align-items-center bg-primary p-3">
+      <Offcanvas
+        placement="end"
+        show={open}
+        onHide={toggle}
+        className="border-0 rounded-start-4 overflow-hidden"
+        tabIndex={-1}
+      >
+        <OffcanvasHeader
+          closeVariant="white"
+          closeButton
+          className="d-flex align-items-center bg-primary p-3"
+        >
           <h5 className="text-white m-0">Theme Settings</h5>
         </OffcanvasHeader>
         <OffcanvasBody className="p-0">
@@ -148,9 +172,9 @@ const ThemeCustomizer = ({ open, toggle }: OffcanvasControlType) => {
             <div className="p-3 settings-bar">
               <ColorScheme />
 
-              {theme === 'light' && <TopbarTheme />}
+              {theme === "light" && <TopbarTheme />}
 
-              {theme === 'light' && <MenuTheme />}
+              {theme === "light" && <MenuTheme />}
 
               <SidebarSize />
             </div>
@@ -159,7 +183,11 @@ const ThemeCustomizer = ({ open, toggle }: OffcanvasControlType) => {
         <div className="offcanvas-footer border-top p-3 text-center">
           <Row>
             <Col>
-              <Button variant="danger" onClick={resetSettings} className="w-100">
+              <Button
+                variant="danger"
+                onClick={resetSettings}
+                className="w-100"
+              >
                 Reset
               </Button>
             </Col>
@@ -167,7 +195,7 @@ const ThemeCustomizer = ({ open, toggle }: OffcanvasControlType) => {
         </div>
       </Offcanvas>
     </div>
-  )
-}
+  );
+};
 
-export default ThemeCustomizer
+export default ThemeCustomizer;

@@ -85,7 +85,7 @@ const StaffRoleDetail = ({ data }: { data: StaffRoleType }) => {
                       />
                       {perm.label}
                     </p>
-                  )
+                  ),
                 )}
               </div>
             ) : (

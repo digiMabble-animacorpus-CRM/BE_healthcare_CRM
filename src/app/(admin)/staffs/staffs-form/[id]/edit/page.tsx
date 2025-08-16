@@ -1,12 +1,11 @@
-'use client';
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import StaffForm from "../../staffForm";
 import { decryptAES } from "@/utils/encryption";
 import type { StaffType } from "@/types/data";
-import { updateStaff  } from "@/helpers/staff";
-
+import { updateStaff } from "@/helpers/staff";
 
 interface Props {
   params: { id?: string };
@@ -53,8 +52,6 @@ const transformToBackendDto = (formData: StaffType) => {
   };
 };
 
-
-
 const EditStaffPage = ({ params }: Props) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -62,7 +59,7 @@ const EditStaffPage = ({ params }: Props) => {
 
   //  Decrypt ID from URL param
   const decryptedId = useMemo(() => {
-      if (!params?.id) return null;
+    if (!params?.id) return null;
     try {
       if (!params?.id) return null;
       const decoded = decodeURIComponent(params.id);
@@ -99,7 +96,6 @@ const EditStaffPage = ({ params }: Props) => {
     setLoading(false);
   }, [decryptedId]);
 
-  
   //  Submit updated form
   const onSubmitHandler = async (formData: StaffType) => {
     try {

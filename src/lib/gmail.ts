@@ -1,22 +1,22 @@
 // lib/gmail.ts
 
-import { google } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
+import { google } from "googleapis";
+import { OAuth2Client } from "google-auth-library";
 
-const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
+const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
 
 export const oauth2Client = new google.auth.OAuth2(
   process.env.GMAIL_CLIENT_ID,
   process.env.GMAIL_CLIENT_SECRET,
-  process.env.GMAIL_REDIRECT_URI
+  process.env.GMAIL_REDIRECT_URI,
 );
 
 // Generate OAuth2 URL
 export function getAuthUrl(): string {
   return oauth2Client.generateAuthUrl({
-    access_type: 'offline',
+    access_type: "offline",
     scope: SCOPES,
-    prompt: 'consent',
+    prompt: "consent",
   });
 }
 
@@ -39,10 +39,10 @@ export function setCredentials(tokens: {
 export async function fetchEmails(): Promise<
   { subject: string; from: string; snippet: string }[]
 > {
-  const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+  const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
   const res = await gmail.users.messages.list({
-    userId: 'me',
+    userId: "me",
     maxResults: 5,
   });
 
@@ -51,15 +51,15 @@ export async function fetchEmails(): Promise<
 
   for (const message of messages) {
     const msg = await gmail.users.messages.get({
-      userId: 'me',
-      id: message.id || '',
+      userId: "me",
+      id: message.id || "",
     });
 
     const headers = msg.data.payload?.headers || [];
     const subject =
-      headers.find((h) => h.name === 'Subject')?.value || 'No Subject';
-    const from = headers.find((h) => h.name === 'From')?.value || 'Unknown';
-    const snippet = msg.data.snippet || '';
+      headers.find((h) => h.name === "Subject")?.value || "No Subject";
+    const from = headers.find((h) => h.name === "From")?.value || "Unknown";
+    const snippet = msg.data.snippet || "";
 
     emailData.push({ subject, from, snippet });
   }

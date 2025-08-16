@@ -84,7 +84,9 @@ const CustomersDetails = ({ data }: { data: CustomerEnquiriesType }) => {
             <p className="mb-0">{data.address}</p>
           </Col>
           <Col lg={3}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Mode of Register :</p>
+            <p className="text-dark fw-semibold fs-16 mb-1">
+              Mode of Register :
+            </p>
             <p className="mb-0">Online</p>
           </Col>
         </Row>

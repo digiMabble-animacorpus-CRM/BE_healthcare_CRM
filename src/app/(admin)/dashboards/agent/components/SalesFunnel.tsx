@@ -1,22 +1,41 @@
-'use client'
-import ReactApexChart from 'react-apexcharts'
-import { Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
-import { salesFunnelOptions } from '../data'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
+"use client";
+import ReactApexChart from "react-apexcharts";
+import {
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Row,
+} from "react-bootstrap";
+import { salesFunnelOptions } from "../data";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
 
 const SalesFunnel = () => {
   return (
     <Col lg={6}>
       <Card>
         <CardHeader className="d-flex  justify-content-between align-items-center border-0">
-          <CardTitle as={'h4'}>Sales Funnel</CardTitle>
+          <CardTitle as={"h4"}>Sales Funnel</CardTitle>
           <Dropdown>
             <DropdownToggle
-              as={'a'}
+              as={"a"}
               className="btn btn-sm btn-outline-light rounded content-none icons-center"
               data-bs-toggle="dropdown"
-              aria-expanded="false">
-              This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+              aria-expanded="false"
+            >
+              This Month{" "}
+              <IconifyIcon
+                className="ms-1"
+                width={16}
+                height={16}
+                icon="ri:arrow-down-s-line"
+              />
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu-end">
               <DropdownItem>Today</DropdownItem>
@@ -27,7 +46,13 @@ const SalesFunnel = () => {
         </CardHeader>
         <CardBody>
           <div className="mx-n3">
-            <ReactApexChart options={salesFunnelOptions} series={salesFunnelOptions.series} height={165} type="area" className="apex-charts mt-2" />
+            <ReactApexChart
+              options={salesFunnelOptions}
+              series={salesFunnelOptions.series}
+              height={165}
+              type="area"
+              className="apex-charts mt-2"
+            />
           </div>
         </CardBody>
         <CardFooter className="p-0 border-top">
@@ -54,7 +79,7 @@ const SalesFunnel = () => {
         </CardFooter>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default SalesFunnel
+export default SalesFunnel;

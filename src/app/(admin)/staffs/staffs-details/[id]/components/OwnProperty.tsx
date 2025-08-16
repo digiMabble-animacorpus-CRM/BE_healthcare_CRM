@@ -1,15 +1,15 @@
-'use client'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { currency } from '@/context/constants'
-import { ApexOptions } from 'apexcharts'
-import ReactApexChart from 'react-apexcharts'
-import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap'
+"use client";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { currency } from "@/context/constants";
+import { ApexOptions } from "apexcharts";
+import ReactApexChart from "react-apexcharts";
+import { Card, CardBody, CardHeader, CardTitle } from "react-bootstrap";
 
 const OwnProperty = () => {
   const OwnPropertyOptions: ApexOptions = {
     chart: {
       height: 343,
-      type: 'radialBar',
+      type: "radialBar",
       toolbar: {
         show: false,
       },
@@ -20,12 +20,12 @@ const OwnProperty = () => {
         endAngle: 225,
         hollow: {
           margin: 0,
-          size: '70%',
-          background: 'transparent',
+          size: "70%",
+          background: "transparent",
           image: undefined,
           imageOffsetX: 0,
           imageOffsetY: 0,
-          position: 'front',
+          position: "front",
           dropShadow: {
             enabled: true,
             top: 3,
@@ -35,8 +35,8 @@ const OwnProperty = () => {
           },
         },
         track: {
-          background: 'rgba(170,184,197, 0.4)',
-          strokeWidth: '67%',
+          background: "rgba(170,184,197, 0.4)",
+          strokeWidth: "67%",
           margin: 0,
         },
 
@@ -44,24 +44,24 @@ const OwnProperty = () => {
           name: {
             offsetY: -10,
             show: true,
-            color: '#888',
-            fontSize: '17px',
+            color: "#888",
+            fontSize: "17px",
           },
           value: {
-            color: '#111',
-            fontSize: '36px',
+            color: "#111",
+            fontSize: "36px",
             show: true,
           },
         },
       },
     },
     fill: {
-      type: 'gradient',
+      type: "gradient",
       gradient: {
-        shade: 'dark',
-        type: 'horizontal',
+        shade: "dark",
+        type: "horizontal",
         shadeIntensity: 0.5,
-        gradientToColors: ['#7f56da', '#4697ce'],
+        gradientToColors: ["#7f56da", "#4697ce"],
         inverseColors: true,
         opacityFrom: 1,
         opacityTo: 1,
@@ -70,23 +70,34 @@ const OwnProperty = () => {
     },
     series: [27],
     stroke: {
-      lineCap: 'round',
+      lineCap: "round",
     },
-    labels: ['Own'],
-  }
+    labels: ["Own"],
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle as={'h4'}>Own Property</CardTitle>
+        <CardTitle as={"h4"}>Own Property</CardTitle>
       </CardHeader>
       <CardBody>
-        <ReactApexChart options={OwnPropertyOptions} series={OwnPropertyOptions.series} height={343} type="radialBar" className="apex-charts" />
+        <ReactApexChart
+          options={OwnPropertyOptions}
+          series={OwnPropertyOptions.series}
+          height={343}
+          type="radialBar"
+          className="apex-charts"
+        />
         <div className="d-flex justify-content-between align-content-center">
           <div className="d-flex align-items-center gap-3">
             <div className="avatar flex-shrink-0">
               <span className="avatar-title bg-danger-subtle text-danger fw-bold rounded">
-                <IconifyIcon icon="ri:arrow-up-line" width={20} height={20} className="fs-20" />
+                <IconifyIcon
+                  icon="ri:arrow-up-line"
+                  width={20}
+                  height={20}
+                  className="fs-20"
+                />
               </span>
             </div>
             <div>
@@ -97,18 +108,25 @@ const OwnProperty = () => {
           <div className="d-flex align-items-center gap-3">
             <div className="avatar flex-shrink-0">
               <span className="avatar-title bg-success-subtle text-success fw-bold rounded">
-                <IconifyIcon icon="ri:arrow-down-line" width={20} height={20} className="fs-20" />
+                <IconifyIcon
+                  icon="ri:arrow-down-line"
+                  width={20}
+                  height={20}
+                  className="fs-20"
+                />
               </span>
             </div>
             <div>
-              <h4 className="text-dark fw-semibold mb-1">{currency}613,321.12</h4>
+              <h4 className="text-dark fw-semibold mb-1">
+                {currency}613,321.12
+              </h4>
               <p className="mb-0 text-muted">Income</p>
             </div>
           </div>
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default OwnProperty
+export default OwnProperty;

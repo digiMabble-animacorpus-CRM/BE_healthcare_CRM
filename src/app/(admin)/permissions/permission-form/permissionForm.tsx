@@ -3,7 +3,15 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+} from "react-bootstrap";
 import { useRouter } from "next/navigation";
 import TextFormInput from "@/components/from/TextFormInput";
 import type { PermissionType } from "@/types/data";
@@ -25,7 +33,9 @@ const schema = yup.object({
 interface Props {
   defaultValues?: Partial<PermissionType>;
   isEditMode?: boolean;
-  onSubmitHandler: (data: PermissionFormValues & { _id?: string }) => Promise<void>;
+  onSubmitHandler: (
+    data: PermissionFormValues & { _id?: string },
+  ) => Promise<void>;
 }
 
 const PermissionForm = ({
@@ -44,15 +54,13 @@ const PermissionForm = ({
     },
   });
 
-  const {
-    handleSubmit,
-    control,
-  } = methods;
+  const { handleSubmit, control } = methods;
 
   const handleFormSubmit = async (data: PermissionFormValues) => {
-    const payload = isEditMode && (defaultValues as any)?._id
-      ? { ...data, _id: (defaultValues as any)._id }
-      : data;
+    const payload =
+      isEditMode && (defaultValues as any)?._id
+        ? { ...data, _id: (defaultValues as any)._id }
+        : data;
 
     await onSubmitHandler(payload);
   };

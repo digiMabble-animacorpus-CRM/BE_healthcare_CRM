@@ -17,14 +17,18 @@ const ProfessionalInfo = () => {
 
   const roleId = watch("roleId");
   const [roleOptions, setRoleOptions] = useState<StaffRoleType[]>([]);
-  const [accessLevelOptions, setAccessLevelOptions] = useState<StaffRoleType[]>([]);
+  const [accessLevelOptions, setAccessLevelOptions] = useState<StaffRoleType[]>(
+    [],
+  );
 
   //  Fetch roles and access levels
   useEffect(() => {
-const accessLevelOptions = staffRoleData.filter((item) => item.tag === "AccessLevel");
-const roleOptions = staffRoleData.filter((item) => item.tag === "Role");
-      setRoleOptions(roleOptions);
-      setAccessLevelOptions(accessLevelOptions);
+    const accessLevelOptions = staffRoleData.filter(
+      (item) => item.tag === "AccessLevel",
+    );
+    const roleOptions = staffRoleData.filter((item) => item.tag === "Role");
+    setRoleOptions(roleOptions);
+    setAccessLevelOptions(accessLevelOptions);
   }, []);
 
   const selectedRole = useMemo(() => {
@@ -65,7 +69,9 @@ const roleOptions = staffRoleData.filter((item) => item.tag === "Role");
               )}
             />
             {errors.roleId?.message && (
-              <small className="text-danger2">{String(errors.roleId.message)}</small>
+              <small className="text-danger2">
+                {String(errors.roleId.message)}
+              </small>
             )}
           </div>
         </Col>
@@ -98,7 +104,9 @@ const roleOptions = staffRoleData.filter((item) => item.tag === "Role");
               )}
             />
             {errors.accessLevelId?.message && (
-              <small className="text-danger2">{String(errors.accessLevelId.message)}</small>
+              <small className="text-danger2">
+                {String(errors.accessLevelId.message)}
+              </small>
             )}
           </div>
         </Col>

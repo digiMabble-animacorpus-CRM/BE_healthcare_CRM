@@ -3,13 +3,7 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-} from "react-bootstrap";
+import { Button, Card, CardBody, CardHeader, CardTitle } from "react-bootstrap";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -40,7 +34,7 @@ const schema: yup.ObjectSchema<any> = yup.object().shape({
       yup.object().shape({
         id: yup.string().required("Branch ID is required"),
         isPrimary: yup.boolean().optional(),
-      })
+      }),
     )
     .min(1, "Select at least one branch")
     .required(),
@@ -57,13 +51,13 @@ const schema: yup.ObjectSchema<any> = yup.object().shape({
       day: yup.string().required("Day is required"),
       from: yup.string().required("Start time is required"),
       to: yup.string().required("End time is required"),
-    })
+    }),
   ),
   permissions: yup.array().of(
     yup.object().shape({
       _id: yup.string().required("Permission ID is required"),
       enabled: yup.boolean().required(),
-    })
+    }),
   ),
 });
 
@@ -73,9 +67,6 @@ interface Props {
   onSubmitHandler: (data: StaffType) => Promise<void>;
 }
 
-
-
-
 const StaffForm = ({ defaultValues, isEditMode, onSubmitHandler }: Props) => {
   const methods = useForm<StaffType>({
     resolver: yupResolver(schema),
@@ -83,23 +74,15 @@ const StaffForm = ({ defaultValues, isEditMode, onSubmitHandler }: Props) => {
     defaultValues: defaultValues || {},
   });
 
-
-  
-
-
-
-   const { watch, getValues, reset, handleSubmit } = methods;
+  const { watch, getValues, reset, handleSubmit } = methods;
   const router = useRouter();
 
-
-
-    useEffect(() => {
+  useEffect(() => {
     if (defaultValues && Object.keys(defaultValues).length > 0) {
       reset({ ...defaultValues });
       console.log(" Form reset with defaultValues", defaultValues);
     }
   }, [defaultValues, reset]);
-
 
   //  Load role and determine if availability is required
   const roleId = watch("roleId") || "";

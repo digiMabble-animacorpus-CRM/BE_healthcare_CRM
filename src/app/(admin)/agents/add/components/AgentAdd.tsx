@@ -1,49 +1,73 @@
-'use client'
-import ChoicesFormInput from '@/components/from/ChoicesFormInput'
-import TextAreaFormInput from '@/components/from/TextAreaFormInput'
-import TextFormInput from '@/components/from/TextFormInput'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap'
-import { useForm } from 'react-hook-form'
-import * as yup from 'yup'
+"use client";
+import ChoicesFormInput from "@/components/from/ChoicesFormInput";
+import TextAreaFormInput from "@/components/from/TextAreaFormInput";
+import TextFormInput from "@/components/from/TextFormInput";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+} from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
 
 const AgentAdd = () => {
   const messageSchema = yup.object({
-    name: yup.string().required('Please enter name'),
-    description: yup.string().required('Please enter description'),
-    zip_code: yup.string().required('Please enter Zip-Code'),
-    email: yup.string().email().required('Please enter email'),
-    number: yup.string().required('Please enter number'),
-    propertiesNumber: yup.string().required('Please enter Properties Number'),
-    facebookUrl: yup.string().required('Please enter Facebook Url'),
-    instagramUrl: yup.string().required('Please enter Instagram Url'),
-    twitterUrl: yup.string().required('Please enter Twitter Url'),
-  })
+    name: yup.string().required("Please enter name"),
+    description: yup.string().required("Please enter description"),
+    zip_code: yup.string().required("Please enter Zip-Code"),
+    email: yup.string().email().required("Please enter email"),
+    number: yup.string().required("Please enter number"),
+    propertiesNumber: yup.string().required("Please enter Properties Number"),
+    facebookUrl: yup.string().required("Please enter Facebook Url"),
+    instagramUrl: yup.string().required("Please enter Instagram Url"),
+    twitterUrl: yup.string().required("Please enter Twitter Url"),
+  });
 
   const { handleSubmit, control } = useForm({
     resolver: yupResolver(messageSchema),
-  })
+  });
   return (
     <form onSubmit={handleSubmit(() => {})}>
       <Card>
         <CardHeader>
-          <CardTitle as={'h4'}>Agent Information</CardTitle>
+          <CardTitle as={"h4"}>Agent Information</CardTitle>
         </CardHeader>
         <CardBody>
           <Row>
             <Col lg={6}>
               <div className="mb-3">
-                <TextFormInput control={control} name="name" placeholder="Full Name" label="Agent Name" />
+                <TextFormInput
+                  control={control}
+                  name="name"
+                  placeholder="Full Name"
+                  label="Agent Name"
+                />
               </div>
             </Col>
             <Col lg={6}>
               <div className="mb-3">
-                <TextFormInput control={control} name="email" placeholder="Enter Email" label="Agent Email" />
+                <TextFormInput
+                  control={control}
+                  name="email"
+                  placeholder="Enter Email"
+                  label="Agent Email"
+                />
               </div>
             </Col>
             <Col lg={6}>
               <div className="mb-3">
-                <TextFormInput control={control} name="number" type="number" placeholder="Enter Number" label="Agent Number" />
+                <TextFormInput
+                  control={control}
+                  name="number"
+                  type="number"
+                  placeholder="Enter Number"
+                  label="Agent Number"
+                />
               </div>
             </Col>
             <Col lg={6}>
@@ -73,7 +97,13 @@ const AgentAdd = () => {
             </Col>
             <Col lg={4}>
               <div className="mb-3">
-                <TextFormInput control={control} name="zip_code" type="number" placeholder="Zip-Code" label="Zip-Code" />
+                <TextFormInput
+                  control={control}
+                  name="zip_code"
+                  type="number"
+                  placeholder="Zip-Code"
+                  label="Zip-Code"
+                />
               </div>
             </Col>
             <Col lg={4}>
@@ -81,7 +111,13 @@ const AgentAdd = () => {
                 <label htmlFor="choices-city" className="form-label">
                   City
                 </label>
-                <ChoicesFormInput className="form-control" id="choices-city" data-choices data-choices-groups data-placeholder="Select City">
+                <ChoicesFormInput
+                  className="form-control"
+                  id="choices-city"
+                  data-choices
+                  data-choices-groups
+                  data-placeholder="Select City"
+                >
                   <option>Choose a city</option>
                   <optgroup label="UK">
                     <option value="London">London</option>
@@ -123,7 +159,13 @@ const AgentAdd = () => {
                 <label htmlFor="choices-country" className="form-label">
                   Country
                 </label>
-                <ChoicesFormInput className="form-control" id="choices-country" data-choices data-choices-groups data-placeholder="Select Country">
+                <ChoicesFormInput
+                  className="form-control"
+                  id="choices-country"
+                  data-choices
+                  data-choices-groups
+                  data-placeholder="Select Country"
+                >
                   <option>Choose a country</option>
                   <optgroup>
                     <option>United Kingdom</option>
@@ -136,24 +178,41 @@ const AgentAdd = () => {
                     <option value="India">India</option>
                     <option value="Germany">Germany</option>
                     <option value="Spain">Spain</option>
-                    <option value="United Arab Emirates">United Arab Emirates</option>
+                    <option value="United Arab Emirates">
+                      United Arab Emirates
+                    </option>
                   </optgroup>
                 </ChoicesFormInput>
               </div>
             </Col>
             <Col lg={4}>
               <div className="mb-3">
-                <TextFormInput control={control} name="facebookUrl" placeholder="Enter URL" label="Facebook URL" />
+                <TextFormInput
+                  control={control}
+                  name="facebookUrl"
+                  placeholder="Enter URL"
+                  label="Facebook URL"
+                />
               </div>
             </Col>
             <Col lg={4}>
               <div className="mb-3">
-                <TextFormInput control={control} name="instagramUrl" placeholder="Enter URL" label="Instagram URL" />
+                <TextFormInput
+                  control={control}
+                  name="instagramUrl"
+                  placeholder="Enter URL"
+                  label="Instagram URL"
+                />
               </div>
             </Col>
             <Col lg={4}>
               <div className="mb-3">
-                <TextFormInput control={control} name="twitterUrl" placeholder="Enter URL" label="Twitter URL" />
+                <TextFormInput
+                  control={control}
+                  name="twitterUrl"
+                  placeholder="Enter URL"
+                  label="Twitter URL"
+                />
               </div>
             </Col>
           </Row>
@@ -174,7 +233,7 @@ const AgentAdd = () => {
         </Row>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default AgentAdd
+export default AgentAdd;

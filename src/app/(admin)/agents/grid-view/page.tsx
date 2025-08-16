@@ -1,12 +1,12 @@
-import PageTitle from '@/components/PageTitle'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Link from 'next/link'
-import { Card, CardHeader, Col, Row } from 'react-bootstrap'
-import AgentData from './Components/AgentData'
-import AgentGridCard from './Components/AgentGridCard'
-import { Metadata } from 'next'
+import PageTitle from "@/components/PageTitle";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import Link from "next/link";
+import { Card, CardHeader, Col, Row } from "react-bootstrap";
+import AgentData from "./Components/AgentData";
+import AgentGridCard from "./Components/AgentGridCard";
+import { Metadata } from "next";
 
-export const metadata: Metadata = { title: 'Agent Grid' }
+export const metadata: Metadata = { title: "Agent Grid" };
 
 const GridViewPage = () => {
   return (
@@ -20,17 +20,25 @@ const GridViewPage = () => {
               <Row className="justify-content-between align-items-center">
                 <Col lg={6}>
                   <p className="mb-0 text-muted">
-                    Showing all <span className="text-dark fw-semibold">311</span> Agent
+                    Showing all{" "}
+                    <span className="text-dark fw-semibold">311</span> Agent
                   </p>
                 </Col>
                 <Col lg={6}>
                   <div className="text-md-end mt-3 mt-md-0">
-                    <button type="button" className="btn btn-outline-primary me-1">
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary me-1"
+                    >
                       <IconifyIcon icon="ri:settings-2-line" className="me-1" />
                       More Setting
                     </button>
-                    <button type="button" className="btn btn-outline-primary me-1">
-                      <IconifyIcon icon="ri:filter-line" className="me-1" /> Filters
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary me-1"
+                    >
+                      <IconifyIcon icon="ri:filter-line" className="me-1" />{" "}
+                      Filters
                     </button>
                     <button type="button" className="btn btn-success me-1">
                       <IconifyIcon icon="ri-add-line" /> New Agent
@@ -75,7 +83,7 @@ const GridViewPage = () => {
         </nav>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default GridViewPage
+export default GridViewPage;

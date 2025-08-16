@@ -1,12 +1,12 @@
-import logoDark from '@/assets/images/logo-dark.png'
-import logoLight from '@/assets/images/logo-light.png'
-import PageTitle from '@/components/PageTitle'
-import { currency } from '@/context/constants'
-import { Metadata } from 'next'
-import Image from 'next/image'
-import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
+import logoDark from "@/assets/images/logo-dark.png";
+import logoLight from "@/assets/images/logo-light.png";
+import PageTitle from "@/components/PageTitle";
+import { currency } from "@/context/constants";
+import { Metadata } from "next";
+import Image from "next/image";
+import { Button, Card, CardBody, CardTitle, Col, Row } from "react-bootstrap";
 
-export const metadata: Metadata = { title: 'Invoice' }
+export const metadata: Metadata = { title: "Invoice" };
 
 const InvoicePage = () => {
   return (
@@ -19,8 +19,18 @@ const InvoicePage = () => {
               <div className="clearfix">
                 <div className="float-sm-end">
                   <div className="auth-logo">
-                    <Image className="logo-dark me-1" src={logoDark} alt="logo-dark" height={24} />
-                    <Image className="logo-light me-1" src={logoLight} alt="logo-dark" height={24} />
+                    <Image
+                      className="logo-dark me-1"
+                      src={logoDark}
+                      alt="logo-dark"
+                      height={24}
+                    />
+                    <Image
+                      className="logo-light me-1"
+                      src={logoLight}
+                      alt="logo-dark"
+                      height={24}
+                    />
                   </div>
                   <address className="mt-3">
                     1729 Bangor St,
@@ -30,7 +40,7 @@ const InvoicePage = () => {
                   </address>
                 </div>
                 <div className="float-sm-start">
-                  <CardTitle as={'h5'} className="mb-2">
+                  <CardTitle as={"h5"} className="mb-2">
                     Invoice: #RB89562
                   </CardTitle>
                   <p>10 May, 2025</p>
@@ -69,7 +79,10 @@ const InvoicePage = () => {
                           <td className="text-end">{currency}721.77</td>
                         </tr>
                         <tr>
-                          <td>Sony Alpha ILCE 6000Y 24.3 MP Mirrorless Digital SLR Camera</td>
+                          <td>
+                            Sony Alpha ILCE 6000Y 24.3 MP Mirrorless Digital SLR
+                            Camera
+                          </td>
                           <td>5</td>
                           <td>{currency}135.99</td>
                           <td className="text-end">{currency}679.95</td>
@@ -81,7 +94,10 @@ const InvoicePage = () => {
                           <td className="text-end">{currency}99.49</td>
                         </tr>
                         <tr className="border-bottom">
-                          <td>Adam ROMA USB-C / USB-A 3.1 (2-in-1 Flash Drive) – 128GB</td>
+                          <td>
+                            Adam ROMA USB-C / USB-A 3.1 (2-in-1 Flash Drive) –
+                            128GB
+                          </td>
                           <td>2</td>
                           <td>{currency}350.19</td>
                           <td className="text-end">700.38</td>
@@ -96,9 +112,12 @@ const InvoicePage = () => {
                   <div className="clearfix pt-xl-3 pt-0">
                     <h6 className="text-muted">Notes:</h6>
                     <small className="text-muted">
-                      All accounts are to be paid within 7 days from receipt of invoice. To be paid by cheque or credit card or direct payment online.
-                      If account is not paid within 7 days the credits details supplied as confirmation of work undertaken will be charged the agreed
-                      quoted fee noted above.
+                      All accounts are to be paid within 7 days from receipt of
+                      invoice. To be paid by cheque or credit card or direct
+                      payment online. If account is not paid within 7 days the
+                      credits details supplied as confirmation of work
+                      undertaken will be charged the agreed quoted fee noted
+                      above.
                     </small>
                   </div>
                 </Col>
@@ -110,7 +129,10 @@ const InvoicePage = () => {
                     </p>
                     <p>
                       <span className="fw-medium">Discount (10%) :</span>
-                      <span className="float-end"> &nbsp;&nbsp;&nbsp; {currency}226.659</span>
+                      <span className="float-end">
+                        {" "}
+                        &nbsp;&nbsp;&nbsp; {currency}226.659
+                      </span>
                     </p>
                     <h3>{currency}2039.931 EUR</h3>
                   </div>
@@ -133,7 +155,7 @@ const InvoicePage = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default InvoicePage
+export default InvoicePage;

@@ -1,11 +1,11 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient'
-import { getAllTasks } from '@/helpers/data'
-import clsx from 'clsx'
-import { Button, Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap'
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import SimplebarReactClient from "@/components/wrappers/SimplebarReactClient";
+import { getAllTasks } from "@/helpers/data";
+import clsx from "clsx";
+import { Button, Card, CardBody, CardHeader, CardTitle } from "react-bootstrap";
 
 const Tasks = async () => {
-  const allTasks = await getAllTasks()
+  const allTasks = await getAllTasks();
 
   return (
     <Card>
@@ -23,12 +23,17 @@ const Tasks = async () => {
       <CardBody className="p-0 pb-3">
         <SimplebarReactClient className="p-3" style={{ maxHeight: 386 }}>
           {allTasks.map((task, idx) => (
-            <div className={clsx('form-check form-todo ps-4', { 'py-1 my-2': idx != 0 })} key={idx}>
+            <div
+              className={clsx("form-check form-todo ps-4", {
+                "py-1 my-2": idx != 0,
+              })}
+              key={idx}
+            >
               <input
                 type="checkbox"
                 className="form-check-input rounded-circle mt-0 fs-18"
                 id={`customCheck${idx}`}
-                defaultChecked={task.status === 'Completed' ? true : false}
+                defaultChecked={task.status === "Completed" ? true : false}
               />
               <label className="form-check-label" htmlFor={`customCheck${idx}`}>
                 {task.task}
@@ -38,7 +43,7 @@ const Tasks = async () => {
         </SimplebarReactClient>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default Tasks
+export default Tasks;

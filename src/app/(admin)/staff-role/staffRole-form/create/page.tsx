@@ -6,10 +6,7 @@ import type { StaffRoleType } from "@/types/data";
 import dynamic from "next/dynamic";
 
 // Dynamic import prevents SSR from executing DOM-dependent code
-const StaffRoleForm = dynamic(
-  () => import("../staffRoleForm"),
-  { ssr: false }
-);
+const StaffRoleForm = dynamic(() => import("../staffRoleForm"), { ssr: false });
 
 const CreateStaffRolePage = () => {
   const router = useRouter();

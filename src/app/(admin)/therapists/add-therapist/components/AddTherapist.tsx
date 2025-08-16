@@ -106,7 +106,7 @@ const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
         day: yup.string().required("Day is required"),
         from: yup.string().required("Start time is required"),
         to: yup.string().required("End time is required"),
-      })
+      }),
     )
     .required("Please add at least one availability slot")
     .min(1, "Please add at least one availability slot"),
@@ -178,7 +178,10 @@ const AddTherapist = ({ params }: Props) => {
   }, [isEditMode, params.id, reset]);
 
   const onSubmit = async (data: TherapistFormValues) => {
-    console.log(isEditMode ? "Edit Submitted Data:" : "Create Submitted Data:", data);
+    console.log(
+      isEditMode ? "Edit Submitted Data:" : "Create Submitted Data:",
+      data,
+    );
   };
 
   if (loading) {

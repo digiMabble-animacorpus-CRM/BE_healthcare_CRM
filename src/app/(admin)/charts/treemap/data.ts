@@ -1,122 +1,122 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from "apexcharts";
 
 export const basicTreemapOpts: ApexOptions = {
   series: [
     {
       data: [
         {
-          x: 'New Delhi',
+          x: "New Delhi",
           y: 218,
         },
         {
-          x: 'Kolkata',
+          x: "Kolkata",
           y: 149,
         },
         {
-          x: 'Mumbai',
+          x: "Mumbai",
           y: 184,
         },
         {
-          x: 'Ahmedabad',
+          x: "Ahmedabad",
           y: 55,
         },
         {
-          x: 'Bangaluru',
+          x: "Bangaluru",
           y: 84,
         },
         {
-          x: 'Pune',
+          x: "Pune",
           y: 31,
         },
         {
-          x: 'Chennai',
+          x: "Chennai",
           y: 70,
         },
         {
-          x: 'Jaipur',
+          x: "Jaipur",
           y: 30,
         },
         {
-          x: 'Surat',
+          x: "Surat",
           y: 44,
         },
         {
-          x: 'Hyderabad',
+          x: "Hyderabad",
           y: 68,
         },
         {
-          x: 'Lucknow',
+          x: "Lucknow",
           y: 28,
         },
         {
-          x: 'Indore',
+          x: "Indore",
           y: 19,
         },
         {
-          x: 'Kanpur',
+          x: "Kanpur",
           y: 29,
         },
       ],
     },
   ],
-  colors: ['#4697ce'],
+  colors: ["#4697ce"],
   legend: {
     show: false,
   },
   chart: {
     height: 350,
-    type: 'treemap',
+    type: "treemap",
   },
   title: {
-    text: 'Basic Treemap',
-    align: 'center',
+    text: "Basic Treemap",
+    align: "center",
   },
-}
+};
 
 export const multipleSeriesTreemapOpts: ApexOptions = {
   series: [
     {
-      name: 'Desktops',
+      name: "Desktops",
       data: [
         {
-          x: 'ABC',
+          x: "ABC",
           y: 10,
         },
         {
-          x: 'DEF',
+          x: "DEF",
           y: 60,
         },
         {
-          x: 'XYZ',
+          x: "XYZ",
           y: 41,
         },
       ],
     },
     {
-      name: 'Mobile',
+      name: "Mobile",
       data: [
         {
-          x: 'ABCD',
+          x: "ABCD",
           y: 10,
         },
         {
-          x: 'DEFG',
+          x: "DEFG",
           y: 20,
         },
         {
-          x: 'WXYZ',
+          x: "WXYZ",
           y: 51,
         },
         {
-          x: 'PQR',
+          x: "PQR",
           y: 30,
         },
         {
-          x: 'MNO',
+          x: "MNO",
           y: 20,
         },
         {
-          x: 'CDE',
+          x: "CDE",
           y: 30,
         },
       ],
@@ -127,69 +127,69 @@ export const multipleSeriesTreemapOpts: ApexOptions = {
   },
   chart: {
     height: 350,
-    type: 'treemap',
+    type: "treemap",
   },
-  colors: ['#f9b931', '#1bb394'],
+  colors: ["#f9b931", "#1bb394"],
   title: {
-    text: 'Multi-dimensional Treemap',
-    align: 'center',
+    text: "Multi-dimensional Treemap",
+    align: "center",
   },
-}
+};
 
 export const distributedTreemapOpts: ApexOptions = {
   series: [
     {
       data: [
         {
-          x: 'New Delhi',
+          x: "New Delhi",
           y: 218,
         },
         {
-          x: 'Kolkata',
+          x: "Kolkata",
           y: 149,
         },
         {
-          x: 'Mumbai',
+          x: "Mumbai",
           y: 184,
         },
         {
-          x: 'Ahmedabad',
+          x: "Ahmedabad",
           y: 55,
         },
         {
-          x: 'Bangaluru',
+          x: "Bangaluru",
           y: 84,
         },
         {
-          x: 'Pune',
+          x: "Pune",
           y: 31,
         },
         {
-          x: 'Chennai',
+          x: "Chennai",
           y: 70,
         },
         {
-          x: 'Jaipur',
+          x: "Jaipur",
           y: 30,
         },
         {
-          x: 'Surat',
+          x: "Surat",
           y: 44,
         },
         {
-          x: 'Hyderabad',
+          x: "Hyderabad",
           y: 68,
         },
         {
-          x: 'Lucknow',
+          x: "Lucknow",
           y: 28,
         },
         {
-          x: 'Indore',
+          x: "Indore",
           y: 19,
         },
         {
-          x: 'Kanpur',
+          x: "Kanpur",
           y: 29,
         },
       ],
@@ -200,26 +200,26 @@ export const distributedTreemapOpts: ApexOptions = {
   },
   chart: {
     height: 350,
-    type: 'treemap',
+    type: "treemap",
   },
   title: {
-    text: 'Distibuted Treemap (different color for each cell)',
-    align: 'center',
+    text: "Distibuted Treemap (different color for each cell)",
+    align: "center",
   },
   colors: [
-    '#4697ce',
-    '#53389f',
-    '#7f56da',
-    '#ff86c8',
-    '#ed5565',
-    '#23c6c8',
-    '#f9b931',
-    '#1bb394',
-    '#2a668b',
-    '#35ba44',
-    '#4ccedd',
-    '#23c880',
-    '#ed8055',
+    "#4697ce",
+    "#53389f",
+    "#7f56da",
+    "#ff86c8",
+    "#ed5565",
+    "#23c6c8",
+    "#f9b931",
+    "#1bb394",
+    "#2a668b",
+    "#35ba44",
+    "#4ccedd",
+    "#23c880",
+    "#ed8055",
   ],
   plotOptions: {
     treemap: {
@@ -227,63 +227,63 @@ export const distributedTreemapOpts: ApexOptions = {
       enableShades: false,
     },
   },
-}
-const colors = ['#4697ce', '#1bb394']
+};
+const colors = ["#4697ce", "#1bb394"];
 
 export const colorRangeTreemapOpts: ApexOptions = {
   series: [
     {
       data: [
         {
-          x: 'INTC',
+          x: "INTC",
           y: 1.2,
         },
         {
-          x: 'GS',
+          x: "GS",
           y: 0.4,
         },
         {
-          x: 'CVX',
+          x: "CVX",
           y: -1.4,
         },
         {
-          x: 'GE',
+          x: "GE",
           y: 2.7,
         },
         {
-          x: 'CAT',
+          x: "CAT",
           y: -0.3,
         },
         {
-          x: 'RTX',
+          x: "RTX",
           y: 5.1,
         },
         {
-          x: 'CSCO',
+          x: "CSCO",
           y: -2.3,
         },
         {
-          x: 'JNJ',
+          x: "JNJ",
           y: 2.1,
         },
         {
-          x: 'PG',
+          x: "PG",
           y: 0.3,
         },
         {
-          x: 'TRV',
+          x: "TRV",
           y: 0.12,
         },
         {
-          x: 'MMM',
+          x: "MMM",
           y: -2.31,
         },
         {
-          x: 'NKE',
+          x: "NKE",
           y: 3.98,
         },
         {
-          x: 'IYT',
+          x: "IYT",
           y: 1.67,
         },
       ],
@@ -294,19 +294,19 @@ export const colorRangeTreemapOpts: ApexOptions = {
   },
   chart: {
     height: 350,
-    type: 'treemap',
+    type: "treemap",
   },
   title: {
-    text: 'Treemap with Color scale',
-    align: 'center',
+    text: "Treemap with Color scale",
+    align: "center",
   },
   dataLabels: {
     enabled: true,
     formatter: function (text, opts) {
-      return text + '  ' + opts.value
+      return text + "  " + opts.value;
     },
     style: {
-      fontSize: '12px',
+      fontSize: "12px",
     },
     offsetY: -4,
   },
@@ -331,4 +331,4 @@ export const colorRangeTreemapOpts: ApexOptions = {
       },
     },
   },
-}
+};

@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { useChatContext } from '@/context/useChatContext'
-import type { UserType } from '@/types/data'
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { useChatContext } from "@/context/useChatContext";
+import type { UserType } from "@/types/data";
 import {
   Accordion,
   AccordionBody,
@@ -15,38 +15,57 @@ import {
   OffcanvasHeader,
   Tab,
   Tabs,
-} from 'react-bootstrap'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import Chat from './Chat'
-import Contact from './Contact'
-import Group from './Group'
+} from "react-bootstrap";
+import { Swiper, SwiperSlide } from "swiper/react";
+import Chat from "./Chat";
+import Contact from "./Contact";
+import Group from "./Group";
 
-import avatar1 from '@/assets/images/users/avatar-1.jpg'
+import avatar1 from "@/assets/images/users/avatar-1.jpg";
 
-import Image from 'next/image'
-import Link from 'next/link'
-import 'swiper/css'
+import Image from "next/image";
+import Link from "next/link";
+import "swiper/css";
 
 type ChatUsersProps = {
-  onUserSelect: (value: UserType) => void
-  users: UserType[]
-  selectedUser: UserType
-}
+  onUserSelect: (value: UserType) => void;
+  users: UserType[];
+  selectedUser: UserType;
+};
 
-const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) => {
-  const { chatSetting } = useChatContext()
-  const [user, setUser] = useState<UserType[]>([...users])
+const ChatLeftSidebar = ({
+  users,
+  onUserSelect,
+  selectedUser,
+}: ChatUsersProps) => {
+  const { chatSetting } = useChatContext();
+  const [user, setUser] = useState<UserType[]>([...users]);
 
   const search = (text: string) => {
-    setUser(text ? [...users].filter((u) => u.name!.toLowerCase().indexOf(text.toLowerCase()) >= 0) : [...users])
-  }
+    setUser(
+      text
+        ? [...users].filter(
+            (u) => u.name!.toLowerCase().indexOf(text.toLowerCase()) >= 0,
+          )
+        : [...users],
+    );
+  };
   return (
     <Card className="position-relative overflow-hidden">
       <CardHeader className="border-0 d-flex justify-content-between align-items-center gap-3">
         <form className="chat-search pb-0">
           <div className="chat-search-box">
-            <input className="form-control" type="text" onKeyUp={(e: any) => search(e.target.value)} name="search" placeholder="Search ..." />
-            <button type="button" className="btn btn-sm btn-link search-icon p-0 fs-15">
+            <input
+              className="form-control"
+              type="text"
+              onKeyUp={(e: any) => search(e.target.value)}
+              name="search"
+              placeholder="Search ..."
+            />
+            <button
+              type="button"
+              className="btn btn-sm btn-link search-icon p-0 fs-15"
+            >
               <IconifyIcon icon="ri:search-eye-line" />
             </button>
           </div>
@@ -58,16 +77,17 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
           type="button"
           data-bs-toggle="offcanvas"
           aria-haspopup="true"
-          aria-expanded="true">
+          aria-expanded="true"
+        >
           <IconifyIcon icon="ri:settings-2-line" />
         </a>
       </CardHeader>
-      <CardTitle as={'h4'} className="mb-3 mx-3">
+      <CardTitle as={"h4"} className="mb-3 mx-3">
         Active
       </CardTitle>
       <Swiper
-        pagination={{ el: '.swiper-pagination', clickable: true }}
-        slidesPerView={'auto'}
+        pagination={{ el: ".swiper-pagination", clickable: true }}
+        slidesPerView={"auto"}
         spaceBetween={8}
         breakpoints={{
           0: {
@@ -78,28 +98,42 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
           },
         }}
         autoHeight
-        className="mySwiper mx-3">
+        className="mySwiper mx-3"
+      >
         {users.map((user) => (
           <SwiperSlide className="avatar" key={user.id}>
             <div className="chat-user-status-box">
               <span>
-                <Image src={user.avatar} alt="avatar-1" className=" avatar rounded-circle  flex-shrink-0" />
+                <Image
+                  src={user.avatar}
+                  alt="avatar-1"
+                  className=" avatar rounded-circle  flex-shrink-0"
+                />
               </span>
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
-      <CardTitle as={'h4'} className="m-3">
+      <CardTitle as={"h4"} className="m-3">
         Message <span className="badge bg-danger badge-pill">5</span>
       </CardTitle>
-      <Tabs justify mountOnEnter className="nav nav-pills chat-tab-pills nav-justified p-1 rounded mx-1" defaultActiveKey={'chat-tab'}>
-        <Tab title="Chat" eventKey={'chat-tab'}>
-          <Chat onUserSelect={onUserSelect} users={user} selectedUser={selectedUser} />
+      <Tabs
+        justify
+        mountOnEnter
+        className="nav nav-pills chat-tab-pills nav-justified p-1 rounded mx-1"
+        defaultActiveKey={"chat-tab"}
+      >
+        <Tab title="Chat" eventKey={"chat-tab"}>
+          <Chat
+            onUserSelect={onUserSelect}
+            users={user}
+            selectedUser={selectedUser}
+          />
         </Tab>
-        <Tab title="Group" eventKey={'group-tab'}>
+        <Tab title="Group" eventKey={"group-tab"}>
           <Group />
         </Tab>
-        <Tab title="Contact" eventKey={'contact-tab'}>
+        <Tab title="Contact" eventKey={"contact-tab"}>
           <Contact />
         </Tab>
       </Tabs>
@@ -112,16 +146,26 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
         data-bs-backdrop="false"
         tabIndex={-1}
         id="user-setting"
-        aria-labelledby="user-settingLabel">
+        aria-labelledby="user-settingLabel"
+      >
         <OffcanvasHeader closeButton>
-          <h5 className="offcanvas-title text-truncate w-50" id="user-settingLabel">
+          <h5
+            className="offcanvas-title text-truncate w-50"
+            id="user-settingLabel"
+          >
             Profile
           </h5>
         </OffcanvasHeader>
         <div className="offcanvas-body p-0 h-100" data-simplebar>
           <h4 className="page-title p-3 my-0">Setting</h4>
           <div className="d-flex align-items-center px-3 pb-3 border-bottom">
-            <Image src={avatar1} className="me-2 rounded-circle" height={36} width={36} alt="avatar-1" />
+            <Image
+              src={avatar1}
+              className="me-2 rounded-circle"
+              height={36}
+              width={36}
+              alt="avatar-1"
+            />
             <div className="flex-grow-1">
               <div className="float-end">
                 <span role="button">
@@ -137,12 +181,16 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
           <div className="px-3 my-3 app-chat-setting">
             <Accordion className="custom-accordion" id="accordionSetting">
               <AccordionItem eventKey="1" className="border-0">
-                <AccordionHeader as={'h5'} className="my-0" id="headingAccount">
+                <AccordionHeader as={"h5"} className="my-0" id="headingAccount">
                   <span className="d-flex align-items-center">
                     <IconifyIcon icon="bx:key" className="me-3 fs-32" />
                     <span className="flex-grow-1">
-                      <span className="fs-14 h5 mt-0 mb-1 d-block">Account</span>
-                      <span className="mt-1 mb-0 text-muted w-75">Privacy, security, change number</span>
+                      <span className="fs-14 h5 mt-0 mb-1 d-block">
+                        Account
+                      </span>
+                      <span className="mt-1 mb-0 text-muted w-75">
+                        Privacy, security, change number
+                      </span>
                     </span>
                   </span>
                 </AccordionHeader>
@@ -151,31 +199,46 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                   <ul className="list-unstyled mb-0">
                     <li className="mb-2">
                       <span role="button">
-                        <IconifyIcon icon="bx:lock-alt" className="fs-18 me-2" />
+                        <IconifyIcon
+                          icon="bx:lock-alt"
+                          className="fs-18 me-2"
+                        />
                         Privacy
                       </span>
                     </li>
                     <li className="mb-2">
                       <span role="button">
-                        <IconifyIcon icon="bx:check-Reback" className="fs-18 me-2" />
+                        <IconifyIcon
+                          icon="bx:check-Reback"
+                          className="fs-18 me-2"
+                        />
                         Security
                       </span>
                     </li>
                     <li className="mb-2">
                       <span role="button">
-                        <IconifyIcon icon="bx:badge-check" className="fs-18 me-2" />
+                        <IconifyIcon
+                          icon="bx:badge-check"
+                          className="fs-18 me-2"
+                        />
                         Two-step verification
                       </span>
                     </li>
                     <li className="mb-2">
                       <span role="button">
-                        <IconifyIcon icon="bx:arrow-from-left" className="fs-18 me-2" />
+                        <IconifyIcon
+                          icon="bx:arrow-from-left"
+                          className="fs-18 me-2"
+                        />
                         Change number
                       </span>
                     </li>
                     <li className="mb-2">
                       <span role="button">
-                        <IconifyIcon icon="bx:info-circle" className="fs-18 me-2" />
+                        <IconifyIcon
+                          icon="bx:info-circle"
+                          className="fs-18 me-2"
+                        />
                         Request account info
                       </span>
                     </li>
@@ -190,12 +253,17 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
               </AccordionItem>
 
               <AccordionItem eventKey="2" className="border-0">
-                <AccordionHeader as={'h5'} className="my-0" id="headingChats">
+                <AccordionHeader as={"h5"} className="my-0" id="headingChats">
                   <span className="d-flex align-items-center">
-                    <IconifyIcon icon="bx:message-dots" className="me-3 fs-32" />
+                    <IconifyIcon
+                      icon="bx:message-dots"
+                      className="me-3 fs-32"
+                    />
                     <span className="flex-grow-1">
                       <span className="fs-14 h5 mt-0 mb-1 d-block">Chats</span>
-                      <span className="mt-1 mb-0 text-muted w-75">Theme, wallpapers, chat history</span>
+                      <span className="mt-1 mb-0 text-muted w-75">
+                        Theme, wallpapers, chat history
+                      </span>
                     </span>
                   </span>
                 </AccordionHeader>
@@ -223,20 +291,33 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     <li className="mb-2 ms-2">
                       <div className="float-end">
                         <div className="form-check form-switch">
-                          <input className="form-check-input" type="checkbox" id="media" defaultChecked />
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="media"
+                            defaultChecked
+                          />
                         </div>
                       </div>
                       <Link href="">Media Visibility</Link>
-                      <p className="mb-0 text-muted fs-12">Show Newly downloaded media in your phone&apos;s gallery</p>
+                      <p className="mb-0 text-muted fs-12">
+                        Show Newly downloaded media in your phone&apos;s gallery
+                      </p>
                     </li>
                     <li className="mb-2 ms-2">
                       <div className="float-end">
                         <div className="form-check form-switch">
-                          <input className="form-check-input" type="checkbox" id="enter" />
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="enter"
+                          />
                         </div>
                       </div>
                       <Link href="">Enter is send</Link>
-                      <p className="mb-0 text-muted fs-12">Enter key will send your message</p>
+                      <p className="mb-0 text-muted fs-12">
+                        Enter key will send your message
+                      </p>
                     </li>
                     <li className="mb-2 ms-2">
                       <Link href="">Font size</Link>
@@ -256,7 +337,10 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     </li>
                     <li className="mb-2">
                       <span role="button">
-                        <IconifyIcon icon="bx:cloud-upload" className="fs-16 me-2" />
+                        <IconifyIcon
+                          icon="bx:cloud-upload"
+                          className="fs-16 me-2"
+                        />
                         Chat Backup
                       </span>
                     </li>
@@ -271,12 +355,20 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
               </AccordionItem>
 
               <AccordionItem eventKey="3" className="border-0">
-                <AccordionHeader as={'h5'} className="my-0" id="headingNotification">
+                <AccordionHeader
+                  as={"h5"}
+                  className="my-0"
+                  id="headingNotification"
+                >
                   <span className="d-flex align-items-center">
                     <IconifyIcon icon="bx:bell" className="me-3 fs-32" />
                     <span className="flex-grow-1">
-                      <span className="fs-14 h5 mt-0 mb-1 d-block">Notification</span>
-                      <span className="mt-1 mb-0 text-muted w-75">Message, group, call tones</span>
+                      <span className="fs-14 h5 mt-0 mb-1 d-block">
+                        Notification
+                      </span>
+                      <span className="mt-1 mb-0 text-muted w-75">
+                        Message, group, call tones
+                      </span>
                     </span>
                   </span>
                 </AccordionHeader>
@@ -285,11 +377,18 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     <li className="mb-2">
                       <div className="float-end">
                         <div className="form-check form-switch">
-                          <input className="form-check-input" type="checkbox" id="conversation" defaultChecked />
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="conversation"
+                            defaultChecked
+                          />
                         </div>
                       </div>
                       <Link href="">Conversation Tones</Link>
-                      <p className="mb-0 text-muted fs-12">Play sound for incoming and outgoing message.</p>
+                      <p className="mb-0 text-muted fs-12">
+                        Play sound for incoming and outgoing message.
+                      </p>
                     </li>
                   </ul>
                   <hr />
@@ -340,12 +439,16 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
               </AccordionItem>
 
               <AccordionItem eventKey="4" className="border-0">
-                <AccordionHeader as={'h5'} className="my-0" id="headingStorage">
+                <AccordionHeader as={"h5"} className="my-0" id="headingStorage">
                   <span className="d-flex align-items-center">
                     <IconifyIcon icon="bx:history" className="me-3 fs-32" />
                     <span className="flex-grow-1">
-                      <span className="fs-14 h5 mt-0 mb-1 d-block">Storage and data</span>
-                      <span className="mt-1 mb-0 text-muted w-75">Network usage, auto download</span>
+                      <span className="fs-14 h5 mt-0 mb-1 d-block">
+                        Storage and data
+                      </span>
+                      <span className="mt-1 mb-0 text-muted w-75">
+                        Network usage, auto download
+                      </span>
                     </span>
                   </span>
                 </AccordionHeader>
@@ -366,13 +469,17 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                       <IconifyIcon icon="bx:wifi" className="fs-16 me-2" />
                       <div className="flex-grow-1">
                         <Link href="">Network usage</Link>
-                        <p className="mb-0 text-muted fs-12">7.2 GB sent - 13.8 GB received</p>
+                        <p className="mb-0 text-muted fs-12">
+                          7.2 GB sent - 13.8 GB received
+                        </p>
                       </div>
                     </li>
                   </ul>
                   <hr />
                   <h5 className="mb-0">Media auto-download</h5>
-                  <p className="mb-0 text-muted fs-12">Voice message are always automatically downloaded</p>
+                  <p className="mb-0 text-muted fs-12">
+                    Voice message are always automatically downloaded
+                  </p>
                   <ul className="list-unstyled mb-0 mt-2">
                     <li className="mb-2">
                       <Link href="">When using mobile data</Link>
@@ -389,23 +496,29 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                   </ul>
                   <hr />
                   <h5 className="mb-0">Media upload quality</h5>
-                  <p className="mb-0 text-muted fs-12">Choose the quality of media files to be sent</p>
+                  <p className="mb-0 text-muted fs-12">
+                    Choose the quality of media files to be sent
+                  </p>
                   <ul className="list-unstyled mb-0 mt-2">
                     <li className="ms-2">
                       <Link href="">Photo upload quality</Link>
-                      <p className="mb-0 text-muted fs-12">Auto (recommended)</p>
+                      <p className="mb-0 text-muted fs-12">
+                        Auto (recommended)
+                      </p>
                     </li>
                   </ul>
                 </AccordionBody>
               </AccordionItem>
 
               <AccordionItem eventKey="5" className="border-0">
-                <AccordionHeader as={'h5'} className="my-0" id="headingHelp">
+                <AccordionHeader as={"h5"} className="my-0" id="headingHelp">
                   <span className="d-flex align-items-center">
                     <IconifyIcon icon="bx:info-circle" className="me-3 fs-32" />
                     <span className="flex-grow-1">
                       <span className="fs-14 h5 mt-0 mb-1 d-block">Help</span>
-                      <span className="mt-1 mb-0 text-muted w-75">Help center, contact us, privacy policy</span>
+                      <span className="mt-1 mb-0 text-muted w-75">
+                        Help center, contact us, privacy policy
+                      </span>
                     </span>
                   </span>
                 </AccordionHeader>
@@ -414,7 +527,10 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                   <ul className="list-unstyled mb-0">
                     <li className="mb-2">
                       <div role="button">
-                        <IconifyIcon icon="bx:info-circle" className="fs-16 me-2" />
+                        <IconifyIcon
+                          icon="bx:info-circle"
+                          className="fs-16 me-2"
+                        />
                         Help center
                       </div>
                     </li>
@@ -427,13 +543,19 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     </li>
                     <li className="mb-2">
                       <span role="button">
-                        <IconifyIcon icon="bx:book-content" className="fs-16 me-2" />
+                        <IconifyIcon
+                          icon="bx:book-content"
+                          className="fs-16 me-2"
+                        />
                         Teams and Privacy Policy
                       </span>
                     </li>
                     <li>
                       <span role="button">
-                        <IconifyIcon icon="bx:book-circle" className="fs-16 me-2" />
+                        <IconifyIcon
+                          icon="bx:book-circle"
+                          className="fs-16 me-2"
+                        />
                         App info
                       </span>
                     </li>
@@ -445,7 +567,7 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
         </div>
       </Offcanvas>
     </Card>
-  )
-}
+  );
+};
 
-export default ChatLeftSidebar
+export default ChatLeftSidebar;

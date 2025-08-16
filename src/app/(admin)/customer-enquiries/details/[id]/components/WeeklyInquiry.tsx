@@ -1,23 +1,35 @@
-'use client'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { ApexOptions } from 'apexcharts'
-import ReactApexChart from 'react-apexcharts'
-import { Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
+"use client";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { ApexOptions } from "apexcharts";
+import ReactApexChart from "react-apexcharts";
+import {
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Row,
+} from "react-bootstrap";
 
 const WeeklyInquiry = () => {
   const WeeklyInquiryOptions: ApexOptions = {
     chart: {
       height: 294,
       parentHeightOffset: 0,
-      type: 'bar',
+      type: "bar",
       toolbar: {
         show: !1,
       },
     },
     plotOptions: {
       bar: {
-        barHeight: '100%',
-        columnWidth: '40%',
+        barHeight: "100%",
+        columnWidth: "40%",
         borderRadius: 4,
         distributed: !0,
       },
@@ -31,13 +43,13 @@ const WeeklyInquiry = () => {
         right: 0,
       },
     },
-    colors: ['#caaa71', '#d3cbff', '#d3cbff', '#d3cbff'],
+    colors: ["#caaa71", "#d3cbff", "#d3cbff", "#d3cbff"],
     dataLabels: {
       enabled: true,
     },
     series: [
       {
-        name: 'Inquiry',
+        name: "Inquiry",
         data: [4, 5, 6, 4, 9, 5, 4],
       },
     ],
@@ -45,7 +57,7 @@ const WeeklyInquiry = () => {
       show: !1,
     },
     xaxis: {
-      categories: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      categories: ["S", "M", "T", "W", "T", "F", "S"],
       axisBorder: {
         show: !1,
       },
@@ -71,23 +83,36 @@ const WeeklyInquiry = () => {
         },
       },
     ],
-  }
+  };
   return (
     <Card>
       <CardHeader className="d-flex align-items-center justify-content-between">
-        <CardTitle as={'h4'}>Weekly Inquiry</CardTitle>
+        <CardTitle as={"h4"}>Weekly Inquiry</CardTitle>
         <Dropdown>
           <DropdownToggle
-            as={'a'}
+            as={"a"}
             className="btn btn-sm btn-outline-light rounded show  content-none icons-center"
             data-bs-toggle="dropdown"
-            aria-expanded="true">
-            This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+            aria-expanded="true"
+          >
+            This Month{" "}
+            <IconifyIcon
+              className="ms-1"
+              width={16}
+              height={16}
+              icon="ri:arrow-down-s-line"
+            />
           </DropdownToggle>
           <DropdownMenu
             className="dropdown-menu-end"
             data-popper-placement="bottom-end"
-            style={{ position: 'absolute', inset: '0px 0px auto auto', margin: 0, transform: 'translate(0px, 34px)' }}>
+            style={{
+              position: "absolute",
+              inset: "0px 0px auto auto",
+              margin: 0,
+              transform: "translate(0px, 34px)",
+            }}
+          >
             <DropdownItem>Day</DropdownItem>
             <DropdownItem>Month</DropdownItem>
             <DropdownItem>Year</DropdownItem>
@@ -97,7 +122,13 @@ const WeeklyInquiry = () => {
       <CardBody>
         <Row>
           <Col xs={12}>
-            <ReactApexChart options={WeeklyInquiryOptions} series={WeeklyInquiryOptions.series} height={294} type="bar" className="apex-charts" />
+            <ReactApexChart
+              options={WeeklyInquiryOptions}
+              series={WeeklyInquiryOptions.series}
+              height={294}
+              type="bar"
+              className="apex-charts"
+            />
           </Col>
         </Row>
       </CardBody>
@@ -106,7 +137,7 @@ const WeeklyInquiry = () => {
         <p className="mb-0 text-dark fw-semibold fs-15">First Week 37</p>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
 
-export default WeeklyInquiry
+export default WeeklyInquiry;

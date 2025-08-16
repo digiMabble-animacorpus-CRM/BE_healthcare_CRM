@@ -1,30 +1,30 @@
-import small2 from '@/assets/images/small/img-2.jpg'
-import { type ApexOptions } from 'apexcharts'
+import small2 from "@/assets/images/small/img-2.jpg";
+import { type ApexOptions } from "apexcharts";
 
 export const basicRadialBarOpts: ApexOptions = {
   chart: {
     height: 320,
-    type: 'radialBar',
+    type: "radialBar",
   },
   plotOptions: {
     radialBar: {
       hollow: {
-        size: '70%',
+        size: "70%",
       },
       track: {
-        background: 'rgba(170,184,197, 0.2)',
+        background: "rgba(170,184,197, 0.2)",
       },
     },
   },
-  colors: ['#7f56da'],
+  colors: ["#7f56da"],
   series: [70],
-  labels: ['CRICKET'],
-}
+  labels: ["CRICKET"],
+};
 
 export const multipleRadialBarsOpts: ApexOptions = {
   chart: {
     height: 320,
-    type: 'radialBar',
+    type: "radialBar",
   },
   plotOptions: {
     // circle: {
@@ -34,13 +34,13 @@ export const multipleRadialBarsOpts: ApexOptions = {
     // },
     radialBar: {
       track: {
-        background: 'rgba(170,184,197, 0.2)',
+        background: "rgba(170,184,197, 0.2)",
       },
     },
   },
-  colors: ['#4697ce', '#7f56da', '#e06d94', '#7dcc93'],
+  colors: ["#4697ce", "#7f56da", "#e06d94", "#7dcc93"],
   series: [44, 55, 67, 83],
-  labels: ['Apples', 'Oranges', 'Bananas', 'Berries'],
+  labels: ["Apples", "Oranges", "Bananas", "Berries"],
   responsive: [
     {
       breakpoint: 380,
@@ -51,12 +51,12 @@ export const multipleRadialBarsOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const customAngleOpts: ApexOptions = {
   chart: {
     height: 380,
-    type: 'radialBar',
+    type: "radialBar",
   },
   plotOptions: {
     radialBar: {
@@ -65,12 +65,12 @@ export const customAngleOpts: ApexOptions = {
       endAngle: 270,
       hollow: {
         margin: 5,
-        size: '30%',
-        background: 'transparent',
+        size: "30%",
+        background: "transparent",
         image: undefined,
       },
       track: {
-        background: 'rgba(170,184,197, 0.2)',
+        background: "rgba(170,184,197, 0.2)",
       },
       dataLabels: {
         name: {
@@ -82,21 +82,21 @@ export const customAngleOpts: ApexOptions = {
       },
     },
   },
-  colors: ['#4697ce', '#7f56da', '#e06d94', '#7dcc93'],
+  colors: ["#4697ce", "#7f56da", "#e06d94", "#7dcc93"],
   series: [76, 67, 61, 90],
-  labels: ['Vimeo', 'Messenger', 'Facebook', 'LinkedIn'],
+  labels: ["Vimeo", "Messenger", "Facebook", "LinkedIn"],
   legend: {
     show: true,
     floating: true,
-    fontSize: '13px',
-    position: 'left',
+    fontSize: "13px",
+    position: "left",
     offsetX: 10,
     offsetY: 10,
     labels: {
       useSeriesColors: true,
     },
     formatter: function (seriesName, opts) {
-      return seriesName + ':  ' + opts.w.globals.series[opts.seriesIndex]
+      return seriesName + ":  " + opts.w.globals.series[opts.seriesIndex];
     },
     itemMargin: {
       horizontal: 1,
@@ -112,15 +112,15 @@ export const customAngleOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const circleWithImageOpts: ApexOptions = {
   chart: {
     height: 360,
-    type: 'radialBar',
+    type: "radialBar",
   },
   fill: {
-    type: 'image',
+    type: "image",
     image: {
       src: [small2.src],
     },
@@ -128,15 +128,15 @@ export const circleWithImageOpts: ApexOptions = {
   plotOptions: {
     radialBar: {
       hollow: {
-        size: '70%',
+        size: "70%",
       },
     },
   },
   series: [70],
   stroke: {
-    lineCap: 'round',
+    lineCap: "round",
   },
-  labels: ['Volatility'],
+  labels: ["Volatility"],
   responsive: [
     {
       breakpoint: 380,
@@ -147,12 +147,12 @@ export const circleWithImageOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const strokedCircularGuageOpts: ApexOptions = {
   chart: {
     height: 380,
-    type: 'radialBar',
+    type: "radialBar",
   },
   plotOptions: {
     radialBar: {
@@ -160,21 +160,21 @@ export const strokedCircularGuageOpts: ApexOptions = {
       endAngle: 135,
       dataLabels: {
         name: {
-          fontSize: '16px',
+          fontSize: "16px",
           color: undefined,
           offsetY: 120,
         },
         value: {
           offsetY: 76,
-          fontSize: '22px',
+          fontSize: "22px",
           color: undefined,
           formatter: function (val) {
-            return val + '%'
+            return val + "%";
           },
         },
       },
       track: {
-        background: 'rgba(170,184,197, 0.2)',
+        background: "rgba(170,184,197, 0.2)",
         margin: 0,
       },
     },
@@ -182,7 +182,7 @@ export const strokedCircularGuageOpts: ApexOptions = {
   fill: {
     gradient: {
       // enabled: true,
-      shade: 'dark',
+      shade: "dark",
       shadeIntensity: 0.2,
       inverseColors: false,
       opacityFrom: 1,
@@ -193,9 +193,9 @@ export const strokedCircularGuageOpts: ApexOptions = {
   stroke: {
     dashArray: 4,
   },
-  colors: ['#e06d94'],
+  colors: ["#e06d94"],
   series: [67],
-  labels: ['Median Ratio'],
+  labels: ["Median Ratio"],
   responsive: [
     {
       breakpoint: 380,
@@ -206,12 +206,12 @@ export const strokedCircularGuageOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const gradientCircularOpts: ApexOptions = {
   chart: {
     height: 330,
-    type: 'radialBar',
+    type: "radialBar",
     toolbar: {
       show: false,
     },
@@ -222,12 +222,12 @@ export const gradientCircularOpts: ApexOptions = {
       endAngle: 225,
       hollow: {
         margin: 0,
-        size: '70%',
-        background: 'transparent',
+        size: "70%",
+        background: "transparent",
         image: undefined,
         imageOffsetX: 0,
         imageOffsetY: 0,
-        position: 'front',
+        position: "front",
         dropShadow: {
           enabled: true,
           top: 3,
@@ -237,8 +237,8 @@ export const gradientCircularOpts: ApexOptions = {
         },
       },
       track: {
-        background: 'rgba(170,184,197, 0.2)',
-        strokeWidth: '67%',
+        background: "rgba(170,184,197, 0.2)",
+        strokeWidth: "67%",
         margin: 0,
       },
 
@@ -247,27 +247,27 @@ export const gradientCircularOpts: ApexOptions = {
         name: {
           offsetY: -10,
           show: true,
-          color: '#888',
-          fontSize: '17px',
+          color: "#888",
+          fontSize: "17px",
         },
         value: {
           formatter: function (val: number) {
-            return val.toString()
+            return val.toString();
           },
-          color: '#111',
-          fontSize: '36px',
+          color: "#111",
+          fontSize: "36px",
           show: true,
         },
       },
     },
   },
   fill: {
-    type: 'gradient',
+    type: "gradient",
     gradient: {
-      shade: 'dark',
-      type: 'horizontal',
+      shade: "dark",
+      type: "horizontal",
       shadeIntensity: 0.5,
-      gradientToColors: ['#7f56da', '#4697ce'],
+      gradientToColors: ["#7f56da", "#4697ce"],
       inverseColors: true,
       opacityFrom: 1,
       opacityTo: 1,
@@ -276,15 +276,15 @@ export const gradientCircularOpts: ApexOptions = {
   },
   series: [75],
   stroke: {
-    lineCap: 'round',
+    lineCap: "round",
   },
-  labels: ['Percent'],
-}
+  labels: ["Percent"],
+};
 
 export const semiCircleGaugeOpts: ApexOptions = {
   series: [76],
   chart: {
-    type: 'radialBar',
+    type: "radialBar",
     offsetY: -20,
     sparkline: {
       enabled: true,
@@ -295,13 +295,13 @@ export const semiCircleGaugeOpts: ApexOptions = {
       startAngle: -90,
       endAngle: 90,
       track: {
-        background: 'rgba(170,184,197, 0.2)',
-        strokeWidth: '97%',
+        background: "rgba(170,184,197, 0.2)",
+        strokeWidth: "97%",
         margin: 5, // margin is in pixels
         dropShadow: {
           top: 2,
           left: 0,
-          color: '#eef2f7',
+          color: "#eef2f7",
           opacity: 1,
           blur: 2,
         },
@@ -312,7 +312,7 @@ export const semiCircleGaugeOpts: ApexOptions = {
         },
         value: {
           offsetY: -2,
-          fontSize: '22px',
+          fontSize: "22px",
         },
       },
     },
@@ -322,6 +322,6 @@ export const semiCircleGaugeOpts: ApexOptions = {
       top: -10,
     },
   },
-  colors: ['#4697ce'],
-  labels: ['Average Results'],
-}
+  colors: ["#4697ce"],
+  labels: ["Average Results"],
+};

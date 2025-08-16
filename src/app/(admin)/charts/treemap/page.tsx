@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllTreemapCharts from './components/AllTreemapCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from "react-bootstrap";
+import UIExamplesList from "@/components/UIExamplesList";
+import AllTreemapCharts from "./components/AllTreemapCharts";
+import type { Metadata } from "next";
+import PageTitle from "@/components/PageTitle";
 
-export const metadata: Metadata = { title: 'Treemap Charts' }
+export const metadata: Metadata = { title: "Treemap Charts" };
 
 const TreemapCharts = () => {
   return (
@@ -17,16 +17,16 @@ const TreemapCharts = () => {
         <Col xl={3}>
           <UIExamplesList
             examples={[
-              { link: '#basic', label: 'Basic' },
-              { link: '#multiple', label: 'Treemap Multiple Series' },
-              { link: '#distributed', label: 'Distributed Treemap' },
-              { link: '#color-range', label: 'Color Range Treemap' },
+              { link: "#basic", label: "Basic" },
+              { link: "#multiple", label: "Treemap Multiple Series" },
+              { link: "#distributed", label: "Distributed Treemap" },
+              { link: "#color-range", label: "Color Range Treemap" },
             ]}
           />
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default TreemapCharts
+export default TreemapCharts;

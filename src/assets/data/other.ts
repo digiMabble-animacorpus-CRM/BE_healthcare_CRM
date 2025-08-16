@@ -332,7 +332,6 @@ export const customerEnquiriesData: CustomerEnquiriesType[] = [
   },
 ];
 
-
 export const therapistData: TherapistType[] = [
   {
     _id: "t1",

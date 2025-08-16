@@ -13,7 +13,9 @@ interface Props {
 const EditStaffRolePage = ({ params }: Props) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [defaultValues, setDefaultValues] = useState<Partial<StaffRoleType>>({});
+  const [defaultValues, setDefaultValues] = useState<Partial<StaffRoleType>>(
+    {},
+  );
   const isEditMode = Boolean(params.id);
 
   useEffect(() => {

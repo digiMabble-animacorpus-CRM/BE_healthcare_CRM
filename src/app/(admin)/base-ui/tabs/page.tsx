@@ -1,9 +1,9 @@
-import type { Metadata } from 'next'
-import AllNavTabs from './components/AllNavTabs'
-import UIExamplesList from '@/components/UIExamplesList'
-import { Col, Row } from 'react-bootstrap'
+import type { Metadata } from "next";
+import AllNavTabs from "./components/AllNavTabs";
+import UIExamplesList from "@/components/UIExamplesList";
+import { Col, Row } from "react-bootstrap";
 
-export const metadata: Metadata = { title: 'Nav Tabs' }
+export const metadata: Metadata = { title: "Nav Tabs" };
 const Tabs = () => {
   return (
     <>
@@ -15,18 +15,18 @@ const Tabs = () => {
         <Col xl={3}>
           <UIExamplesList
             examples={[
-              { link: '#default', label: 'Nav Tabs' },
-              { link: '#tab-justify', label: 'Tabs Justify' },
-              { link: '#nav-pills', label: 'Nav Pills' },
-              { link: '#pills-justify', label: 'Pills Justified' },
-              { link: '#tab-vertical-left', label: 'Tabs Vertical Left' },
-              { link: '#tab-vertical-right', label: 'Tabs Vertical right' },
+              { link: "#default", label: "Nav Tabs" },
+              { link: "#tab-justify", label: "Tabs Justify" },
+              { link: "#nav-pills", label: "Nav Pills" },
+              { link: "#pills-justify", label: "Pills Justified" },
+              { link: "#tab-vertical-left", label: "Tabs Vertical Left" },
+              { link: "#tab-vertical-right", label: "Tabs Vertical right" },
             ]}
           />
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Tabs
+export default Tabs;

@@ -19,10 +19,10 @@ import PermissionsSection from "../../components/permissionSection";
 import { getStaffById } from "@/helpers/data";
 
 const PermissionPage = () => {
-  const { id }  = useParams<{ id: string }>();
-  const router  = useRouter();
+  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
 
-  const [loading, setLoading]     = useState(true);
+  const [loading, setLoading] = useState(true);
   const [staffInfo, setStaffInfo] = useState<StaffType | null>(null);
 
   /* form ---------------------------------------------------------------- */
@@ -40,7 +40,7 @@ const PermissionPage = () => {
     const fetchData = async () => {
       try {
         const response = await getStaffById(id);
-        const data     = response?.data?.[0];
+        const data = response?.data?.[0];
 
         if (data) {
           setStaffInfo(data);
@@ -51,7 +51,7 @@ const PermissionPage = () => {
             (data.permissions || []).map((p: any) => ({
               _id: p._id,
               enabled: false,
-            }))
+            })),
           );
 
           /* make sure roleId exists in the form */
@@ -104,15 +104,33 @@ const PermissionPage = () => {
             </CardHeader>
             <CardBody>
               <Row>
-                <Col md={6}><strong>Name:</strong> {staffInfo.name}</Col>
-                <Col md={6}><strong>Email:</strong> {staffInfo.email}</Col>
-                <Col md={6} className="mt-2"><strong>Phone:</strong> {staffInfo.phoneNumber}</Col>
-                <Col md={6} className="mt-2"><strong>Gender:</strong> {staffInfo.gender}</Col>
-                <Col md={6} className="mt-2"><strong>Role:</strong> {staffInfo.role}</Col>
-                <Col md={6} className="mt-2"><strong>Access Level:</strong> {staffInfo.accessLevel}</Col>
-                <Col md={6} className="mt-2"><strong>Primary Branch:</strong> {staffInfo.selectedBranch}</Col>
-                <Col md={6} className="mt-2"><strong>Date of Birth:</strong> {staffInfo.dob}</Col>
-                <Col md={12} className="mt-2"><strong>Description:</strong> {staffInfo.description || "-"}</Col>
+                <Col md={6}>
+                  <strong>Name:</strong> {staffInfo.name}
+                </Col>
+                <Col md={6}>
+                  <strong>Email:</strong> {staffInfo.email}
+                </Col>
+                <Col md={6} className="mt-2">
+                  <strong>Phone:</strong> {staffInfo.phoneNumber}
+                </Col>
+                <Col md={6} className="mt-2">
+                  <strong>Gender:</strong> {staffInfo.gender}
+                </Col>
+                <Col md={6} className="mt-2">
+                  <strong>Role:</strong> {staffInfo.role}
+                </Col>
+                <Col md={6} className="mt-2">
+                  <strong>Access Level:</strong> {staffInfo.accessLevel}
+                </Col>
+                <Col md={6} className="mt-2">
+                  <strong>Primary Branch:</strong> {staffInfo.selectedBranch}
+                </Col>
+                <Col md={6} className="mt-2">
+                  <strong>Date of Birth:</strong> {staffInfo.dob}
+                </Col>
+                <Col md={12} className="mt-2">
+                  <strong>Description:</strong> {staffInfo.description || "-"}
+                </Col>
               </Row>
             </CardBody>
           </Card>
@@ -126,8 +144,12 @@ const PermissionPage = () => {
           <CardBody>
             <PermissionsSection />
             <div className="mt-4 d-flex gap-3 justify-content-end">
-              <Button type="submit" variant="primary">Update</Button>
-              <Button variant="secondary" onClick={() => router.back()}>Cancel</Button>
+              <Button type="submit" variant="primary">
+                Update
+              </Button>
+              <Button variant="secondary" onClick={() => router.back()}>
+                Cancel
+              </Button>
             </div>
           </CardBody>
         </Card>

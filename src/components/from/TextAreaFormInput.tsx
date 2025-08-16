@@ -1,12 +1,25 @@
-import { FormControl, FormGroup, FormLabel, type FormControlProps } from 'react-bootstrap'
-import Feedback from 'react-bootstrap/esm/Feedback'
-import { Controller, type FieldPath, type FieldValues, type PathValue } from 'react-hook-form'
+import {
+  FormControl,
+  FormGroup,
+  FormLabel,
+  type FormControlProps,
+} from "react-bootstrap";
+import Feedback from "react-bootstrap/esm/Feedback";
+import {
+  Controller,
+  type FieldPath,
+  type FieldValues,
+  type PathValue,
+} from "react-hook-form";
 
-import type { FormInputProps } from '@/types/component-props'
+import type { FormInputProps } from "@/types/component-props";
 
-type TextAreaFormInputProps = { rows?: number }
+type TextAreaFormInputProps = { rows?: number };
 
-const TextAreaFormInput = <TFieldValues extends FieldValues = FieldValues, TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>>({
+const TextAreaFormInput = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
   name,
   rows = 3,
   containerClassName,
@@ -15,21 +28,32 @@ const TextAreaFormInput = <TFieldValues extends FieldValues = FieldValues, TName
   label,
   noValidate,
   ...other
-}: FormInputProps<TFieldValues> & FormControlProps & TextAreaFormInputProps) => {
+}: FormInputProps<TFieldValues> &
+  FormControlProps &
+  TextAreaFormInputProps) => {
   return (
     <Controller<TFieldValues, TName>
       name={name as TName}
       // defaultValue={'' as PathValue<TFieldValues, TName>}
       control={control}
       render={({ field, fieldState }) => (
-        <FormGroup className={containerClassName ?? ''}>
+        <FormGroup className={containerClassName ?? ""}>
           {label && <FormLabel>{label}</FormLabel>}
-          <FormControl id={id} rows={rows} as="textarea" {...other} {...field} isInvalid={Boolean(fieldState.error?.message)} />
-          {!noValidate && fieldState.error?.message && <Feedback type="invalid">{fieldState.error?.message}</Feedback>}
+          <FormControl
+            id={id}
+            rows={rows}
+            as="textarea"
+            {...other}
+            {...field}
+            isInvalid={Boolean(fieldState.error?.message)}
+          />
+          {!noValidate && fieldState.error?.message && (
+            <Feedback type="invalid">{fieldState.error?.message}</Feedback>
+          )}
         </FormGroup>
       )}
     />
-  )
-}
+  );
+};
 
-export default TextAreaFormInput
+export default TextAreaFormInput;

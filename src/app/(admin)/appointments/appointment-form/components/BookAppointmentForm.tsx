@@ -3,13 +3,7 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Button,
-} from "react-bootstrap";
+import { Card, CardBody, CardHeader, CardTitle, Button } from "react-bootstrap";
 import AppointmentFields from "./AppointmentFields";
 
 type AppointmentFormValues = {
@@ -71,7 +65,7 @@ const BookAppointmentForm = ({
             </CardTitle>
           </CardHeader>
           <CardBody>
-            <AppointmentFields/>
+            <AppointmentFields />
 
             <div className="d-flex justify-content-end mt-4">
               <Button type="submit" variant="primary">

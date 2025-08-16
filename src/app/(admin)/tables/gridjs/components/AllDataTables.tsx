@@ -1,35 +1,52 @@
-'use client'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import type { Employee } from '@/types/data'
-import { Grid } from 'gridjs-react'
-import Link from 'next/link'
-import { Button, Card, CardBody, CardTitle } from 'react-bootstrap'
+"use client";
+import ComponentContainerCard from "@/components/ComponentContainerCard";
+import type { Employee } from "@/types/data";
+import { Grid } from "gridjs-react";
+import Link from "next/link";
+import { Button, Card, CardBody, CardTitle } from "react-bootstrap";
 
-const AllDataTables = ({ dataTableRecords }: { dataTableRecords: Employee[] }) => {
+const AllDataTables = ({
+  dataTableRecords,
+}: {
+  dataTableRecords: Employee[];
+}) => {
   return (
     <>
       <Card>
         <CardBody>
-          <CardTitle as={'h5'} className="anchor mb-1" id="overview">
+          <CardTitle as={"h5"} className="anchor mb-1" id="overview">
             Overview
-            <Button variant="outline-success" size="sm" className="rounded-2 float-end" href="https://gridjs.io" target="_blank">
+            <Button
+              variant="outline-success"
+              size="sm"
+              className="rounded-2 float-end"
+              href="https://gridjs.io"
+              target="_blank"
+            >
               Official Website
             </Button>
           </CardTitle>
-          <p className="sub-header">Grid.js is a Free and open-source JavaScript table plugin</p>
-          <CardTitle as={'h5'} className="anchor mb-1" id="basic">
+          <p className="sub-header">
+            Grid.js is a Free and open-source JavaScript table plugin
+          </p>
+          <CardTitle as={"h5"} className="anchor mb-1" id="basic">
             Basic
             <Link className="anchor-link" href="#basic">
               #
             </Link>
           </CardTitle>
           <p className="text-muted">
-            The most basic list group is an unordered list with list items and the proper classes. Build upon it with the options that follow, or with
-            your own CSS as needed.
+            The most basic list group is an unordered list with list items and
+            the proper classes. Build upon it with the options that follow, or
+            with your own CSS as needed.
           </p>
           <div>
             <div className="py-3">
-              <Grid data={dataTableRecords} pagination={{ limit: 5 }} search={true} />
+              <Grid
+                data={dataTableRecords}
+                pagination={{ limit: 5 }}
+                search={true}
+              />
             </div>
           </div>
         </CardBody>
@@ -42,7 +59,8 @@ const AllDataTables = ({ dataTableRecords }: { dataTableRecords: Employee[] }) =
           <>
             Pagination can be enabled by setting <code>pagination: true</code>:
           </>
-        }>
+        }
+      >
         <div className="pt-3">
           <Grid data={dataTableRecords} pagination={{ limit: 5 }} />
         </div>
@@ -53,11 +71,17 @@ const AllDataTables = ({ dataTableRecords }: { dataTableRecords: Employee[] }) =
         title="Search"
         description={
           <>
-            Grid.js supports global search on all rows and columns. Set <code>search: true</code> to enable the search plugin:
+            Grid.js supports global search on all rows and columns. Set{" "}
+            <code>search: true</code> to enable the search plugin:
           </>
-        }>
+        }
+      >
         <div className="pt-3">
-          <Grid data={dataTableRecords} pagination={{ limit: 5 }} search={true} />
+          <Grid
+            data={dataTableRecords}
+            pagination={{ limit: 5 }}
+            search={true}
+          />
         </div>
       </ComponentContainerCard>
 
@@ -66,9 +90,11 @@ const AllDataTables = ({ dataTableRecords }: { dataTableRecords: Employee[] }) =
         title="Sorting"
         description={
           <>
-            To enable sorting, simply add <code>sort: true</code> to your config:
+            To enable sorting, simply add <code>sort: true</code> to your
+            config:
           </>
-        }>
+        }
+      >
         <div className="pt-3">
           <Grid data={dataTableRecords} pagination={{ limit: 5 }} sort />
         </div>
@@ -79,13 +105,16 @@ const AllDataTables = ({ dataTableRecords }: { dataTableRecords: Employee[] }) =
         title="Loading State"
         description={
           <>
-            Grid.js renders a loading bar automatically while it waits for the data to be fetched. Here we are using an async function to demonstrate
-            this behaviour (e.g. an async function can be a XHR call to a server backend)
+            Grid.js renders a loading bar automatically while it waits for the
+            data to be fetched. Here we are using an async function to
+            demonstrate this behaviour (e.g. an async function can be a XHR call
+            to a server backend)
           </>
-        }>
+        }
+      >
         <div className="pt-3">
           <Grid
-            columns={['Name', 'Email', 'Phone Number']}
+            columns={["Name", "Email", "Phone Number"]}
             sort={true}
             search={true}
             pagination={{ limit: 5 }}
@@ -94,12 +123,12 @@ const AllDataTables = ({ dataTableRecords }: { dataTableRecords: Employee[] }) =
                 setTimeout(
                   () =>
                     resolve([
-                      ['John', 'john@example.com', '(353) 01 222 3333'],
-                      ['Mark', 'mark@gmail.com', '(01) 22 888 4444'],
+                      ["John", "john@example.com", "(353) 01 222 3333"],
+                      ["Mark", "mark@gmail.com", "(01) 22 888 4444"],
                     ]),
                   4000,
-                )
-              })
+                );
+              });
             }}
           />
         </div>
@@ -110,14 +139,16 @@ const AllDataTables = ({ dataTableRecords }: { dataTableRecords: Employee[] }) =
         title="Fixed Header"
         description={
           <>
-            The most basic list group is an unordered list with list items and the proper classes. Build upon it with the options that follow, or with
-            your own CSS as needed.
+            The most basic list group is an unordered list with list items and
+            the proper classes. Build upon it with the options that follow, or
+            with your own CSS as needed.
           </>
-        }>
+        }
+      >
         <div className="pt-3">
           <Grid
             data={dataTableRecords}
-            columns={['id', 'name', 'email', 'position', 'company', 'country']}
+            columns={["id", "name", "email", "position", "company", "country"]}
             height="320px"
             fixedHeader={true}
             pagination={{ limit: 10 }}
@@ -130,22 +161,24 @@ const AllDataTables = ({ dataTableRecords }: { dataTableRecords: Employee[] }) =
         title="Hidden Columns"
         description={
           <>
-            The most basic list group is an unordered list with list items and the proper classes. Build upon it with the options that follow, or with
-            your own CSS as needed.
+            The most basic list group is an unordered list with list items and
+            the proper classes. Build upon it with the options that follow, or
+            with your own CSS as needed.
           </>
-        }>
+        }
+      >
         <div className="pt-3">
           <Grid
             data={dataTableRecords}
             columns={[
               {
-                id: 'id',
+                id: "id",
                 hidden: true,
               },
-              'name',
-              'email',
-              'position',
-              'company',
+              "name",
+              "email",
+              "position",
+              "company",
             ]}
             sort={true}
             pagination={{ limit: 5 }}
@@ -153,7 +186,7 @@ const AllDataTables = ({ dataTableRecords }: { dataTableRecords: Employee[] }) =
         </div>
       </ComponentContainerCard>
     </>
-  )
-}
+  );
+};
 
-export default AllDataTables
+export default AllDataTables;

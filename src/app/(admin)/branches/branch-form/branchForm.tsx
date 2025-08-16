@@ -3,7 +3,15 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+} from "react-bootstrap";
 import { useRouter } from "next/navigation";
 import TextFormInput from "@/components/from/TextFormInput";
 
@@ -70,9 +78,10 @@ const BranchForm = ({
   const { handleSubmit, control } = methods;
 
   const handleFormSubmit = async (data: BranchFormValues) => {
-    const payload = isEditMode && (defaultValues as any)?._id
-      ? { ...data, _id: (defaultValues as any)._id }
-      : data;
+    const payload =
+      isEditMode && (defaultValues as any)?._id
+        ? { ...data, _id: (defaultValues as any)._id }
+        : data;
 
     await onSubmitHandler(payload);
   };
@@ -90,31 +99,84 @@ const BranchForm = ({
           <CardBody>
             <Row className="mb-4">
               <Col lg={6}>
-                <TextFormInput required control={control} name="name" label="Branch Name" placeholder="Ex: Bangalore Main Branch" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="name"
+                  label="Branch Name"
+                  placeholder="Ex: Bangalore Main Branch"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="code" label="Branch Code" placeholder="Ex: BLR-MAIN" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="code"
+                  label="Branch Code"
+                  placeholder="Ex: BLR-MAIN"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="email" label="Email" placeholder="Ex: branch@example.com" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="email"
+                  label="Email"
+                  placeholder="Ex: branch@example.com"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="phoneNumber" label="Phone Number" placeholder="Ex: +91 9876543210" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="phoneNumber"
+                  label="Phone Number"
+                  placeholder="Ex: +91 9876543210"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="address.street" label="Address Line 1" placeholder="Ex: 123 MG Road" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="address.street"
+                  label="Address Line 1"
+                  placeholder="Ex: 123 MG Road"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput control={control} name="address.line2" label="Address Line 2 (Optional)" placeholder="Ex: Near Park" />
+                <TextFormInput
+                  control={control}
+                  name="address.line2"
+                  label="Address Line 2 (Optional)"
+                  placeholder="Ex: Near Park"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="address.city" label="City" placeholder="Ex: Bangalore" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="address.city"
+                  label="City"
+                  placeholder="Ex: Bangalore"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="address.zip_code" label="Zip Code" placeholder="Ex: 560001" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="address.zip_code"
+                  label="Zip Code"
+                  placeholder="Ex: 560001"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="address.country" label="Country" placeholder="Ex: India" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="address.country"
+                  label="Country"
+                  placeholder="Ex: India"
+                />
               </Col>
             </Row>
 

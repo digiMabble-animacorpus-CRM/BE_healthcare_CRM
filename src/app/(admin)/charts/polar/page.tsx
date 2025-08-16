@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllPolarAreaCharts from './components/AllPolarAreaCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from "react-bootstrap";
+import UIExamplesList from "@/components/UIExamplesList";
+import AllPolarAreaCharts from "./components/AllPolarAreaCharts";
+import type { Metadata } from "next";
+import PageTitle from "@/components/PageTitle";
 
-export const metadata: Metadata = { title: 'Polar Area Charts' }
+export const metadata: Metadata = { title: "Polar Area Charts" };
 
 const PolarAreaCharts = () => {
   return (
@@ -17,14 +17,14 @@ const PolarAreaCharts = () => {
         <Col xl={3}>
           <UIExamplesList
             examples={[
-              { link: '#basic', label: 'Basic Polar Area Chart' },
-              { link: '#monochrome', label: 'Monochrome Polar Area' },
+              { link: "#basic", label: "Basic Polar Area Chart" },
+              { link: "#monochrome", label: "Monochrome Polar Area" },
             ]}
           />
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default PolarAreaCharts
+export default PolarAreaCharts;

@@ -29,7 +29,7 @@ const LanguageListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null
+    null,
   );
   const router = useRouter();
 
@@ -106,7 +106,10 @@ const LanguageListPage = () => {
                     }}
                   />
                 </div>
-                <Button variant="primary" onClick={() => router.push("/languages/language-form/create")}>
+                <Button
+                  variant="primary"
+                  onClick={() => router.push("/languages/language-form/create")}
+                >
                   Add Language
                 </Button>
               </div>

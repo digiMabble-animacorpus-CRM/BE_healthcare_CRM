@@ -36,7 +36,7 @@ const ChoicesFormInput = forwardRef<
       value,
       ...props
     },
-    ref
+    ref,
   ) => {
     const choicesRef = useRef<HTMLInputElement & HTMLSelectElement>(null);
 
@@ -72,47 +72,45 @@ const ChoicesFormInput = forwardRef<
     //   }
     // }, [choicesRef]);
 
-
     useEffect(() => {
-  if (choicesRef.current) {
-    const choices = new Choices(choicesRef.current, {
-      ...options,
-      placeholder: true,
-      allowHTML: true,
-      shouldSort: false,
-      removeItemButton: multiple,
-    });
+      if (choicesRef.current) {
+        const choices = new Choices(choicesRef.current, {
+          ...options,
+          placeholder: true,
+          allowHTML: true,
+          shouldSort: false,
+          removeItemButton: multiple,
+        });
 
-    //  Ensure current value is set on mount
-    if (value) {
-      if (multiple && Array.isArray(value)) {
-        choices.setChoiceByValue(value);
-      } else if (typeof value === "string") {
-        choices.setChoiceByValue([value]);
-      }
-    }
-
-    choices.passedElement.element.addEventListener("change", (e: Event) => {
-      if (!(e.target instanceof HTMLSelectElement)) return;
-
-      if (onChange) {
-        if (multiple) {
-          const values = Array.from(e.target.selectedOptions).map(
-            (opt) => opt.value
-          );
-          onChange(values);
-        } else {
-          onChange(e.target.value);
+        //  Ensure current value is set on mount
+        if (value) {
+          if (multiple && Array.isArray(value)) {
+            choices.setChoiceByValue(value);
+          } else if (typeof value === "string") {
+            choices.setChoiceByValue([value]);
+          }
         }
+
+        choices.passedElement.element.addEventListener("change", (e: Event) => {
+          if (!(e.target instanceof HTMLSelectElement)) return;
+
+          if (onChange) {
+            if (multiple) {
+              const values = Array.from(e.target.selectedOptions).map(
+                (opt) => opt.value,
+              );
+              onChange(values);
+            } else {
+              onChange(e.target.value);
+            }
+          }
+        });
+
+        return () => {
+          choices.destroy();
+        };
       }
-    });
-
-    return () => {
-      choices.destroy();
-    };
-  }
-}, [choicesRef, value, multiple]);
-
+    }, [choicesRef, value, multiple]);
 
     return allowInput ? (
       <input
@@ -132,7 +130,7 @@ const ChoicesFormInput = forwardRef<
           if (onChange) {
             if (multiple) {
               const values = Array.from(e.target.selectedOptions).map(
-                (opt) => opt.value
+                (opt) => opt.value,
               );
               onChange(values);
             } else {
@@ -146,7 +144,7 @@ const ChoicesFormInput = forwardRef<
         {children}
       </select>
     );
-  }
+  },
 );
 
 export default ChoicesFormInput;

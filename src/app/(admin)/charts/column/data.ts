@@ -1,9 +1,9 @@
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from "apexcharts";
 
 export const basicChartOpts: ApexOptions = {
   chart: {
     height: 396,
-    type: 'bar',
+    type: "bar",
     toolbar: {
       show: false,
     },
@@ -19,32 +19,32 @@ export const basicChartOpts: ApexOptions = {
   stroke: {
     show: true,
     width: 0,
-    colors: ['transparent'],
+    colors: ["transparent"],
   },
-  colors: ['#f8ac59', '#e06d94', '#7dcc93'],
+  colors: ["#f8ac59", "#e06d94", "#7dcc93"],
   series: [
     {
-      name: 'Net Profit',
+      name: "Net Profit",
       data: [47, 58, 59, 54, 62, 59, 65, 61, 68],
     },
     {
-      name: 'Revenue',
+      name: "Revenue",
       data: [79, 86, 103, 97, 89, 107, 93, 116, 96],
     },
     {
-      name: 'Free Cash Flow',
+      name: "Free Cash Flow",
       data: [38, 42, 39, 28, 47, 50, 54, 55, 43],
     },
   ],
   xaxis: {
-    categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+    categories: ["Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
   },
   legend: {
     offsetY: 7,
   },
   yaxis: {
     title: {
-      text: '€ (thousands)',
+      text: "€ (thousands)",
     },
   },
   fill: {
@@ -52,10 +52,10 @@ export const basicChartOpts: ApexOptions = {
   },
   grid: {
     row: {
-      colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+      colors: ["transparent", "transparent"], // takes an array which will be repeated on columns
       opacity: 0.2,
     },
-    borderColor: '#f1f3fa',
+    borderColor: "#f1f3fa",
     padding: {
       bottom: 5,
     },
@@ -63,16 +63,16 @@ export const basicChartOpts: ApexOptions = {
   tooltip: {
     y: {
       formatter: function (val: any) {
-        return '€ ' + val + ' thousands'
+        return "€ " + val + " thousands";
       },
     },
   },
-}
+};
 
 export const dataLabelsChartOpts: ApexOptions = {
   chart: {
     height: 380,
-    type: 'bar',
+    type: "bar",
     toolbar: {
       show: false,
     },
@@ -81,37 +81,50 @@ export const dataLabelsChartOpts: ApexOptions = {
     bar: {
       borderRadius: 10,
       dataLabels: {
-        position: 'top', // top, center, bottom
+        position: "top", // top, center, bottom
       },
     },
   },
   dataLabels: {
     enabled: true,
     formatter: function (val) {
-      return val + '%'
+      return val + "%";
     },
     offsetY: -25,
     style: {
-      fontSize: '12px',
-      colors: ['#304758'],
+      fontSize: "12px",
+      colors: ["#304758"],
     },
   },
-  colors: ['#7dcc93'],
+  colors: ["#7dcc93"],
   legend: {
     show: true,
-    horizontalAlign: 'center',
+    horizontalAlign: "center",
     offsetX: 0,
     offsetY: -5,
   },
   series: [
     {
-      name: 'Inflation',
+      name: "Inflation",
       data: [2.3, 3.1, 4.0, 10.1, 4.0, 3.6, 3.2, 2.3, 1.4, 0.8, 0.5, 0.2],
     },
   ],
   xaxis: {
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-    position: 'top',
+    categories: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
+    position: "top",
     labels: {
       offsetY: 0,
     },
@@ -123,10 +136,10 @@ export const dataLabelsChartOpts: ApexOptions = {
     },
     crosshairs: {
       fill: {
-        type: 'gradient',
+        type: "gradient",
         gradient: {
-          colorFrom: '#D8E3F0',
-          colorTo: '#BED1E6',
+          colorFrom: "#D8E3F0",
+          colorTo: "#BED1E6",
           stops: [0, 100],
           opacityFrom: 0.6,
           opacityTo: 0.5,
@@ -140,8 +153,8 @@ export const dataLabelsChartOpts: ApexOptions = {
   },
   fill: {
     gradient: {
-      shade: 'light',
-      type: 'horizontal',
+      shade: "light",
+      type: "horizontal",
       shadeIntensity: 0.25,
       gradientToColors: undefined,
       inverseColors: true,
@@ -160,32 +173,32 @@ export const dataLabelsChartOpts: ApexOptions = {
     labels: {
       show: false,
       formatter: function (val) {
-        return val + '%'
+        return val + "%";
       },
     },
   },
   title: {
-    text: 'Monthly Inflation in Argentina, 2002',
+    text: "Monthly Inflation in Argentina, 2002",
     floating: true,
     offsetY: 360,
-    align: 'center',
+    align: "center",
     style: {
-      color: '#444',
+      color: "#444",
     },
   },
   grid: {
     row: {
-      colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+      colors: ["transparent", "transparent"], // takes an array which will be repeated on columns
       opacity: 0.2,
     },
-    borderColor: '#f1f3fa',
+    borderColor: "#f1f3fa",
   },
-}
+};
 
 export const stackedChartOpts: ApexOptions = {
   chart: {
     height: 380,
-    type: 'bar',
+    type: "bar",
     stacked: true,
     toolbar: {
       show: false,
@@ -194,27 +207,36 @@ export const stackedChartOpts: ApexOptions = {
   plotOptions: {
     bar: {
       horizontal: false,
-      columnWidth: '50%',
+      columnWidth: "50%",
     },
   },
   series: [
     {
-      name: 'Product A',
+      name: "Product A",
       data: [47, 58, 44, 70, 25, 46, 24, 52],
     },
     {
-      name: 'Product B',
+      name: "Product B",
       data: [16, 26, 23, 11, 16, 30, 36, 15],
     },
     {
-      name: 'Product C',
+      name: "Product C",
       data: [14, 20, 18, 18, 24, 17, 18, 16],
     },
   ],
   xaxis: {
-    categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2', '2012 Q3', '2012 Q4'],
+    categories: [
+      "2011 Q1",
+      "2011 Q2",
+      "2011 Q3",
+      "2011 Q4",
+      "2012 Q1",
+      "2012 Q2",
+      "2012 Q3",
+      "2012 Q4",
+    ],
   },
-  colors: ['#4697ce', '#f8ac59', '#7dcc93'],
+  colors: ["#4697ce", "#f8ac59", "#7dcc93"],
   fill: {
     opacity: 1,
   },
@@ -223,47 +245,56 @@ export const stackedChartOpts: ApexOptions = {
   },
   grid: {
     row: {
-      colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+      colors: ["transparent", "transparent"], // takes an array which will be repeated on columns
       opacity: 0.2,
     },
-    borderColor: '#f1f3fa',
+    borderColor: "#f1f3fa",
     padding: {
       bottom: 5,
     },
   },
-}
+};
 
 export const fullStackedChartOpts: ApexOptions = {
   chart: {
     height: 380,
-    type: 'bar',
+    type: "bar",
     stacked: true,
-    stackType: '100%',
+    stackType: "100%",
     toolbar: {
       show: false,
     },
   },
   plotOptions: {
     bar: {
-      columnWidth: '50%',
+      columnWidth: "50%",
     },
   },
   series: [
     {
-      name: 'Product A',
+      name: "Product A",
       data: [11, 17, 15, 15, 21, 14, 15, 13],
     },
     {
-      name: 'Product B',
+      name: "Product B",
       data: [44, 55, 41, 67, 22, 43, 21, 49],
     },
     {
-      name: 'Product C',
+      name: "Product C",
       data: [13, 23, 20, 8, 13, 27, 33, 12],
     },
   ],
   xaxis: {
-    categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2', '2012 Q3', '2012 Q4'],
+    categories: [
+      "2011 Q1",
+      "2011 Q2",
+      "2011 Q3",
+      "2011 Q4",
+      "2012 Q1",
+      "2012 Q2",
+      "2012 Q3",
+      "2012 Q4",
+    ],
   },
   fill: {
     opacity: 1,
@@ -271,120 +302,120 @@ export const fullStackedChartOpts: ApexOptions = {
   legend: {
     offsetY: 7,
   },
-  colors: ['#eef2f7', '#4697ce', '#323a46'],
+  colors: ["#eef2f7", "#4697ce", "#323a46"],
   grid: {
     row: {
-      colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+      colors: ["transparent", "transparent"], // takes an array which will be repeated on columns
       opacity: 0.2,
     },
-    borderColor: '#f1f3fa',
+    borderColor: "#f1f3fa",
     padding: {
       bottom: 5,
     },
   },
-}
+};
 
 export const markersChartOpts: ApexOptions = {
   series: [
     {
-      name: 'Actual',
+      name: "Actual",
       data: [
         {
-          x: '2011',
+          x: "2011",
           y: 1292,
           goals: [
             {
-              name: 'Expected',
+              name: "Expected",
               value: 1400,
               strokeHeight: 5,
-              strokeColor: '#57606c',
+              strokeColor: "#57606c",
             },
           ],
         },
         {
-          x: '2012',
+          x: "2012",
           y: 4432,
           goals: [
             {
-              name: 'Expected',
+              name: "Expected",
               value: 5400,
               strokeHeight: 5,
-              strokeColor: '#57606c',
+              strokeColor: "#57606c",
             },
           ],
         },
         {
-          x: '2013',
+          x: "2013",
           y: 5423,
           goals: [
             {
-              name: 'Expected',
+              name: "Expected",
               value: 5200,
               strokeHeight: 5,
-              strokeColor: '#57606c',
+              strokeColor: "#57606c",
             },
           ],
         },
         {
-          x: '2014',
+          x: "2014",
           y: 6653,
           goals: [
             {
-              name: 'Expected',
+              name: "Expected",
               value: 6500,
               strokeHeight: 5,
-              strokeColor: '#57606c',
+              strokeColor: "#57606c",
             },
           ],
         },
         {
-          x: '2015',
+          x: "2015",
           y: 8133,
           goals: [
             {
-              name: 'Expected',
+              name: "Expected",
               value: 6600,
               strokeHeight: 13,
               strokeWidth: 0,
-              strokeLineCap: 'round',
-              strokeColor: '#57606c',
+              strokeLineCap: "round",
+              strokeColor: "#57606c",
             },
           ],
         },
         {
-          x: '2016',
+          x: "2016",
           y: 7132,
           goals: [
             {
-              name: 'Expected',
+              name: "Expected",
               value: 7500,
               strokeHeight: 5,
-              strokeColor: '#57606c',
+              strokeColor: "#57606c",
             },
           ],
         },
         {
-          x: '2017',
+          x: "2017",
           y: 7332,
           goals: [
             {
-              name: 'Expected',
+              name: "Expected",
               value: 8700,
               strokeHeight: 5,
-              strokeColor: '#57606c',
+              strokeColor: "#57606c",
             },
           ],
         },
         {
-          x: '2018',
+          x: "2018",
           y: 6553,
           goals: [
             {
-              name: 'Expected',
+              name: "Expected",
               value: 7300,
               strokeHeight: 2,
               strokeDashArray: 2,
-              strokeColor: '#57606c',
+              strokeColor: "#57606c",
             },
           ],
         },
@@ -393,69 +424,69 @@ export const markersChartOpts: ApexOptions = {
   ],
   chart: {
     height: 380,
-    type: 'bar',
+    type: "bar",
   },
   plotOptions: {
     bar: {
-      columnWidth: '60%',
+      columnWidth: "60%",
     },
   },
-  colors: ['#e06d94', '#323a46'],
+  colors: ["#e06d94", "#323a46"],
   dataLabels: {
     enabled: false,
   },
   legend: {
     show: true,
     showForSingleSeries: true,
-    customLegendItems: ['Actual', 'Expected'],
+    customLegendItems: ["Actual", "Expected"],
     markers: {
-      fillColors: ['#e06d94', '#57606c'],
+      fillColors: ["#e06d94", "#57606c"],
     },
   },
-}
+};
 
 export const groupLabelChartOpts: ApexOptions = {
   series: [
     {
-      name: 'Sales',
+      name: "Sales",
       data: [
         {
-          x: '2020/01/01',
+          x: "2020/01/01",
           y: 400,
         },
         {
-          x: '2020/04/01',
+          x: "2020/04/01",
           y: 430,
         },
         {
-          x: '2020/07/01',
+          x: "2020/07/01",
           y: 448,
         },
         {
-          x: '2020/10/01',
+          x: "2020/10/01",
           y: 470,
         },
         {
-          x: '2021/01/01',
+          x: "2021/01/01",
           y: 540,
         },
         {
-          x: '2021/04/01',
+          x: "2021/04/01",
           y: 580,
         },
         {
-          x: '2021/07/01',
+          x: "2021/07/01",
           y: 690,
         },
         {
-          x: '2021/10/01',
+          x: "2021/10/01",
           y: 690,
         },
       ],
     },
   ],
   chart: {
-    type: 'bar',
+    type: "bar",
     height: 380,
     toolbar: {
       show: false,
@@ -464,12 +495,12 @@ export const groupLabelChartOpts: ApexOptions = {
   plotOptions: {
     bar: {
       horizontal: false,
-      columnWidth: '45%',
+      columnWidth: "45%",
     },
   },
-  colors: ['#4697ce', '#fa5c7c'],
+  colors: ["#4697ce", "#fa5c7c"],
   xaxis: {
-    type: 'category',
+    type: "category",
     labels: {
       // formatter: function (val) {
       //     return "Q" + dayjs(val).quarter()
@@ -477,16 +508,16 @@ export const groupLabelChartOpts: ApexOptions = {
     },
     group: {
       style: {
-        fontSize: '10px',
+        fontSize: "10px",
         fontWeight: 700,
       },
       groups: [
         {
-          title: '2020',
+          title: "2020",
           cols: 4,
         },
         {
-          title: '2021',
+          title: "2021",
           cols: 4,
         },
       ],
@@ -499,36 +530,36 @@ export const groupLabelChartOpts: ApexOptions = {
       // }
     },
   },
-}
+};
 
 export const columnWithRotatedLabelsOpts: ApexOptions = {
   annotations: {
     points: [
       {
-        x: 'Bananas',
+        x: "Bananas",
         seriesIndex: 0,
         label: {
-          borderColor: '#3e60d5',
+          borderColor: "#3e60d5",
           offsetY: 0,
           style: {
-            color: '#fff',
-            background: '#3e60d5',
+            color: "#fff",
+            background: "#3e60d5",
           },
-          text: 'Bananas are good',
+          text: "Bananas are good",
         },
       },
     ],
   },
   chart: {
     height: 380,
-    type: 'bar',
+    type: "bar",
     toolbar: {
       show: false,
     },
   },
   plotOptions: {
     bar: {
-      columnWidth: '50%',
+      columnWidth: "50%",
       // endingShape: 'rounded'
     },
   },
@@ -538,15 +569,15 @@ export const columnWithRotatedLabelsOpts: ApexOptions = {
   stroke: {
     width: 2,
   },
-  colors: ['#f8ac59'],
+  colors: ["#f8ac59"],
   series: [
     {
-      name: 'Servings',
+      name: "Servings",
       data: [44, 55, 41, 67, 22, 43, 21, 33, 45, 31, 87, 65, 35],
     },
   ],
   grid: {
-    borderColor: '#f1f3fa',
+    borderColor: "#f1f3fa",
     padding: {
       top: 0,
       right: -2,
@@ -559,31 +590,31 @@ export const columnWithRotatedLabelsOpts: ApexOptions = {
       rotate: -45,
     },
     categories: [
-      'Apples',
-      'Oranges',
-      'Strawberries',
-      'Pineapples',
-      'Mangoes',
-      'Bananas',
-      'Blackberries',
-      'Pears',
-      'Watermelons',
-      'Cherries',
-      'Pomegranates',
-      'Tangerines',
-      'Papayas',
+      "Apples",
+      "Oranges",
+      "Strawberries",
+      "Pineapples",
+      "Mangoes",
+      "Bananas",
+      "Blackberries",
+      "Pears",
+      "Watermelons",
+      "Cherries",
+      "Pomegranates",
+      "Tangerines",
+      "Papayas",
     ],
   },
   yaxis: {
     title: {
-      text: 'Servings',
+      text: "Servings",
     },
   },
   fill: {
-    type: 'gradient',
+    type: "gradient",
     gradient: {
-      shade: 'light',
-      type: 'horizontal',
+      shade: "light",
+      type: "horizontal",
       shadeIntensity: 0.25,
       gradientToColors: undefined,
       inverseColors: true,
@@ -592,12 +623,12 @@ export const columnWithRotatedLabelsOpts: ApexOptions = {
       stops: [50, 0, 100],
     },
   },
-}
+};
 
 export const columnWithNegativeValueOpts: ApexOptions = {
   chart: {
     height: 380,
-    type: 'bar',
+    type: "bar",
     toolbar: {
       show: false,
     },
@@ -609,77 +640,78 @@ export const columnWithNegativeValueOpts: ApexOptions = {
           {
             from: -100,
             to: -46,
-            color: '#ff86c8',
+            color: "#ff86c8",
           },
           {
             from: -45,
             to: 0,
-            color: '#7f56da',
+            color: "#7f56da",
           },
         ],
       },
-      columnWidth: '80%',
+      columnWidth: "80%",
     },
   },
   dataLabels: {
     enabled: false,
   },
-  colors: ['#7dcc93'],
+  colors: ["#7dcc93"],
   series: [
     {
-      name: 'Cash Flow',
+      name: "Cash Flow",
       data: [
-        1.45, 5.42, 5.9, -0.42, -12.6, -18.1, -18.2, -14.16, -11.1, -6.09, 0.34, 3.88, 13.07, 5.8, 2, 7.37, 8.1, 13.57, 15.75, 17.1, 19.8, -27.03,
-        -54.4, -47.2, -43.3, -18.6, -48.6, -41.1, -39.6, -37.6, -29.4, -21.4, -2.4,
+        1.45, 5.42, 5.9, -0.42, -12.6, -18.1, -18.2, -14.16, -11.1, -6.09, 0.34,
+        3.88, 13.07, 5.8, 2, 7.37, 8.1, 13.57, 15.75, 17.1, 19.8, -27.03, -54.4,
+        -47.2, -43.3, -18.6, -48.6, -41.1, -39.6, -37.6, -29.4, -21.4, -2.4,
       ],
     },
   ],
   yaxis: {
     title: {
-      text: 'Growth',
+      text: "Growth",
     },
     labels: {
       formatter: function (y) {
-        return y.toFixed(0) + '%'
+        return y.toFixed(0) + "%";
       },
     },
   },
   xaxis: {
-    type: 'datetime',
+    type: "datetime",
     categories: [
-      '2011-01-01',
-      '2011-02-01',
-      '2011-03-01',
-      '2011-04-01',
-      '2011-05-01',
-      '2011-06-01',
-      '2011-07-01',
-      '2011-08-01',
-      '2011-09-01',
-      '2011-10-01',
-      '2011-11-01',
-      '2011-12-01',
-      '2012-01-01',
-      '2012-02-01',
-      '2012-03-01',
-      '2012-04-01',
-      '2012-05-01',
-      '2012-06-01',
-      '2012-07-01',
-      '2012-08-01',
-      '2012-09-01',
-      '2012-10-01',
-      '2012-11-01',
-      '2012-12-01',
-      '2013-01-01',
-      '2013-02-01',
-      '2013-03-01',
-      '2013-04-01',
-      '2013-05-01',
-      '2013-06-01',
-      '2013-07-01',
-      '2013-08-01',
-      '2013-09-01',
+      "2011-01-01",
+      "2011-02-01",
+      "2011-03-01",
+      "2011-04-01",
+      "2011-05-01",
+      "2011-06-01",
+      "2011-07-01",
+      "2011-08-01",
+      "2011-09-01",
+      "2011-10-01",
+      "2011-11-01",
+      "2011-12-01",
+      "2012-01-01",
+      "2012-02-01",
+      "2012-03-01",
+      "2012-04-01",
+      "2012-05-01",
+      "2012-06-01",
+      "2012-07-01",
+      "2012-08-01",
+      "2012-09-01",
+      "2012-10-01",
+      "2012-11-01",
+      "2012-12-01",
+      "2013-01-01",
+      "2013-02-01",
+      "2013-03-01",
+      "2013-04-01",
+      "2013-05-01",
+      "2013-06-01",
+      "2013-07-01",
+      "2013-08-01",
+      "2013-09-01",
     ],
     labels: {
       rotate: -90,
@@ -687,30 +719,39 @@ export const columnWithNegativeValueOpts: ApexOptions = {
   },
   grid: {
     row: {
-      colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+      colors: ["transparent", "transparent"], // takes an array which will be repeated on columns
       opacity: 0.2,
     },
-    borderColor: '#f1f3fa',
+    borderColor: "#f1f3fa",
   },
-}
+};
 
 export const distributedColumnOpts: ApexOptions = {
   chart: {
     height: 380,
-    type: 'bar',
+    type: "bar",
     toolbar: {
       show: false,
     },
     events: {
       click: function (chart, w, e) {
-        console.info(chart, w, e)
+        console.info(chart, w, e);
       },
     },
   },
-  colors: ['#4697ce', '#53389f', '#7f56da', '#ff86c8', '#e06d94', '#63b7e6', '#f8ac59', '#7dcc93'],
+  colors: [
+    "#4697ce",
+    "#53389f",
+    "#7f56da",
+    "#ff86c8",
+    "#e06d94",
+    "#63b7e6",
+    "#f8ac59",
+    "#7dcc93",
+  ],
   plotOptions: {
     bar: {
-      columnWidth: '45%',
+      columnWidth: "45%",
       distributed: true,
     },
   },
@@ -723,11 +764,29 @@ export const distributedColumnOpts: ApexOptions = {
     },
   ],
   xaxis: {
-    categories: ['John', 'Joe', 'Jake', 'Amber', 'Peter', 'Mary', 'David', 'Lily'],
+    categories: [
+      "John",
+      "Joe",
+      "Jake",
+      "Amber",
+      "Peter",
+      "Mary",
+      "David",
+      "Lily",
+    ],
     labels: {
       style: {
-        colors: ['#4697ce', '#53389f', '#7f56da', '#ff86c8', '#e06d94', '#63b7e6', '#f8ac59', '#7dcc93'],
-        fontSize: '14px',
+        colors: [
+          "#4697ce",
+          "#53389f",
+          "#7f56da",
+          "#ff86c8",
+          "#e06d94",
+          "#63b7e6",
+          "#f8ac59",
+          "#7dcc93",
+        ],
+        fontSize: "14px",
       },
     },
   },
@@ -736,17 +795,17 @@ export const distributedColumnOpts: ApexOptions = {
   },
   grid: {
     row: {
-      colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+      colors: ["transparent", "transparent"], // takes an array which will be repeated on columns
       opacity: 0.2,
     },
-    borderColor: '#f1f3fa',
+    borderColor: "#f1f3fa",
   },
-}
+};
 
 export const rangeColumnOpts: ApexOptions = {
   chart: {
     height: 380,
-    type: 'rangeBar',
+    type: "rangeBar",
     toolbar: {
       show: false,
     },
@@ -762,49 +821,49 @@ export const rangeColumnOpts: ApexOptions = {
   legend: {
     offsetY: 7,
   },
-  colors: ['#4697ce', '#7f56da'],
+  colors: ["#4697ce", "#7f56da"],
   series: [
     {
-      name: 'Product A',
+      name: "Product A",
       data: [
         {
-          x: 'Team A',
+          x: "Team A",
           y: [1, 5],
         },
         {
-          x: 'Team B',
+          x: "Team B",
           y: [4, 6],
         },
         {
-          x: 'Team C',
+          x: "Team C",
           y: [5, 8],
         },
         {
-          x: 'Team D',
+          x: "Team D",
           y: [3, 11],
         },
       ],
     },
     {
-      name: 'Product B',
+      name: "Product B",
       data: [
         {
-          x: 'Team A',
+          x: "Team A",
           y: [2, 6],
         },
         {
-          x: 'Team B',
+          x: "Team B",
           y: [1, 3],
         },
         {
-          x: 'Team C',
+          x: "Team C",
           y: [7, 8],
         },
         {
-          x: 'Team D',
+          x: "Team D",
           y: [5, 9],
         },
       ],
     },
   ],
-}
+};

@@ -1,54 +1,62 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from "apexcharts";
 
 export const basicRadarOpts: ApexOptions = {
   chart: {
     height: 350,
-    type: 'radar',
+    type: "radar",
     toolbar: {
       show: false,
     },
   },
   series: [
     {
-      name: 'Series 1',
+      name: "Series 1",
       data: [80, 50, 30, 40, 100, 20],
     },
   ],
-  colors: ['#7f56da'],
-  labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-}
+  colors: ["#7f56da"],
+  labels: ["January", "February", "March", "April", "May", "June"],
+};
 
 export const polygonFillOpts: ApexOptions = {
   chart: {
     height: 350,
-    type: 'radar',
+    type: "radar",
     toolbar: {
       show: false,
     },
   },
   series: [
     {
-      name: 'Series 1',
+      name: "Series 1",
       data: [20, 100, 40, 30, 50, 80, 33],
     },
   ],
-  labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  labels: [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ],
   plotOptions: {
     radar: {
       size: 140,
     },
   },
-  colors: ['#e06d94'],
+  colors: ["#e06d94"],
   markers: {
     size: 4,
-    colors: ['#fff'],
-    strokeColors: ['#e06d94'],
+    colors: ["#fff"],
+    strokeColors: ["#e06d94"],
     strokeWidth: 2,
   },
   tooltip: {
     y: {
       formatter: function (val: number) {
-        return val.toString()
+        return val.toString();
       },
     },
   },
@@ -57,34 +65,34 @@ export const polygonFillOpts: ApexOptions = {
     labels: {
       formatter: function (val: number, i): string {
         if (i % 2 === 0) {
-          return val.toString()
+          return val.toString();
         } else {
-          return ''
+          return "";
         }
       },
     },
   },
-}
+};
 
 export const multipleSeriesOpts: ApexOptions = {
   chart: {
     height: 350,
-    type: 'radar',
+    type: "radar",
     toolbar: {
       show: false,
     },
   },
   series: [
     {
-      name: 'Series 1',
+      name: "Series 1",
       data: [80, 50, 30, 40, 100, 20],
     },
     {
-      name: 'Series 2',
+      name: "Series 2",
       data: [20, 30, 40, 80, 20, 80],
     },
     {
-      name: 'Series 3',
+      name: "Series 3",
       data: [44, 76, 78, 13, 43, 10],
     },
   ],
@@ -100,6 +108,6 @@ export const multipleSeriesOpts: ApexOptions = {
   legend: {
     offsetY: -10,
   },
-  colors: ['#4697ce', '#e06d94', '#7dcc93'],
-  labels: ['2011', '2012', '2013', '2014', '2015', '2016'],
-}
+  colors: ["#4697ce", "#e06d94", "#7dcc93"],
+  labels: ["2011", "2012", "2013", "2014", "2015", "2016"],
+};

@@ -1,5 +1,5 @@
-import type { ApexOptions } from 'apexcharts'
-import dayjs from 'dayjs'
+import type { ApexOptions } from "apexcharts";
+import dayjs from "dayjs";
 const seriesData = [
   {
     x: new Date(2016, 1, 1),
@@ -93,11 +93,11 @@ const seriesData = [
     x: new Date(2017, 11, 1),
     y: [61.71, 64.15, 61.29, 63.04],
   },
-]
+];
 export const simpleChartOpts: ApexOptions = {
   chart: {
     height: 400,
-    type: 'candlestick',
+    type: "candlestick",
     toolbar: {
       show: false,
     },
@@ -105,8 +105,8 @@ export const simpleChartOpts: ApexOptions = {
   plotOptions: {
     candlestick: {
       colors: {
-        upward: '#e06d94',
-        downward: '#7dcc93',
+        upward: "#e06d94",
+        downward: "#7dcc93",
       },
     },
   },
@@ -118,21 +118,21 @@ export const simpleChartOpts: ApexOptions = {
 
   stroke: {
     show: true,
-    colors: ['#f1f3fa'],
+    colors: ["#f1f3fa"],
     width: 1,
   },
   xaxis: {
-    type: 'datetime',
+    type: "datetime",
   },
   grid: {
-    borderColor: '#f1f3fa',
+    borderColor: "#f1f3fa",
   },
-}
+};
 
 export const categoryXAxisChartOpts: ApexOptions = {
   series: [
     {
-      name: 'candle',
+      name: "candle",
       data: [
         {
           x: new Date(1538778600000),
@@ -383,14 +383,14 @@ export const categoryXAxisChartOpts: ApexOptions = {
   ],
   chart: {
     height: 380,
-    type: 'candlestick',
+    type: "candlestick",
     toolbar: {
       show: false,
     },
   },
   title: {
-    text: 'CandleStick Chart - Category X-axis',
-    align: 'left',
+    text: "CandleStick Chart - Category X-axis",
+    align: "left",
   },
   grid: {
     padding: {
@@ -403,18 +403,18 @@ export const categoryXAxisChartOpts: ApexOptions = {
   annotations: {
     xaxis: [
       {
-        x: 'Oct 06 14:00',
-        borderColor: '#22c55e',
+        x: "Oct 06 14:00",
+        borderColor: "#22c55e",
         label: {
-          borderColor: '#22c55e',
+          borderColor: "#22c55e",
           style: {
-            fontSize: '12px',
-            color: '#fff',
-            background: '#22c55e',
+            fontSize: "12px",
+            color: "#fff",
+            background: "#22c55e",
           },
-          orientation: 'horizontal',
+          orientation: "horizontal",
           offsetY: 7,
-          text: 'Annotation Test',
+          text: "Annotation Test",
         },
       },
     ],
@@ -422,20 +422,20 @@ export const categoryXAxisChartOpts: ApexOptions = {
   plotOptions: {
     candlestick: {
       colors: {
-        upward: '#ed5565',
-        downward: '#7dcc93',
+        upward: "#ed5565",
+        downward: "#7dcc93",
       },
     },
   },
   tooltip: {
     enabled: true,
   },
-  colors: ['#e06d94', '#7dcc93'],
+  colors: ["#e06d94", "#7dcc93"],
   xaxis: {
-    type: 'category',
+    type: "category",
     labels: {
       formatter: function (val) {
-        return dayjs(val).format('MMM DD HH:mm')
+        return dayjs(val).format("MMM DD HH:mm");
       },
     },
   },
@@ -444,13 +444,13 @@ export const categoryXAxisChartOpts: ApexOptions = {
       enabled: true,
     },
   },
-}
+};
 
 export const candlestickWithLineOpts: ApexOptions = {
   series: [
     {
-      name: 'Line',
-      type: 'line',
+      name: "Line",
+      type: "line",
       data: [
         {
           x: new Date(1538778600000),
@@ -471,8 +471,8 @@ export const candlestickWithLineOpts: ApexOptions = {
       ],
     },
     {
-      name: 'Candle',
-      type: 'candlestick',
+      name: "Candle",
+      type: "candlestick",
       data: [
         {
           x: new Date(1538778600000),
@@ -719,19 +719,19 @@ export const candlestickWithLineOpts: ApexOptions = {
   ],
   chart: {
     height: 380,
-    type: 'line',
+    type: "line",
   },
   title: {
-    text: 'CandleStick Chart',
-    align: 'left',
+    text: "CandleStick Chart",
+    align: "left",
   },
   stroke: {
     width: [3, 1],
-    colors: ['#7dcc93'],
+    colors: ["#7dcc93"],
   },
   legend: {
     show: true,
-    horizontalAlign: 'center',
+    horizontalAlign: "center",
     offsetX: 0,
     offsetY: 5,
   },
@@ -743,17 +743,17 @@ export const candlestickWithLineOpts: ApexOptions = {
       left: 10,
     },
   },
-  colors: ['#7dcc93', '#e06d94'],
+  colors: ["#7dcc93", "#e06d94"],
   plotOptions: {
     candlestick: {
       colors: {
-        upward: '#e06d94',
-        downward: '#e06d94',
+        upward: "#e06d94",
+        downward: "#e06d94",
       },
     },
   },
 
   xaxis: {
-    type: 'datetime',
+    type: "datetime",
   },
-}
+};

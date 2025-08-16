@@ -30,34 +30,35 @@ const BranchSection = () => {
   }));
 
   //  Auto-select or clear primary branch based on selection count
-useEffect(() => {
-  if (assignedBranches.length === 1) {
-    const branchId = typeof assignedBranches[0] === "string"
-      ? assignedBranches[0]
-      : assignedBranches[0].id;
+  useEffect(() => {
+    if (assignedBranches.length === 1) {
+      const branchId =
+        typeof assignedBranches[0] === "string"
+          ? assignedBranches[0]
+          : assignedBranches[0].id;
 
-    if (selectedBranch !== branchId) {
-      setValue("selectedBranch", branchId, { shouldValidate: true });
-    }
-  } else if (assignedBranches.length > 1) {
-    const isCurrentSelectedValid = assignedBranches.some(
-      (b) => (typeof b === "string" ? b : b.id) === selectedBranch
-    );
-
-    if (!selectedBranch || !isCurrentSelectedValid) {
-      const firstBranch = typeof assignedBranches[0] === "string"
-        ? assignedBranches[0]
-        : assignedBranches[0].id;
-
-      if (selectedBranch !== firstBranch) {
-        setValue("selectedBranch", firstBranch, { shouldValidate: true });
+      if (selectedBranch !== branchId) {
+        setValue("selectedBranch", branchId, { shouldValidate: true });
       }
-    }
-  } else if (selectedBranch !== "") {
-    setValue("selectedBranch", "", { shouldValidate: true });
-  }
-}, [assignedBranches, selectedBranch, setValue]);
+    } else if (assignedBranches.length > 1) {
+      const isCurrentSelectedValid = assignedBranches.some(
+        (b) => (typeof b === "string" ? b : b.id) === selectedBranch,
+      );
 
+      if (!selectedBranch || !isCurrentSelectedValid) {
+        const firstBranch =
+          typeof assignedBranches[0] === "string"
+            ? assignedBranches[0]
+            : assignedBranches[0].id;
+
+        if (selectedBranch !== firstBranch) {
+          setValue("selectedBranch", firstBranch, { shouldValidate: true });
+        }
+      }
+    } else if (selectedBranch !== "") {
+      setValue("selectedBranch", "", { shouldValidate: true });
+    }
+  }, [assignedBranches, selectedBranch, setValue]);
 
   return (
     <div className="mb-4">

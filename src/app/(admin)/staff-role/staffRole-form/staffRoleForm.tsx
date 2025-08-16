@@ -22,7 +22,7 @@ interface StaffRoleFormValues {
 const schema = yup.object({
   key: yup.string().required("Role Key is required"),
   label: yup.string().required("Role Label is required"),
-  
+
   tag: yup
     .mixed<"Role" | "AccessLevel">()
     .oneOf(["Role", "AccessLevel"], "Tag must be Role or AccessLevel")
@@ -71,7 +71,7 @@ const StaffRoleForm = ({
       requiresAvailability: !!defaultValues?.requiresAvailability,
     },
   });
-  
+
   const {
     handleSubmit,
     formState: { errors },

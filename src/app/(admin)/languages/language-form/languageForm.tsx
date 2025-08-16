@@ -3,7 +3,15 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+} from "react-bootstrap";
 import { useRouter } from "next/navigation";
 import TextFormInput from "@/components/from/TextFormInput";
 
@@ -22,7 +30,9 @@ const schema = yup.object({
 interface Props {
   defaultValues?: Partial<LanguageFormValues>;
   isEditMode?: boolean;
-  onSubmitHandler: (data: LanguageFormValues & { _id?: string }) => Promise<void>;
+  onSubmitHandler: (
+    data: LanguageFormValues & { _id?: string },
+  ) => Promise<void>;
 }
 
 const LanguageForm = ({
@@ -48,9 +58,10 @@ const LanguageForm = ({
 
   // ✅ Merge _id only in edit mode
   const handleFormSubmit = async (data: LanguageFormValues) => {
-    const payload = isEditMode && (defaultValues as any)?._id
-      ? { ...data, _id: (defaultValues as any)._id }
-      : data;
+    const payload =
+      isEditMode && (defaultValues as any)?._id
+        ? { ...data, _id: (defaultValues as any)._id }
+        : data;
 
     await onSubmitHandler(payload);
   };

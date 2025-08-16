@@ -1,34 +1,43 @@
-'use client'
-import properties1 from '@/assets/images/properties/p-1.jpg'
-import properties2 from '@/assets/images/properties/p-2.jpg'
-import properties3 from '@/assets/images/properties/p-3.jpg'
-import properties4 from '@/assets/images/properties/p-4.jpg'
-import properties5 from '@/assets/images/properties/p-5.jpg'
-import trophyImg from '@/assets/images/trophy.png'
-import avatar2 from '@/assets/images/users/avatar-2.jpg'
-import { WorldVectorMap } from '@/components/VectorMap'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Card, CardBody, CardHeader, CardTitle, Carousel, CarouselItem, Col, Row } from 'react-bootstrap'
-import AgentDetailsCard from './AgentDetailsCard'
+"use client";
+import properties1 from "@/assets/images/properties/p-1.jpg";
+import properties2 from "@/assets/images/properties/p-2.jpg";
+import properties3 from "@/assets/images/properties/p-3.jpg";
+import properties4 from "@/assets/images/properties/p-4.jpg";
+import properties5 from "@/assets/images/properties/p-5.jpg";
+import trophyImg from "@/assets/images/trophy.png";
+import avatar2 from "@/assets/images/users/avatar-2.jpg";
+import { WorldVectorMap } from "@/components/VectorMap";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Carousel,
+  CarouselItem,
+  Col,
+  Row,
+} from "react-bootstrap";
+import AgentDetailsCard from "./AgentDetailsCard";
 
 const AgentDetails = () => {
   const salesLocationOptions = {
-    map: 'world',
+    map: "world",
     zoomOnScroll: true,
     zoomButtons: false,
     markersSelectable: true,
     markers: [
-      { name: 'Canada', coords: [56.1304, -106.3468] },
-      { name: 'Brazil', coords: [-14.235, -51.9253] },
-      { name: 'Russia', coords: [61, 105] },
-      { name: 'China', coords: [35.8617, 104.1954] },
-      { name: 'United States', coords: [37.0902, -95.7129] },
+      { name: "Canada", coords: [56.1304, -106.3468] },
+      { name: "Brazil", coords: [-14.235, -51.9253] },
+      { name: "Russia", coords: [61, 105] },
+      { name: "China", coords: [35.8617, 104.1954] },
+      { name: "United States", coords: [37.0902, -95.7129] },
     ],
     markerStyle: {
-      initial: { fill: '#7f56da' },
-      selected: { fill: '#1bb394' },
+      initial: { fill: "#7f56da" },
+      selected: { fill: "#1bb394" },
     },
     labels: {
       markers: {
@@ -37,11 +46,11 @@ const AgentDetails = () => {
     },
     regionStyle: {
       initial: {
-        fill: 'rgba(169,183,197, 0.3)',
+        fill: "rgba(169,183,197, 0.3)",
         fillOpacity: 1,
       },
     },
-  }
+  };
 
   return (
     <Row className="justify-content-center">
@@ -52,20 +61,37 @@ const AgentDetails = () => {
         <Card className="bg-light-subtle overflow-hidden z-1">
           <CardBody>
             <div className="d-flex align-items-center gap-2 mb-3">
-              <Image src={avatar2} alt="avatar" className="avatar-md rounded-circle" />
+              <Image
+                src={avatar2}
+                alt="avatar"
+                className="avatar-md rounded-circle"
+              />
               <div className="d-block">
                 <h5 className="text-dark fw-medium">Michael A. Miner</h5>
                 <p className=" mb-0 fw-medium">#1 Medal</p>
               </div>
               <div className="ms-auto">
                 <div className="avatar bg-primary-subtle rounded flex-centered">
-                  <IconifyIcon width={28} height={28} icon="solar:cup-star-bold" className="fs-28 text-primary" />
+                  <IconifyIcon
+                    width={28}
+                    height={28}
+                    icon="solar:cup-star-bold"
+                    className="fs-28 text-primary"
+                  />
                 </div>
               </div>
             </div>
             <div className="p-3 position-relative overflow-hidden z-1 rounded bg-primary-subtle border border-primary-subtle mt-4 text-center">
-              <Image src={trophyImg} alt="trophyImg" className="mx-auto" height={150} width={150} />
-              <span className="position-absolute top-0 end-0 m-1 badge text-light bg-danger px-2 py-1 fs-12"># 1</span>
+              <Image
+                src={trophyImg}
+                alt="trophyImg"
+                className="mx-auto"
+                height={150}
+                width={150}
+              />
+              <span className="position-absolute top-0 end-0 m-1 badge text-light bg-danger px-2 py-1 fs-12">
+                # 1
+              </span>
               <div className="position-absolute top-50 start-50 translate-middle z-n1 opacity-50">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -73,18 +99,43 @@ const AgentDetails = () => {
                   xmlnsXlink="http://www.w3.org/1999/xlink"
                   viewBox="0 0 800 800"
                   width={400}
-                  height={400}>
+                  height={400}
+                >
                   <defs>
-                    <filter id="bbburst-blur-1" x="-100%" y="-100%" width="400%" height="400%">
+                    <filter
+                      id="bbburst-blur-1"
+                      x="-100%"
+                      y="-100%"
+                      width="400%"
+                      height="400%"
+                    >
                       <feGaussianBlur in="SourceGraphic" stdDeviation={1} />
                     </filter>
-                    <filter id="bbburst-blur-2" x="-100%" y="-100%" width="400%" height="400%">
+                    <filter
+                      id="bbburst-blur-2"
+                      x="-100%"
+                      y="-100%"
+                      width="400%"
+                      height="400%"
+                    >
                       <feGaussianBlur in="SourceGraphic" stdDeviation={2} />
                     </filter>
-                    <filter id="bbburst-blur-3" x="-100%" y="-100%" width="400%" height="400%">
+                    <filter
+                      id="bbburst-blur-3"
+                      x="-100%"
+                      y="-100%"
+                      width="400%"
+                      height="400%"
+                    >
                       <feGaussianBlur in="SourceGraphic" stdDeviation={4} />
                     </filter>
-                    <filter id="bbburst-blur-4" x="-100%" y="-100%" width="400%" height="400%">
+                    <filter
+                      id="bbburst-blur-4"
+                      x="-100%"
+                      y="-100%"
+                      width="400%"
+                      height="400%"
+                    >
                       <feGaussianBlur in="SourceGraphic" stdDeviation={12} />
                     </filter>
                     <symbol id="bbburst-shape-1" viewBox="0 0 194 167">
@@ -105,7 +156,13 @@ const AgentDetails = () => {
                       />
                     </symbol>
                     <symbol id="bbburst-shape-10" viewBox="0 0 145 145">
-                      <circle cx="72.5" cy="72.5" r="61.5" fill="none" strokeWidth={22} />
+                      <circle
+                        cx="72.5"
+                        cy="72.5"
+                        r="61.5"
+                        fill="none"
+                        strokeWidth={22}
+                      />
                     </symbol>
                   </defs>
                   <use
@@ -1020,7 +1077,11 @@ const AgentDetails = () => {
             </div>
             <div className="mt-4">
               <h5 className="text-dark mb-0">
-                <IconifyIcon icon="ri:coins-fill" className="fs-24 text-primary align-middle" /> 19,343 Collected In This Month
+                <IconifyIcon
+                  icon="ri:coins-fill"
+                  className="fs-24 text-primary align-middle"
+                />{" "}
+                19,343 Collected In This Month
               </h5>
             </div>
           </CardBody>
@@ -1032,43 +1093,77 @@ const AgentDetails = () => {
           <CardBody>
             <Carousel indicators={false}>
               <CarouselItem className="carousel-item active">
-                <Image src={properties1} height={305} className="d-block w-100 rounded" alt="img-6" />
+                <Image
+                  src={properties1}
+                  height={305}
+                  className="d-block w-100 rounded"
+                  alt="img-6"
+                />
                 <div className="carousel-caption d-none d-md-block bg-light rounded p-2 text-start">
                   <div className="d-flex align-items-center gap-2">
                     <div className="avatar bg-primary rounded flex-centered">
-                      <IconifyIcon icon="solar:home-bold-duotone" width={24} height={24} className="fs-24 text-white" />
+                      <IconifyIcon
+                        icon="solar:home-bold-duotone"
+                        width={24}
+                        height={24}
+                        className="fs-24 text-white"
+                      />
                     </div>
                     <div>
                       <Link href="" className="text-dark fw-medium fs-16">
                         Dvilla Residences Batu
                       </Link>
-                      <p className="text-muted mb-0">4604 , Philli Lane Kiowa</p>
+                      <p className="text-muted mb-0">
+                        4604 , Philli Lane Kiowa
+                      </p>
                     </div>
                   </div>
                 </div>
               </CarouselItem>
               <CarouselItem className="carousel-item">
-                <Image src={properties2} height={305} className="d-block w-100 rounded" alt="img-7" />
+                <Image
+                  src={properties2}
+                  height={305}
+                  className="d-block w-100 rounded"
+                  alt="img-7"
+                />
                 <div className="carousel-caption d-none d-md-block bg-light rounded p-2 text-start">
                   <div className="d-flex align-items-center gap-2">
                     <div className="avatar bg-primary rounded flex-centered">
-                      <IconifyIcon icon="solar:home-bold-duotone" width={24} height={24} className="fs-24 text-white" />
+                      <IconifyIcon
+                        icon="solar:home-bold-duotone"
+                        width={24}
+                        height={24}
+                        className="fs-24 text-white"
+                      />
                     </div>
                     <div>
                       <Link href="" className="text-dark fw-medium fs-16">
                         PIK Villa House
                       </Link>
-                      <p className="text-muted mb-0">27, Boulevard Cockeysville</p>
+                      <p className="text-muted mb-0">
+                        27, Boulevard Cockeysville
+                      </p>
                     </div>
                   </div>
                 </div>
               </CarouselItem>
               <CarouselItem className="carousel-item">
-                <Image src={properties3} height={305} className="d-block w-100 rounded" alt="img-5" />
+                <Image
+                  src={properties3}
+                  height={305}
+                  className="d-block w-100 rounded"
+                  alt="img-5"
+                />
                 <div className="carousel-caption d-none d-md-block bg-light rounded p-2 text-start">
                   <div className="d-flex align-items-center gap-2">
                     <div className="avatar bg-primary rounded flex-centered">
-                      <IconifyIcon icon="solar:home-bold-duotone" width={24} height={24} className="fs-24 text-white" />
+                      <IconifyIcon
+                        icon="solar:home-bold-duotone"
+                        width={24}
+                        height={24}
+                        className="fs-24 text-white"
+                      />
                     </div>
                     <div>
                       <Link href="" className="text-dark fw-medium fs-16">
@@ -1080,33 +1175,57 @@ const AgentDetails = () => {
                 </div>
               </CarouselItem>
               <CarouselItem className="carousel-item">
-                <Image src={properties4} height={305} className="d-block w-100 rounded" alt="img-5" />
+                <Image
+                  src={properties4}
+                  height={305}
+                  className="d-block w-100 rounded"
+                  alt="img-5"
+                />
                 <div className="carousel-caption d-none d-md-block bg-light rounded p-2 text-start">
                   <div className="d-flex align-items-center gap-2">
                     <div className="avatar bg-primary rounded flex-centered">
-                      <IconifyIcon icon="solar:buildings-3-bold-duotone" width={24} height={24} className="fs-24 text-white" />
+                      <IconifyIcon
+                        icon="solar:buildings-3-bold-duotone"
+                        width={24}
+                        height={24}
+                        className="fs-24 text-white"
+                      />
                     </div>
                     <div>
                       <Link href="" className="text-dark fw-medium fs-16">
                         Luxury Apartment
                       </Link>
-                      <p className="text-muted mb-0">223 , Creside Santa Maria</p>
+                      <p className="text-muted mb-0">
+                        223 , Creside Santa Maria
+                      </p>
                     </div>
                   </div>
                 </div>
               </CarouselItem>
               <CarouselItem className="carousel-item">
-                <Image src={properties5} height={305} className="d-block w-100 rounded" alt="img-5" />
+                <Image
+                  src={properties5}
+                  height={305}
+                  className="d-block w-100 rounded"
+                  alt="img-5"
+                />
                 <div className="carousel-caption d-none d-md-block bg-light rounded p-2 text-start">
                   <div className="d-flex align-items-center gap-2">
                     <div className="avatar bg-primary rounded flex-centered">
-                      <IconifyIcon icon="solar:home-bold-duotone" width={24} height={24} className="fs-24 text-white" />
+                      <IconifyIcon
+                        icon="solar:home-bold-duotone"
+                        width={24}
+                        height={24}
+                        className="fs-24 text-white"
+                      />
                     </div>
                     <div>
                       <Link href="" className="text-dark fw-medium fs-16">
                         Weekend Villa MBH
                       </Link>
-                      <p className="text-muted mb-0">980, Jim Rosa Lane Dublin</p>
+                      <p className="text-muted mb-0">
+                        980, Jim Rosa Lane Dublin
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1116,16 +1235,18 @@ const AgentDetails = () => {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle as={'h4'}>Location</CardTitle>
+            <CardTitle as={"h4"}>Location</CardTitle>
           </CardHeader>
           <CardBody>
-            <div className="my-4" style={{ height: '228px' }}>
+            <div className="my-4" style={{ height: "228px" }}>
               <WorldVectorMap width="100%" options={salesLocationOptions} />
             </div>
             <div className="d-flex align-items-center bg-light justify-content-between p-3 rounded">
               <div>
                 <h5 className="fw-medium mb-1 text-dark">Walker Art Center</h5>
-                <p className="mb-2">Lincoln Drive Harrisburg, PA 17101 Belgium</p>
+                <p className="mb-2">
+                  Lincoln Drive Harrisburg, PA 17101 Belgium
+                </p>
                 <div className="d-flex gap-2 align-items-center">
                   <ul className="d-flex text-warning m-0 fs-18  list-unstyled">
                     <li>
@@ -1151,7 +1272,12 @@ const AgentDetails = () => {
               </div>
               <div>
                 <div className="avatar bg-dark rounded flex-centered">
-                  <IconifyIcon icon="solar:point-on-map-perspective-bold" width={30} height={30} className="fs-30 text-light" />
+                  <IconifyIcon
+                    icon="solar:point-on-map-perspective-bold"
+                    width={30}
+                    height={30}
+                    className="fs-30 text-light"
+                  />
                 </div>
               </div>
             </div>
@@ -1159,7 +1285,7 @@ const AgentDetails = () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default AgentDetails
+export default AgentDetails;

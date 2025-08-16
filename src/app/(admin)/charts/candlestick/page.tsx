@@ -1,10 +1,10 @@
-import UIExamplesList from '@/components/UIExamplesList'
-import { Col, Row } from 'react-bootstrap'
-import AllCandlestickCharts from './components/AllCandlestickCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import UIExamplesList from "@/components/UIExamplesList";
+import { Col, Row } from "react-bootstrap";
+import AllCandlestickCharts from "./components/AllCandlestickCharts";
+import type { Metadata } from "next";
+import PageTitle from "@/components/PageTitle";
 
-export const metadata: Metadata = { title: 'Candlestick Alert' }
+export const metadata: Metadata = { title: "Candlestick Alert" };
 
 const CandlestickCharts = () => {
   return (
@@ -17,15 +17,15 @@ const CandlestickCharts = () => {
         <Col xl={3}>
           <UIExamplesList
             examples={[
-              { link: '#simple', label: 'Simple Candlestick Chart' },
-              { link: '#x-axis', label: 'Category X-Axis' },
-              { link: '#line', label: 'Candlestick with Line' },
+              { link: "#simple", label: "Simple Candlestick Chart" },
+              { link: "#x-axis", label: "Category X-Axis" },
+              { link: "#line", label: "Candlestick with Line" },
             ]}
           />
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default CandlestickCharts
+export default CandlestickCharts;

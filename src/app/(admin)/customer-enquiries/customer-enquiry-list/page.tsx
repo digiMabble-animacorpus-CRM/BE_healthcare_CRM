@@ -25,8 +25,6 @@ import {
 import { useRouter } from "next/navigation";
 import "@/assets/scss/components/_edittogglebtn.scss";
 
-
-
 const PAGE_LIMIT = 10;
 const BRANCHES = [
   "Gembloux - Orneau",
@@ -44,7 +42,7 @@ const CustomersListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null
+    null,
   );
   const router = useRouter();
 
@@ -91,7 +89,7 @@ const CustomersListPage = () => {
         selectedBranch || undefined,
         from,
         to,
-        searchTerm
+        searchTerm,
       );
       setEnquirys(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
@@ -308,91 +306,96 @@ const CustomersListPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {enquirys.map((item: CustomerEnquiriesType, idx: number) => (
-                        <tr key={idx}>
-                          <td>
-                            <div className="form-check">
-                              <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id={`check-${idx}`}
-                              />
-                            </div>
-                          </td>
-                          <td>{item.name}</td>
-                          <td>{item.email}</td>
-                          <td>{item.number}</td>
-                          <td>
-                            {calculateAge(item.dob)} yrs |{" "}
-                            {formatGender(item.gender)}
-                          </td>
-                          <td>{item.branch}</td>
-                          <td>{item.source}</td>
-                          <td>
-                            <span
-                              className={`badge bg-${
-                                item.status === "new" ? "success" : "danger"
-                              } text-white fs-12 px-2 py-1`}
-                            >
-                              {item.status}
-                            </span>
-                          </td>
-                          <td>{item.lastUpdated}</td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <Button
-                                variant="light"
-                                size="sm"
-                                onClick={() => handleView(item._id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:eye-broken"
-                                  className="align-middle fs-18"
+                      {enquirys.map(
+                        (item: CustomerEnquiriesType, idx: number) => (
+                          <tr key={idx}>
+                            <td>
+                              <div className="form-check">
+                                <input
+                                  type="checkbox"
+                                  className="form-check-input"
+                                  id={`check-${idx}`}
                                 />
-                              </Button>
-                              <Dropdown>
-  <Dropdown.Toggle
-    className="editToggleBtn"
-
-    variant="soft-primary"
-    size="sm"
-    id={`edit-dropdown-${item._id}`}
-    
-    style={{ padding: "4px 8px" }}
-  >
-    <IconifyIcon icon="solar:pen-2-broken" className="fs-18" />
-  </Dropdown.Toggle>
-
-  <Dropdown.Menu>
-    <Dropdown.Item
-      onClick={() => handleEditClick(item._id)}
-    >
-      Edit 
-    </Dropdown.Item>
-    <Dropdown.Item
-      onClick={() => router.push(`/customers/edit/${item._id}`)}
-    >
-      Edit Medical Info
-    </Dropdown.Item>
-  </Dropdown.Menu>
-</Dropdown>
-
-
-
-                              <Button
-                                variant="soft-danger"
-                                size="sm"
-                                onClick={() => handleDeleteClick(item._id)}
+                              </div>
+                            </td>
+                            <td>{item.name}</td>
+                            <td>{item.email}</td>
+                            <td>{item.number}</td>
+                            <td>
+                              {calculateAge(item.dob)} yrs |{" "}
+                              {formatGender(item.gender)}
+                            </td>
+                            <td>{item.branch}</td>
+                            <td>{item.source}</td>
+                            <td>
+                              <span
+                                className={`badge bg-${
+                                  item.status === "new" ? "success" : "danger"
+                                } text-white fs-12 px-2 py-1`}
                               >
-                                <IconifyIcon
-                                  icon="solar:trash-bin-minimalistic-2-broken"
-                                  className="align-middle fs-18"
-                                />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                                {item.status}
+                              </span>
+                            </td>
+                            <td>{item.lastUpdated}</td>
+                            <td>
+                              <div className="d-flex gap-2">
+                                <Button
+                                  variant="light"
+                                  size="sm"
+                                  onClick={() => handleView(item._id)}
+                                >
+                                  <IconifyIcon
+                                    icon="solar:eye-broken"
+                                    className="align-middle fs-18"
+                                  />
+                                </Button>
+                                <Dropdown>
+                                  <Dropdown.Toggle
+                                    className="editToggleBtn"
+                                    variant="soft-primary"
+                                    size="sm"
+                                    id={`edit-dropdown-${item._id}`}
+                                    style={{ padding: "4px 8px" }}
+                                  >
+                                    <IconifyIcon
+                                      icon="solar:pen-2-broken"
+                                      className="fs-18"
+                                    />
+                                  </Dropdown.Toggle>
+
+                                  <Dropdown.Menu>
+                                    <Dropdown.Item
+                                      onClick={() => handleEditClick(item._id)}
+                                    >
+                                      Edit
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                      onClick={() =>
+                                        router.push(
+                                          `/customers/edit/${item._id}`,
+                                        )
+                                      }
+                                    >
+                                      Edit Medical Info
+                                    </Dropdown.Item>
+                                  </Dropdown.Menu>
+                                </Dropdown>
+
+                                <Button
+                                  variant="soft-danger"
+                                  size="sm"
+                                  onClick={() => handleDeleteClick(item._id)}
+                                >
+                                  <IconifyIcon
+                                    icon="solar:trash-bin-minimalistic-2-broken"
+                                    className="align-middle fs-18"
+                                  />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ),
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -402,7 +405,9 @@ const CustomersListPage = () => {
             <CardFooter>
               <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-end mb-0">
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li
+                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  >
                     <Button
                       variant="link"
                       className="page-link"

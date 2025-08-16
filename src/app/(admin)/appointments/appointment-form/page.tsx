@@ -9,17 +9,17 @@ import { getUserByEmail } from "@/helpers/customer";
 // Dynamically import components to avoid SSR issues
 const CheckCustomerModal = dynamic(
   () => import("./components/CheckCustomerModal"),
-  { ssr: false }
+  { ssr: false },
 );
 
 const BookAppointmentForm = dynamic(
   () => import("./components/BookAppointmentForm"),
-  { ssr: false }
+  { ssr: false },
 );
 
 const CustomerInfoCard = dynamic(
   () => import("./components/CustomerInfoCard"),
-  { ssr: false }
+  { ssr: false },
 );
 
 const AppointmentPage = () => {

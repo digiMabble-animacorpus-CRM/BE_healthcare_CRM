@@ -41,7 +41,7 @@ const TherapistsListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null
+    null,
   );
   const router = useRouter();
 
@@ -88,7 +88,7 @@ const TherapistsListPage = () => {
         selectedBranch || undefined,
         from,
         to,
-        searchTerm
+        searchTerm,
       );
       setTherapists(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
@@ -380,7 +380,9 @@ const TherapistsListPage = () => {
             <CardFooter>
               <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-end mb-0">
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li
+                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  >
                     <Button
                       variant="link"
                       className="page-link"

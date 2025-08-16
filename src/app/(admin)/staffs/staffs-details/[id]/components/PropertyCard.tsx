@@ -1,11 +1,12 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { PropertyType } from '@/types/data'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Card, CardBody, Col, Row } from 'react-bootstrap'
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { PropertyType } from "@/types/data";
+import Image from "next/image";
+import Link from "next/link";
+import { Card, CardBody, Col, Row } from "react-bootstrap";
 
 const PropertyCard = ({ property }: { property: PropertyType }) => {
-  const { bath, beds, size, image, name, location, save, icon, flor } = property
+  const { bath, beds, size, image, name, location, save, icon, flor } =
+    property;
 
   return (
     <Card className="overflow-hidden">
@@ -15,17 +16,19 @@ const PropertyCard = ({ property }: { property: PropertyType }) => {
           {save ? (
             <button
               type="button"
-              className="btn btn-warning avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded text-light ">
-              {' '}
+              className="btn btn-warning avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded text-light "
+            >
+              {" "}
               <span>
-                {' '}
+                {" "}
                 <IconifyIcon icon="solar:bookmark-broken" />
               </span>
             </button>
           ) : (
             <button
               type="button"
-              className="btn bg-warning-subtle avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded text-warning">
+              className="btn bg-warning-subtle avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded text-warning"
+            >
               <span>
                 <IconifyIcon icon="solar:bookmark-broken" />
               </span>
@@ -36,7 +39,12 @@ const PropertyCard = ({ property }: { property: PropertyType }) => {
       <CardBody>
         <div className="d-flex align-items-center gap-2">
           <div className="avatar bg-light rounded flex-centered">
-            <IconifyIcon icon={icon} width={24} height={24} className="fs-24 text-primary" />
+            <IconifyIcon
+              icon={icon}
+              width={24}
+              height={24}
+              className="fs-24 text-primary"
+            />
           </div>
           <div>
             <Link href="" className="text-dark fw-medium fs-16">
@@ -57,7 +65,10 @@ const PropertyCard = ({ property }: { property: PropertyType }) => {
           <Col lg={4} xs={4}>
             <span className="badge bg-light-subtle text-muted border fs-12">
               <span className="fs-16">
-                <IconifyIcon icon="solar:bath-broken" className="align-middle" />
+                <IconifyIcon
+                  icon="solar:bath-broken"
+                  className="align-middle"
+                />
               </span>
               &nbsp;{bath} Bath
             </span>
@@ -65,7 +76,10 @@ const PropertyCard = ({ property }: { property: PropertyType }) => {
           <Col lg={4} xs={4}>
             <span className="badge bg-light-subtle text-muted border fs-12">
               <span className="fs-16">
-                <IconifyIcon icon="solar:scale-broken" className="align-middle" />
+                <IconifyIcon
+                  icon="solar:scale-broken"
+                  className="align-middle"
+                />
               </span>
               &nbsp;{size}m²
             </span>
@@ -73,7 +87,10 @@ const PropertyCard = ({ property }: { property: PropertyType }) => {
           <Col lg={4} xs={4}>
             <span className="badge bg-light-subtle text-muted border fs-12">
               <span className="fs-16">
-                <IconifyIcon icon="solar:double-alt-arrow-up-broken" className="align-middle" />
+                <IconifyIcon
+                  icon="solar:double-alt-arrow-up-broken"
+                  className="align-middle"
+                />
               </span>
               &nbsp;{flor} Floor
             </span>
@@ -81,7 +98,7 @@ const PropertyCard = ({ property }: { property: PropertyType }) => {
         </Row>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default PropertyCard
+export default PropertyCard;

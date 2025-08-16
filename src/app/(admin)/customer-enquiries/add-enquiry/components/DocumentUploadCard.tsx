@@ -24,7 +24,7 @@ const DocumentUploadCard = ({ field, error, single = false }: Props) => {
     if (!files) return;
     const selectedFiles = Array.from(files);
     field.onChange(
-      single ? selectedFiles[0] : [...(field.value || []), ...selectedFiles]
+      single ? selectedFiles[0] : [...(field.value || []), ...selectedFiles],
     );
   };
 
@@ -137,7 +137,8 @@ export default DocumentUploadCard;
 //   </div>
 // </Col>
 
-{/* <Modal
+{
+  /* <Modal
   show={showPreview}
   onHide={() => setShowPreview(false)}
   size="lg"
@@ -159,4 +160,5 @@ export default DocumentUploadCard;
       <p className="text-muted">Preview not available for this file type.</p>
     )}
   </Modal.Body>
-</Modal>; */}
+</Modal>; */
+}

@@ -1,21 +1,26 @@
-import 'jsvectormap'
-import 'jsvectormap/dist/maps/spain.js'
+import "jsvectormap";
+import "jsvectormap/dist/maps/spain.js";
 
 //components
-import BaseVectorMap from './BaseVectorMap'
+import BaseVectorMap from "./BaseVectorMap";
 
 interface SpainVectorMapProps {
-  width?: string
-  height?: string
-  options?: any
+  width?: string;
+  height?: string;
+  options?: any;
 }
 
 const SpainVectorMap = ({ width, height, options }: SpainVectorMapProps) => {
   return (
     <>
-      <BaseVectorMap width={width} height={height} options={options} type="spain" />
+      <BaseVectorMap
+        width={width}
+        height={height}
+        options={options}
+        type="spain"
+      />
     </>
-  )
-}
+  );
+};
 
-export default SpainVectorMap
+export default SpainVectorMap;

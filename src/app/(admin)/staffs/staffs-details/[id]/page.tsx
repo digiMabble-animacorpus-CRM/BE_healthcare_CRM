@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import PageTitle from "@/components/PageTitle";
 import { getStaffById } from "@/helpers/staff";
@@ -20,7 +20,6 @@ const StaffDetailPage = ({ params }: Props) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
   useEffect(() => {
     const fetchStaff = async () => {
       try {
@@ -31,7 +30,7 @@ const StaffDetailPage = ({ params }: Props) => {
         console.log(" API Response:", response);
 
         //  If response is the staff data directly:
-        if (!response || typeof response !== 'object' || !('id' in response)) {
+        if (!response || typeof response !== "object" || !("id" in response)) {
           throw new Error("Invalid staff data received from server");
         }
 
@@ -50,7 +49,8 @@ const StaffDetailPage = ({ params }: Props) => {
   if (loading) {
     return (
       <div className="text-center mt-5">
-        <Spinner animation="border" variant="primary" /> Loading staff details...
+        <Spinner animation="border" variant="primary" /> Loading staff
+        details...
       </div>
     );
   }
@@ -64,13 +64,15 @@ const StaffDetailPage = ({ params }: Props) => {
   //     </div>
   //   );
   // }
-if (!staff) {
-  return (
-    <div className="text-center mt-5">
-      <Alert variant="danger">{error || "Staff not found or failed to load."}</Alert>
-    </div>
-  );
-}
+  if (!staff) {
+    return (
+      <div className="text-center mt-5">
+        <Alert variant="danger">
+          {error || "Staff not found or failed to load."}
+        </Alert>
+      </div>
+    );
+  }
   return (
     <>
       <PageTitle subName="Staffs" title="Staff Overview" />

@@ -1,10 +1,10 @@
-import type { Metadata } from 'next'
-import AllToasts from './components/AllToasts'
-import UIExamplesList from '@/components/UIExamplesList'
-import { Col, Row } from 'react-bootstrap'
-import PageTitle from '@/components/PageTitle'
+import type { Metadata } from "next";
+import AllToasts from "./components/AllToasts";
+import UIExamplesList from "@/components/UIExamplesList";
+import { Col, Row } from "react-bootstrap";
+import PageTitle from "@/components/PageTitle";
 
-export const metadata: Metadata = { title: 'Toasts' }
+export const metadata: Metadata = { title: "Toasts" };
 
 const Toasts = () => {
   return (
@@ -17,18 +17,18 @@ const Toasts = () => {
         <Col xl={3}>
           <UIExamplesList
             examples={[
-              { link: '#basic_examples', label: 'Basic Examples' },
-              { link: '#live_example', label: 'Live example' },
-              { link: '#default_buttons', label: 'Staking' },
-              { link: '#custom_content', label: 'Custom Content' },
-              { link: '#transcluent', label: 'Transcluent' },
-              { link: '#placement', label: 'Placement' },
+              { link: "#basic_examples", label: "Basic Examples" },
+              { link: "#live_example", label: "Live example" },
+              { link: "#default_buttons", label: "Staking" },
+              { link: "#custom_content", label: "Custom Content" },
+              { link: "#transcluent", label: "Transcluent" },
+              { link: "#placement", label: "Placement" },
             ]}
           />
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Toasts
+export default Toasts;

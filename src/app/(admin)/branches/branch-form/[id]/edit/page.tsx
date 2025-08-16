@@ -13,7 +13,9 @@ interface Props {
 const EditBranchPage = ({ params }: Props) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [defaultValues, setDefaultValues] = useState<Partial<BranchFormValues>>({});
+  const [defaultValues, setDefaultValues] = useState<Partial<BranchFormValues>>(
+    {},
+  );
   const isEditMode = Boolean(params.id);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { getAllTransaction } from '@/helpers/data'
-import Link from 'next/link'
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { getAllTransaction } from "@/helpers/data";
+import Link from "next/link";
 import {
   Button,
   Card,
@@ -14,25 +14,32 @@ import {
   DropdownMenu,
   DropdownToggle,
   Row,
-} from 'react-bootstrap'
+} from "react-bootstrap";
 
 const UpcomingAppointmrnt = async () => {
-  const transactionData = await getAllTransaction()
+  const transactionData = await getAllTransaction();
   return (
     <Row>
       <Col xl={12}>
         <Card>
           <CardHeader className="d-flex justify-content-between align-items-center">
             <div>
-              <CardTitle as={'h4'}>Upcoming Appointments</CardTitle>
+              <CardTitle as={"h4"}>Upcoming Appointments</CardTitle>
             </div>
             <Dropdown>
               <DropdownToggle
-                as={'a'}
+                as={"a"}
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
                 data-bs-toggle="dropdown"
-                aria-expanded="false">
-                This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+                aria-expanded="false"
+              >
+                This Month{" "}
+                <IconifyIcon
+                  className="ms-1"
+                  width={16}
+                  height={16}
+                  icon="ri:arrow-down-s-line"
+                />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
                 <DropdownItem>Download</DropdownItem>
@@ -48,8 +55,15 @@ const UpcomingAppointmrnt = async () => {
                   <tr>
                     <th style={{ width: 20 }}>
                       <div className="form-check">
-                        <input type="checkbox" className="form-check-input" id="customCheck1" />
-                        <label className="form-check-label" htmlFor="customCheck1" />
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          id="customCheck1"
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="customCheck1"
+                        />
                       </div>
                     </th>
                     <th>Order ID</th>
@@ -67,31 +81,55 @@ const UpcomingAppointmrnt = async () => {
                     <tr key={idx}>
                       <td>
                         <div className="form-check">
-                          <input type="checkbox" className="form-check-input" id="customCheck2" />
-                          <label className="form-check-label" htmlFor="customCheck2">
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            id="customCheck2"
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="customCheck2"
+                          >
                             &nbsp;
                           </label>
                         </div>
                       </td>
                       <td>{item.orderId}</td>
-                      <td>{item.purchaseDate.toLocaleString('en-us', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+                      <td>
+                        {item.purchaseDate.toLocaleString("en-us", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        })}
+                      </td>
                       <td>{item.property?.propertyType}</td>
                       <td>{item.property?.location}</td>
                       <td>€{item.amount}</td>
                       <td>
-                        <span className="badge bg-success text-white fs-11">Paid</span>
+                        <span className="badge bg-success text-white fs-11">
+                          Paid
+                        </span>
                       </td>
                       <td>{item.agentName}</td>
                       <td>
                         <div className="d-flex gap-2">
                           <Button variant="light" size="sm">
-                            <IconifyIcon icon="solar:eye-broken" className="align-middle fs-18" />
+                            <IconifyIcon
+                              icon="solar:eye-broken"
+                              className="align-middle fs-18"
+                            />
                           </Button>
                           <Button variant="soft-primary" size="sm">
-                            <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
+                            <IconifyIcon
+                              icon="solar:pen-2-broken"
+                              className="align-middle fs-18"
+                            />
                           </Button>
                           <Button variant="soft-danger" size="sm">
-                            <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
+                            <IconifyIcon
+                              icon="solar:trash-bin-minimalistic-2-broken"
+                              className="align-middle fs-18"
+                            />
                           </Button>
                         </div>
                       </td>
@@ -135,7 +173,7 @@ const UpcomingAppointmrnt = async () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default UpcomingAppointmrnt
+export default UpcomingAppointmrnt;

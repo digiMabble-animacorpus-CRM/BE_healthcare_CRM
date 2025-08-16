@@ -7,14 +7,14 @@ export const staffRoleData: StaffRoleType[] = [
     tag: "AccessLevel",
     key: "staff",
     label: "Staff",
-    description: "Basic user with limited access"
+    description: "Basic user with limited access",
   },
   {
     _id: "al-002",
     tag: "AccessLevel",
     key: "branch-admin",
     label: "Branch Admin",
-    description: "Manages staff and operations for a branch"
+    description: "Manages staff and operations for a branch",
   },
   {
     _id: "al-003",
@@ -22,7 +22,7 @@ export const staffRoleData: StaffRoleType[] = [
     key: "super-admin",
     label: "Super Admin",
     description: "Has full access across all branches and settings",
-    internal: true
+    internal: true,
   },
 
   // ✅ Roles
@@ -36,10 +36,10 @@ export const staffRoleData: StaffRoleType[] = [
       "view-patients",
       "edit-patients",
       "manage-appointments",
-      "prescribe-meds"
+      "prescribe-meds",
     ],
     requiresDetails: true,
-    requiresAvailability: true
+    requiresAvailability: true,
   },
   {
     _id: "role-002",
@@ -49,7 +49,7 @@ export const staffRoleData: StaffRoleType[] = [
     description: "Assists doctors and manages patient care",
     defaultPermissions: ["view-patients", "edit-patients"],
     requiresDetails: true,
-    requiresAvailability: true
+    requiresAvailability: true,
   },
   {
     _id: "role-003",
@@ -59,7 +59,7 @@ export const staffRoleData: StaffRoleType[] = [
     description: "Provides physical and mental therapy",
     defaultPermissions: ["view-patients", "edit-patients"],
     requiresDetails: true,
-    requiresAvailability: true
+    requiresAvailability: true,
   },
   {
     _id: "role-004",
@@ -67,7 +67,7 @@ export const staffRoleData: StaffRoleType[] = [
     key: "Receptionist",
     label: "Receptionist",
     description: "Manages appointments and front-desk operations",
-    defaultPermissions: ["manage-appointments", "access-billing"]
+    defaultPermissions: ["manage-appointments", "access-billing"],
   },
   {
     _id: "role-005",
@@ -77,7 +77,7 @@ export const staffRoleData: StaffRoleType[] = [
     description: "Manages inventory and dispenses medications",
     defaultPermissions: ["manage-inventory"],
     requiresDetails: true,
-    requiresAvailability: true
+    requiresAvailability: true,
   },
   {
     _id: "role-006",
@@ -87,7 +87,7 @@ export const staffRoleData: StaffRoleType[] = [
     description: "Handles medical equipment and diagnostics",
     defaultPermissions: ["view-patients"],
     requiresDetails: true,
-    requiresAvailability: true
+    requiresAvailability: true,
   },
   {
     _id: "role-007",
@@ -95,7 +95,7 @@ export const staffRoleData: StaffRoleType[] = [
     key: "SupportStaff",
     label: "Support Staff",
     description: "Supports general hospital operations",
-    defaultPermissions: []
+    defaultPermissions: [],
   },
   {
     _id: "role-008",
@@ -105,7 +105,7 @@ export const staffRoleData: StaffRoleType[] = [
     description: "Conducts lab tests and diagnostics",
     defaultPermissions: ["view-patients"],
     requiresDetails: true,
-    requiresAvailability: true
+    requiresAvailability: true,
   },
   {
     _id: "role-009",
@@ -113,7 +113,7 @@ export const staffRoleData: StaffRoleType[] = [
     key: "Assistant",
     label: "Assistant",
     description: "Assists doctors or other medical staff",
-    defaultPermissions: ["view-patients"]
+    defaultPermissions: ["view-patients"],
   },
   {
     _id: "role-010",
@@ -121,7 +121,7 @@ export const staffRoleData: StaffRoleType[] = [
     key: "Other",
     label: "Other",
     description: "Miscellaneous role not categorized",
-    defaultPermissions: []
+    defaultPermissions: [],
   },
   {
     _id: "role-011",
@@ -136,8 +136,8 @@ export const staffRoleData: StaffRoleType[] = [
       "prescribe-meds",
       "manage-inventory",
       "access-billing",
-      "admin-access"
+      "admin-access",
     ],
-    internal: true
-  }
+    internal: true,
+  },
 ];

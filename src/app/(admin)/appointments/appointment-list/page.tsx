@@ -17,10 +17,9 @@ import "@toast-ui/calendar/dist/toastui-calendar.min.css";
 import { Icon } from "@iconify/react";
 import dynamic from "next/dynamic";
 
-const Calendar = dynamic(
-  () => import("@toast-ui/react-calendar"),
-  { ssr: false }
-);
+const Calendar = dynamic(() => import("@toast-ui/react-calendar"), {
+  ssr: false,
+});
 
 // MUI
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -46,13 +45,13 @@ const AppointmentCalendarPage = () => {
     ...BRANCHES,
   ]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    CATEGORIES.map((c) => c.id)
+    CATEGORIES.map((c) => c.id),
   );
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<"month" | "week" | "day">("month");
   const [calendarViewMode, setCalendarViewMode] = useState<"calendar" | "list">(
-    "calendar"
+    "calendar",
   );
   const [calendarHeight, setCalendarHeight] = useState("750px");
 
@@ -230,7 +229,7 @@ const AppointmentCalendarPage = () => {
       .filter(
         (appt) =>
           selectedBranches.includes(appt.branch) &&
-          selectedCategories.includes(appt.calendarId)
+          selectedCategories.includes(appt.calendarId),
       )
       .map((appt) => {
         // Style adjustments based on status
@@ -261,13 +260,13 @@ const AppointmentCalendarPage = () => {
     setSelectedBranches((prev) =>
       prev.includes(branch)
         ? prev.filter((b) => b !== branch)
-        : [...prev, branch]
+        : [...prev, branch],
     );
   };
 
   const handleCategoryChange = (catId: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(catId) ? prev.filter((c) => c !== catId) : [...prev, catId]
+      prev.includes(catId) ? prev.filter((c) => c !== catId) : [...prev, catId],
     );
   };
 
