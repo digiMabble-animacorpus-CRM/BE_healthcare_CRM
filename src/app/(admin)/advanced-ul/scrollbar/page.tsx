@@ -67,7 +67,9 @@ const RTLPosition = () => {
       description={
         <>
           Just use data attribute&nbsp;
-          <code>data-simplebar data-simplebar-direction=&apos;rtl&apos;</code>{" "}
+          <code>
+            data-simplebar data-simplebar-direction=&apos;rtl&apos;
+          </code>{" "}
           and add <code>max-height: **px</code> oh fix height
         </>
       }
