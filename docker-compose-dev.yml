@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    command: npm run start:dev
+    restart: always
+
+  postgres_db:
+    image: postgis/postgis:16-3.5
+    volumes:
+      - postgres_db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    environment:
+      POSTGRES_DB: realestate
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Pass@1234
+    labels:
+      - "io.vendure.create.name=my-shop"
+
+volumes:
+    postgres_db_data:
+        driver: local
+        labels:
+            - "io.vendure.create.name=my-shop"
+
+
