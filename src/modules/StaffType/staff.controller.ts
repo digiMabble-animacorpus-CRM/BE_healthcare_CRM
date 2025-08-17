@@ -12,41 +12,23 @@ import {
   NotFoundException,
   UseGuards,
   Req,
-  
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiBody,
-  ApiQuery,
-  ApiResponse,
-  ApiParam,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiQuery, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { StaffService } from './staff.service';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { StaffFilterDto } from './dto/staff-filter.dto';
 import HandleResponse from 'src/core/utils/handle_response';
-import {
-  EC200,
-  EC201,
-  EC204,
-  EC500,
-  EM100,
-  EM104,
-  EM106,
-  EM116,
-  EM127,
-} from 'src/core/constants';
+import { EC200, EC201, EC204, EC500, EM100, EM104, EM106, EM116, EM127 } from 'src/core/constants';
 import { AES } from 'src/core/utils/encryption.util';
-import { validateOrReject  } from 'class-validator';
-import { plainToClass,plainToInstance } from 'class-transformer';
+import { validateOrReject } from 'class-validator';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { Permissions } from 'src/common/decorators/permissions.decorator';
 import { PermissionGuard } from 'src/common/guards/permission.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
-import {  enc } from 'crypto-js';
+import { enc } from 'crypto-js';
 import * as CryptoJS from 'crypto-js';
 import { Between, ILike, FindManyOptions } from 'typeorm';
 import { Staff } from './entities/staff.entity';
@@ -88,10 +70,9 @@ export class StaffController {
   @ApiParam({ name: 'key', type: Number, description: 'Staff key' })
   @ApiResponse({ status: 200, description: 'Staff found', type: Staff })
   @ApiResponse({ status: 404, description: 'Staff not found' })
-async findOne(@Param('key', ParseIntPipe) key: number) {
-  return this.staffService.findOne(key);
-}
-
+  async findOne(@Param('key', ParseIntPipe) key: number) {
+    return this.staffService.findOne(key);
+  }
 
   // PATCH / UPDATE
   @Patch(':key')

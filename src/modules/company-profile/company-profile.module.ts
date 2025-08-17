@@ -7,9 +7,7 @@ import User from '../users/entities/user.entity';
 import { Address } from '../addresses/entities/address.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User, Address]),
-  ],
+  imports: [TypeOrmModule.forFeature([User, Address])],
   controllers: [CompanyProfileController],
   providers: [CompanyProfileService],
   exports: [CompanyProfileService],

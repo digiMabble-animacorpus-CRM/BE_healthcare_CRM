@@ -5,14 +5,14 @@ export enum PermissionAction {
   CREATE = 'CREATE',
   READ = 'READ',
   UPDATE = 'UPDATE',
-  DELETE = 'DELETE'
+  DELETE = 'DELETE',
 }
 
 export class CreatePermissionDto {
   @ApiProperty({
     example: 'manage_users',
     description: 'The name of the permission',
-    required: true
+    required: true,
   })
   @IsString()
   @IsNotEmpty()
@@ -21,7 +21,7 @@ export class CreatePermissionDto {
   @ApiProperty({
     example: 'Allows managing user accounts',
     description: 'A description of what this permission allows',
-    required: false
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -31,7 +31,7 @@ export class CreatePermissionDto {
     example: 'CREATE',
     description: 'The type of action this permission grants',
     enum: PermissionAction,
-    required: true
+    required: true,
   })
   @IsEnum(PermissionAction)
   @IsNotEmpty()
@@ -40,7 +40,7 @@ export class CreatePermissionDto {
   @ApiProperty({
     example: 'users',
     description: 'The resource this permission applies to',
-    required: true
+    required: true,
   })
   @IsString()
   @IsNotEmpty()

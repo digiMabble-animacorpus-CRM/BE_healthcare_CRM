@@ -20,7 +20,7 @@ export class MenusService {
 
     if (permission_ids && permission_ids.length > 0) {
       const permissions = await Promise.all(
-        permission_ids.map(id => this.permissionsService.findOne(id))
+        permission_ids.map((id) => this.permissionsService.findOne(id)),
       );
       menu.permissions = permissions;
     }
@@ -56,7 +56,7 @@ export class MenusService {
 
     if (permission_ids) {
       const permissions = await Promise.all(
-        permission_ids.map(id => this.permissionsService.findOne(id))
+        permission_ids.map((id) => this.permissionsService.findOne(id)),
       );
       menu.permissions = permissions;
     }

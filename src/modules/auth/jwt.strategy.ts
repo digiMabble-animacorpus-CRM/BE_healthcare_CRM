@@ -38,14 +38,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     const userPermissions =
-      user.roles?.flatMap((role) => role.permissions)?.map(
-        (p) => `${p.action}:${p.resource}`,
-      ) || [];
+      user.roles?.flatMap((role) => role.permissions)?.map((p) => `${p.action}:${p.resource}`) ||
+      [];
 
-    const roleMeta = user.roles?.map((r) => ({
-      name: r.name,
-      role_type: r.role_type,
-    })) || [];
+    const roleMeta =
+      user.roles?.map((r) => ({
+        name: r.name,
+        role_type: r.role_type,
+      })) || [];
 
     console.log(' User validated:', {
       user_id: user.id,

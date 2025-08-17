@@ -28,12 +28,10 @@
 
 // src/modules/users/entities/token.entity.ts
 
-
-
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseModel } from 'src/core/database/BaseModel';
 import { Staff } from 'src/modules/StaffType/entities/staff.entity';
-import User  from 'src/modules/users/entities/user.entity'; // Adjust the import path as necessary
+import User from 'src/modules/users/entities/user.entity'; // Adjust the import path as necessary
 
 // token.entity.ts
 @Entity({ name: 'tokens' })
@@ -47,11 +45,10 @@ export class Token extends BaseModel {
   @Column({ type: 'varchar', length: 50 })
   type: string;
 
-@Column({ type: 'timestamp', nullable: false })
-expires_at: Date;
+  @Column({ type: 'timestamp', nullable: false })
+  expires_at: Date;
 
-
- // Relation to Staff
+  // Relation to Staff
   @ManyToOne(() => Staff, { nullable: true })
   @JoinColumn({ name: 'staff_id' })
   staff?: Staff;
@@ -61,4 +58,3 @@ expires_at: Date;
   @JoinColumn({ name: 'user_id' })
   user?: User;
 }
-
