@@ -2,9 +2,8 @@ import { BaseModel } from 'src/core/database/BaseModel';
 import { Entity, Column } from 'typeorm';
 
 @Entity({ name: 'patients' })
-export class Patient  {
-
-     @Column({ type: 'uuid', primary: true })
+export class Patient {
+  @Column({ type: 'uuid', primary: true })
   id: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })

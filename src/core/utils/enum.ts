@@ -1,8 +1,3 @@
-
-
-
-
-
 export enum Day {
   MONDAY = 0,
   TUESDAY = 1,
@@ -33,6 +28,5 @@ export enum PaygPaymentStatus {
 
 export const RazorpayPaymentStatus = {
   CAPTURED: 'captured',
-  FAILED: 'failed'
+  FAILED: 'failed',
 };
-

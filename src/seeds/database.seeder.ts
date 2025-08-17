@@ -8,7 +8,6 @@
 // import { Product } from 'src/modules/products/entities/product.entity';
 // import { StoreProduct } from 'src/modules/store-products/entities/store-product.entity';
 
-
 // @Injectable()
 // export class DatabaseSeeder {
 //   constructor() {}

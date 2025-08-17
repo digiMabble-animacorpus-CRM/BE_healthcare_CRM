@@ -1,13 +1,8 @@
-import {
-  Controller,
-  Get,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { StaffRoleService } from './staff-role.service';
 import { AuthGuard } from '@nestjs/passport';
-import { AES } from 'src/core/utils/encryption.util'; 
+import { AES } from 'src/core/utils/encryption.util';
 
 @ApiTags('Staff Roles')
 @Controller('staff-role')

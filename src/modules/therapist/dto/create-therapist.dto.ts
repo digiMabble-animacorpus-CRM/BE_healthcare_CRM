@@ -11,7 +11,6 @@ import {
 import { Type } from 'class-transformer';
 import { CreateAddressDto } from 'src/modules/addresses/dto/create-address.dto';
 
-
 class CertificationFileDto {
   @ApiProperty({ example: 'uploads/cert1.pdf' })
   @IsString()
@@ -68,12 +67,10 @@ export class CreateTherapistDto {
   @IsString()
   description: string;
 
-  
   @ApiProperty({ type: () => CreateAddressDto })
   @ValidateNested()
   @Type(() => CreateAddressDto)
   address: CreateAddressDto;
-
 
   @ApiProperty({ example: 'Female' })
   @IsNotEmpty()
@@ -84,10 +81,6 @@ export class CreateTherapistDto {
   @IsNotEmpty()
   @IsString()
   language: string;
-
-  
-
- 
 
   @ApiProperty({ example: 'Cognitive Behavioral Therapy' })
   @IsNotEmpty()

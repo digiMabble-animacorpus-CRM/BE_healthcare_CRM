@@ -21,9 +21,15 @@ export class CompanyProfileController {
   }
 
   @Put()
-  async updateCompanyProfile(@Req() req: any, @Body() updateCompanyProfileDto: UpdateCompanyProfileDto) {
+  async updateCompanyProfile(
+    @Req() req: any,
+    @Body() updateCompanyProfileDto: UpdateCompanyProfileDto,
+  ) {
     try {
-      const data = await this.companyProfileService.updateCompanyProfile(req, updateCompanyProfileDto);
+      const data = await this.companyProfileService.updateCompanyProfile(
+        req,
+        updateCompanyProfileDto,
+      );
       return HandleResponse.buildSuccessObj(EC200, EM116, data);
     } catch (error) {
       return HandleResponse.buildErrObj(EC500, error.message || EM100, error);

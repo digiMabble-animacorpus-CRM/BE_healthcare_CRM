@@ -4,7 +4,7 @@ import { Role } from '../modules/roles/entities/role.entity';
 
 (async () => {
   try {
-    await AppDataSource.initialize(); 
+    await AppDataSource.initialize();
 
     const roleRepository = AppDataSource.getRepository(Role);
 

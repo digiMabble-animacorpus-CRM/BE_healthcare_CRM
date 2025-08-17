@@ -12,7 +12,7 @@ export class AgentResponseDto {
 
   @ApiProperty()
   email_id: string;
-  
+
   @ApiProperty({ required: false })
   profile_url?: string;
 
