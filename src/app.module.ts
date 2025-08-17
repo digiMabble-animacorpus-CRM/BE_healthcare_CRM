@@ -34,31 +34,27 @@ import { CalendarsModule } from './modules/calendars/calendars.module';
 import { FunctionDescriptionModule } from './modules/function-description/function-description.module';
 config();
 
-console.log(
-  'env--->',
-  DBconfig.host,
-  DBconfig.port,
-  DBconfig.username,
-  DBconfig.password,
-  DBconfig.database,
-);
+console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
 
-@Module({
+
+@Module({ 
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: DBconfig.host,
-      port: DBconfig.port,
-      username: DBconfig.username,
-      password: DBconfig.password,
-      database: DBconfig.database,
-      entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
-      synchronize: false,
-      logging: true,
-      ssl: {
-        rejectUnauthorized: false, // <--- allow self-signed certs
-      },
-    }),
+    TypeOrmModule.forRoot(
+      {
+          type: 'postgres',
+          host: DBconfig.host,
+          port: DBconfig.port,
+          username: DBconfig.username,
+          password: DBconfig.password,
+          database: DBconfig.database,
+          entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
+          synchronize: false,
+          logging: true,
+                    ssl: {
+    rejectUnauthorized: false, // <--- allow self-signed certs
+  },
+        }
+    ),
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
     MulterModule.register({
@@ -87,16 +83,18 @@ console.log(
     FunctionDescriptionModule
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
+  providers: [AppService,
     //   {
     //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard,
+    //   useClass: JwtAuthGuard, 
     // },
   ],
+
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes('*');
+    consumer
+      .apply(JwtMiddleware)
+      .forRoutes('*');
   }
 }

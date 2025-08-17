@@ -5,7 +5,7 @@ export class CreateRoleDto {
   @ApiProperty({
     example: 'admin',
     description: 'The name of the role',
-    required: true,
+    required: true
   })
   @IsString()
   @IsNotEmpty()
@@ -14,7 +14,7 @@ export class CreateRoleDto {
   @ApiProperty({
     example: 'Administrator with full system access',
     description: 'A description of the role and its responsibilities',
-    required: false,
+    required: false
   })
   @IsString()
   @IsOptional()
@@ -24,7 +24,7 @@ export class CreateRoleDto {
     example: false,
     description: 'Whether this is a default role assigned to new users',
     required: false,
-    default: false,
+    default: false
   })
   @IsBoolean()
   @IsOptional()
@@ -34,7 +34,7 @@ export class CreateRoleDto {
     example: ['123e4567-e89b-12d3-a456-426614174000'],
     description: 'Array of permission IDs to be assigned to this role',
     required: false,
-    type: [String],
+    type: [String]
   })
   @IsArray()
   @IsOptional()

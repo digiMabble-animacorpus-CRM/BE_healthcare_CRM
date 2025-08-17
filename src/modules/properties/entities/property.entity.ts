@@ -34,4 +34,5 @@ export default class Property extends BaseModel {
 
   @Column({ type: 'varchar', nullable: true })
   image: string;
+
 }

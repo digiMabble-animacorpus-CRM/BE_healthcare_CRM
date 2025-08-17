@@ -29,6 +29,7 @@ export const EM141 = 'Mail sent successfully';
 export const EM149 = 'Logout successfully';
 export const EM150 = 'Please verify the email';
 
+
 export const EC500 = 500; //Internal server error
 export const EC100 = 100; //Continue
 export const EC200 = 200; //Success
@@ -47,4 +48,8 @@ export const EC404 = 404; // page not found
 export const E1 = true;
 export const E0 = false;
 
+
+
+
 export const ALLOWED_METHODS: string[] = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
+

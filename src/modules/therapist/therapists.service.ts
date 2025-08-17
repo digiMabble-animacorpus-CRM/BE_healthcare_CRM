@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ConflictException, HttpException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  HttpException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindManyOptions } from 'typeorm';
 import { Therapist } from './entities/therapist.entity';
@@ -62,120 +67,129 @@ export class TherapistsService extends BaseService<Therapist> {
     }
   }
 
+
   async findAll(options?: FindManyOptions<Therapist>): Promise<Therapist[]> {
-    try {
-      logger.info('Therapist_FindAll_Entry');
-      const therapists = await this.therapistRepository.find({
-        where: {
-          ...(options?.where || {}),
-          is_deleted: false,
-        },
-        relations: ['address'],
-        order: { created_at: 'DESC' },
-        ...options,
-      });
-      logger.info(`Therapist_FindAll_Exit: Found ${therapists.length} therapists`);
-      return therapists;
-    } catch (error) {
-      logger.error(`Therapist_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
-    }
+  try {
+    logger.info('Therapist_FindAll_Entry');
+    const therapists = await this.therapistRepository.find({
+      where: {
+        ...(options?.where || {}),
+        is_deleted: false, 
+      },
+      relations: ['address'],
+      order: { created_at: 'DESC' },
+      ...options,
+    });
+    logger.info(`Therapist_FindAll_Exit: Found ${therapists.length} therapists`);
+    return therapists;
+  } catch (error) {
+    logger.error(`Therapist_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
 
   async searchWithFilters(dto: TherapistFilterDto): Promise<{ data: Therapist[]; total: number }> {
-    const { page = '1', limit = '10', searchText, branch, fromDate, toDate } = dto;
+  const {
+    page = '1',
+    limit = '10',
+    searchText,
+    branch,
+    fromDate,
+    toDate,
+  } = dto;
 
-    try {
-      const query = this.therapistRepository
-        .createQueryBuilder('therapist')
-        .leftJoinAndSelect('therapist.address', 'address')
-        .where('therapist.is_deleted = :isDeleted', { isDeleted: false });
+  try {
+    const query = this.therapistRepository.createQueryBuilder('therapist')
+      .leftJoinAndSelect('therapist.address', 'address')
+      .where('therapist.is_deleted = :isDeleted', { isDeleted: false });
 
-      if (searchText) {
-        query.andWhere(
-          `(therapist.name ILIKE :search OR therapist.email ILIKE :search OR therapist.number ILIKE :search)`,
-          { search: `%${searchText}%` },
-        );
-      }
-
-      if (branch) {
-        query.andWhere('therapist.branch = :branch', { branch });
-      }
-
-      if (fromDate && toDate) {
-        query.andWhere('DATE(therapist.created_at) BETWEEN :fromDate AND :toDate', {
-          fromDate,
-          toDate,
-        });
-      }
-
-      const [data, total] = await query
-        .orderBy('therapist.created_at', 'DESC')
-        .skip((+page - 1) * +limit)
-        .take(+limit)
-        .getManyAndCount();
-
-      return { data, total };
-    } catch (error) {
-      logger.error(`Therapist_Pagination_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    if (searchText) {
+      query.andWhere(
+        `(therapist.name ILIKE :search OR therapist.email ILIKE :search OR therapist.number ILIKE :search)`,
+        { search: `%${searchText}%` },
+      );
     }
+
+    if (branch) {
+      query.andWhere('therapist.branch = :branch', { branch });
+    }
+
+    if (fromDate && toDate) {
+      query.andWhere('DATE(therapist.created_at) BETWEEN :fromDate AND :toDate', {
+        fromDate,
+        toDate,
+      });
+    }
+
+    const [data, total] = await query
+      .orderBy('therapist.created_at', 'DESC')
+      .skip((+page - 1) * +limit)
+      .take(+limit)
+      .getManyAndCount();
+
+    return { data, total };
+  } catch (error) {
+    logger.error(`Therapist_Pagination_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
 
   async findOne(id: number): Promise<Therapist> {
-    try {
-      logger.info(`Therapist_FindOne_Entry: id=${id}`);
-      const therapist = await this.therapistRepository.findOne({
-        where: {
-          id,
-          is_deleted: false, // ✅ Only fetch if not deleted
-        },
-        relations: ['address'],
-      });
+  try {
+    logger.info(`Therapist_FindOne_Entry: id=${id}`);
+    const therapist = await this.therapistRepository.findOne({
+      where: {
+        id,
+        is_deleted: false, // ✅ Only fetch if not deleted
+      },
+      relations: ['address'],
+    });
 
-      if (!therapist) {
-        logger.error(`Therapist_FindOne_Error: No record found for ID ${id}`);
-        throw new NotFoundException(Errors.NO_RECORD_FOUND);
-      }
-
-      logger.info(`Therapist_FindOne_Exit: ${JSON.stringify(therapist)}`);
-      return therapist;
-    } catch (error) {
-      logger.error(`Therapist_FindOne_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    if (!therapist) {
+      logger.error(`Therapist_FindOne_Error: No record found for ID ${id}`);
+      throw new NotFoundException(Errors.NO_RECORD_FOUND);
     }
+
+    logger.info(`Therapist_FindOne_Exit: ${JSON.stringify(therapist)}`);
+    return therapist;
+  } catch (error) {
+    logger.error(`Therapist_FindOne_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
 
-  async updateTherapist(id: number, dto: UpdateTherapistDto): Promise<Therapist> {
-    try {
-      logger.info(`Therapist_Update_Entry: id=${id}, data=${JSON.stringify(dto)}`);
 
-      // Load therapist with address
-      const therapist = await this.therapistRepository.findOne({
-        where: { id },
-        relations: ['address'],
-      });
+ async updateTherapist(id: number, dto: UpdateTherapistDto): Promise<Therapist> {
+  try {
+    logger.info(`Therapist_Update_Entry: id=${id}, data=${JSON.stringify(dto)}`);
 
-      if (!therapist) throw new NotFoundException('Therapist not found');
+    // Load therapist with address
+    const therapist = await this.therapistRepository.findOne({
+      where: { id },
+      relations: ['address'],
+    });
 
-      // Update therapist fields (excluding address)
-      Object.assign(therapist, { ...dto, address: therapist.address });
+    if (!therapist) throw new NotFoundException('Therapist not found');
 
-      // Update nested address if present
-      if (dto.address) {
-        Object.assign(therapist.address, dto.address);
-      }
+    // Update therapist fields (excluding address)
+    Object.assign(therapist, { ...dto, address: therapist.address });
 
-      // Save full entity with nested update
-      const updated = await this.therapistRepository.save(therapist);
-
-      logger.info(`Therapist_Update_Exit: ${JSON.stringify(updated)}`);
-      return updated;
-    } catch (error) {
-      logger.error(`Therapist_Update_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    // Update nested address if present
+    if (dto.address) {
+      Object.assign(therapist.address, dto.address);
     }
+
+    // Save full entity with nested update
+    const updated = await this.therapistRepository.save(therapist);
+
+    logger.info(`Therapist_Update_Exit: ${JSON.stringify(updated)}`);
+    return updated;
+  } catch (error) {
+    logger.error(`Therapist_Update_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
 
   async removeTherapist(id: number): Promise<void> {
     try {

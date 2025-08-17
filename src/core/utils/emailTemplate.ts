@@ -1,4 +1,5 @@
-let logo = '';
+
+let logo=""
 
 export default class EmailTemService {
   static logo() {
@@ -8,9 +9,15 @@ export default class EmailTemService {
   }
 
   static emailOtpVerification(otp: any) {
-    return 'html';
-  }
-  static emailPasswordVerification(password: any) {}
 
-  static forgotPassword(token: any) {}
+    return "html";
+  }
+  static emailPasswordVerification(password: any) {
+
+  }
+
+  static forgotPassword(token: any) {
+  }
+
 }
+

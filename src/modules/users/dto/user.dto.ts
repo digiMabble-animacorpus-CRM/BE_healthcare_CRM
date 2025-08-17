@@ -50,7 +50,7 @@ export class UpdateUserDto {
   email_verified: boolean;
 
   @ApiProperty()
-  @Transform(({ value }) => (value ? new Date(value) : null))
+  @Transform(({ value }) => value ? new Date(value) : null)
   @IsDate()
   @IsOptional()
   dob: Date | null;
@@ -69,7 +69,7 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   device_token: string;
-
+  
   @ApiProperty()
   @IsArray()
   @IsOptional()
@@ -86,6 +86,7 @@ export class UpdateUserDto {
   @IsBoolean()
   is_active?: boolean = true;
 }
+
 
 export class GetBranchAndServiceSearch {
   @ApiProperty({ example: 'Some text' })

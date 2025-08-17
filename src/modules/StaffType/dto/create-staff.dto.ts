@@ -74,31 +74,19 @@ export class CreateStaffDto {
   @IsInt()
   id_pro?: number;
 
-  @ApiProperty({
-    required: false,
-    example: '2025-08-15T10:00:00Z',
-    description: 'ISO 8601 start datetime',
-  })
+  @ApiProperty({ required: false, example: '2025-08-15T10:00:00Z', description: 'ISO 8601 start datetime' })
   @IsOptional()
   @Type(() => Date)
   @IsDate()
   appointment_start?: Date;
 
-  @ApiProperty({
-    required: false,
-    example: '2025-08-15T12:00:00Z',
-    description: 'ISO 8601 end datetime',
-  })
+  @ApiProperty({ required: false, example: '2025-08-15T12:00:00Z', description: 'ISO 8601 end datetime' })
   @IsOptional()
   @Type(() => Date)
   @IsDate()
   appointment_end?: Date;
 
-  @ApiProperty({
-    required: false,
-    example: 30,
-    description: 'Alert time in minutes before appointment',
-  })
+  @ApiProperty({ required: false, example: 30, description: 'Alert time in minutes before appointment' })
   @IsOptional()
   @IsInt()
   appointment_alert?: number;

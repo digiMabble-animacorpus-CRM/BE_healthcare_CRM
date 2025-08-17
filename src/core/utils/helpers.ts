@@ -10,6 +10,7 @@ export function applyDynamicConditions(
   return qb;
 }
 
+
 export function buildFilters(query: Record<string, any>) {
   const filters: Record<string, any> = {};
   for (const [key, value] of Object.entries(query)) {
