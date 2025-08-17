@@ -56,7 +56,7 @@ export interface LoginDetails {
 
 @Entity('therapists')
 export class Staff {
-  @Column({ name: '_key', type: 'int', primary: true })
+@PrimaryGeneratedColumn({ name: '_key', type: 'int' })
 _key: number;
 
 
