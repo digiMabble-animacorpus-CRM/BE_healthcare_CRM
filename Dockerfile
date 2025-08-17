@@ -1,63 +1,72 @@
-# Use the official Node.js 18 image as base
-FROM node:18-alpine AS base
+###################
+# BUILD FOR LOCAL DEVELOPMENT
+###################
 
-# Install dependencies only when needed
-FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
+FROM node:18-alpine AS development
 
-# Install dependencies based on the preferred package manager
-ENV NEXT_PRIVATE_STANDALONE true
-COPY package.json package-lock.json* ./
-RUN npm ci --only=production --legacy-peer-deps
+# Create app directory
+WORKDIR /usr/src/app
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copy application dependency manifests to the container image.
+COPY package*.json ./
+
+# Install app dependencies using the `npm ci` command instead of `npm install`
+RUN npm ci
+
+# Bundle app source
 COPY . .
-ENV NEXT_PRIVATE_STANDALONE true
-# Install all dependencies (including dev dependencies) for build
-RUN npm ci --legacy-peer-deps
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-ENV NEXT_TELEMETRY_DISABLED 1
+# Use the node user from the image (instead of the root user)
+USER node
 
+###################
+# BUILD FOR PRODUCTION
+###################
+
+FROM node:18-alpine AS build
+
+WORKDIR /usr/src/app
+
+# Copy dependency manifests
+COPY package*.json ./
+
+# Copy node_modules from development stage
+COPY --from=development /usr/src/app/node_modules ./node_modules
+
+# Copy the rest of the application code
+COPY . .
+# COPY .env .env
+COPY user-swagger.json user-swagger.json
+# Run the build command which creates the production bundle
 RUN npm run build
 
-# Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
-
+# Set NODE_ENV environment variable
 ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Clean up dev dependencies
+RUN npm ci --only=production && npm cache clean --force
 
-COPY --from=builder /app/public ./public
+###################
+# PRODUCTION
+###################
 
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
+FROM node:18-alpine AS production
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+WORKDIR /usr/src/app
 
-USER nextjs
+RUN npm install \
+    && npm cache clean --force \
+    && rm -rf /tmp/*
+# Copy the production node_modules and dist from build stage
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/dist ./dist
+COPY user-swagger.json user-swagger.json
+RUN mkdir -p /usr/src/app/logs && chmod -R 777 /usr/src/app/logs
+# Use the node user from the image (instead of the root user)
+USER node
 
-EXPOSE 3000
+# Expose application port
+EXPOSE 8080
 
-ENV PORT 3000
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
-
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["node", "server.js"] 
+# Start the server using the production build
+CMD ["node", "dist/src/main"]

@@ -29,9 +29,6 @@ import { SeederModule } from './seeds/seeder.module';
 import { TokenModule } from './modules/users/token.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
-import { AppointmentsModule } from './modules/appointment/appointment.module';
-import { CalendarsModule } from './modules/calendars/calendars.module';
-import { FunctionDescriptionModule } from './modules/function-description/function-description.module';
 config();
 
 console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
@@ -49,8 +46,8 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
           database: DBconfig.database,
           entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
           synchronize: false,
-          logging: true,
-                    ssl: {
+          logging: true,   
+           ssl: {
     rejectUnauthorized: false, // <--- allow self-signed certs
   },
         }
@@ -78,9 +75,6 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     StaffModule,
     SeederModule,
     TokenModule,
-    AppointmentsModule,
-    CalendarsModule,
-    FunctionDescriptionModule
   ],
   controllers: [AppController],
   providers: [AppService,
