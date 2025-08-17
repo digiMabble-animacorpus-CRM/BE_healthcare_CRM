@@ -92,7 +92,7 @@
 // }
 
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { Not, Repository, FindOneOptions } from 'typeorm';
+import { Not, Repository ,FindOneOptions } from 'typeorm';
 import { BaseService } from 'src/base.service';
 import { VerifyOtpDto } from '../auth/dto/verify-otp.dto';
 import { UpdateUserDto } from './dto/user.dto';
@@ -131,19 +131,19 @@ export class UsersService extends BaseService<User> {
   // async findOneById(id: string | number): Promise<User | null> {
   //   return await super.findOne(id);
   // }
-  async findOneById(id: string | number, options?: FindOneOptions<User>): Promise<User | null> {
-    const userId = typeof id === 'string' ? parseInt(id, 10) : id;
-    return await this.repository.findOne({
-      where: { id: userId },
-      ...(options || {}),
-    });
-  }
+async findOneById(id: string | number, options?: FindOneOptions<User>): Promise<User | null> {
+  const userId = typeof id === 'string' ? parseInt(id, 10) : id;
+  return await this.repository.findOne({
+    where: { id: userId },
+    ...(options || {}),
+  });
+}
   /**
    * Find a user by email.
    */
   async findOneByEmail(email: string): Promise<User | null> {
     return await this.repository.findOne({
-      where: { email_id: email },
+      where: { email_id: email }
     });
   }
 
@@ -171,9 +171,13 @@ export class UsersService extends BaseService<User> {
     return updatedUser!;
   }
 
+
+
+
+
   /**
-   * Create a password reset token for a user
-   */
+  * Create a password reset token for a user
+  */
   async createPasswordResetToken(email: string, token: string): Promise<Token> {
     // First delete any existing reset tokens for this email
     await this.deleteTokensByEmailAndType(email, 'password_reset');
@@ -187,6 +191,7 @@ export class UsersService extends BaseService<User> {
       expires_at: moment().add(30, 'minutes').utc().toDate(),
     };
 
+
     const newToken = this.tokenRepository.create(tokenData);
     return await this.tokenRepository.save(newToken);
   }
@@ -196,7 +201,7 @@ export class UsersService extends BaseService<User> {
    */
   async findTokenByTokenAndType(token: string, type: string): Promise<Token | null> {
     return await this.tokenRepository.findOne({
-      where: { token, type },
+      where: { token, type }
     });
   }
 
@@ -229,6 +234,7 @@ export class UsersService extends BaseService<User> {
 
     return { valid: true, email: tokenRecord.user_email };
   }
+
 
   async findOneByIdForAddress(id: number): Promise<User | null> {
     return this.userRepository.findOne({
@@ -284,29 +290,31 @@ export class UsersService extends BaseService<User> {
   }
 
   async findOneByRole(roleName: string): Promise<User | undefined> {
-    return this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.roles', 'role')
-      .where('role.name = :roleName', { roleName })
-      .getOne();
-  }
+  return this.userRepository
+    .createQueryBuilder('user')
+    .leftJoinAndSelect('user.roles', 'role')
+    .where('role.name = :roleName', { roleName })
+    .getOne();
+}
 
-  /**
-   * Create an email verification token for a user
-   */
-  // async createEmailVerificationToken(email: string, token: string): Promise<Token> {
-  //   // Delete any previous verification tokens for this user
-  //   await this.deleteTokensByEmailAndType(email, 'email_verification');
+/**
+ * Create an email verification token for a user
+ */
+// async createEmailVerificationToken(email: string, token: string): Promise<Token> {
+//   // Delete any previous verification tokens for this user
+//   await this.deleteTokensByEmailAndType(email, 'email_verification');
 
-  //   const tokenData = {
-  //     user_email: email,
-  //     token: token,
-  //     type: 'email_verification',
-  //     created_at: moment().utc().toDate(),
-  //     expires_at: moment().add(10, 'minutes').utc().toDate(),
-  //   };
+//   const tokenData = {
+//     user_email: email,
+//     token: token,
+//     type: 'email_verification',
+//     created_at: moment().utc().toDate(),
+//     expires_at: moment().add(10, 'minutes').utc().toDate(),
+//   };
 
-  //   const newToken = this.tokenRepository.create(tokenData);
-  //   return await this.tokenRepository.save(newToken);
-  // }
+//   const newToken = this.tokenRepository.create(tokenData);
+//   return await this.tokenRepository.save(newToken);
+// }
+
+
 }

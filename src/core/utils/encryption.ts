@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { logger } from './logger';
 
 export default class Encryption {
+
   static encryptValue = (input_data: any) => {
     try {
       let cipher = crypto.createCipheriv(
@@ -14,11 +15,10 @@ export default class Encryption {
       encrypted += cipher.final('base64');
       return encrypted;
     } catch (error) {
-      logger.error(
-        'EncryptValue_Error_:' + JSON.stringify(error?.stack || error?.message || error),
-      );
+      logger.error('EncryptValue_Error_:' + JSON.stringify(error?.stack || error?.message || error));
       throw new Error(error);
     }
+
   };
   static decryptValue = (input_data: any) => {
     try {
@@ -31,14 +31,14 @@ export default class Encryption {
         );
         decrypted = decipher.update(input_data, 'base64', 'utf8');
         decrypted = decrypted + decipher.final('utf8');
+
       }
       return decrypted;
     } catch (error) {
-      logger.error(
-        'DecryptValue_Error_:' + JSON.stringify(error?.stack || error?.message || error),
-      );
+      logger.error('DecryptValue_Error_:' + JSON.stringify(error?.stack || error?.message || error));
       throw new Error(error);
     }
+
   };
 
   static hashPassword(password: string) {
@@ -52,12 +52,12 @@ export default class Encryption {
   }
 
   /** 256‑bit hex string (64 chars) */
-  static generateRawToken(): string {
-    return crypto.randomBytes(32).toString('hex');
-  }
+static generateRawToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
 
-  /** One‑way SHA‑256 */
-  static hashToken(raw: string): string {
-    return crypto.createHash('sha256').update(raw).digest('hex');
-  }
+/** One‑way SHA‑256 */
+static hashToken(raw: string): string {
+  return crypto.createHash('sha256').update(raw).digest('hex');
+}
 }

@@ -28,6 +28,7 @@ export class AgentQueryDto {
     enum: ['name', 'email_id', 'mobile_no', 'created_at'],
     default: 'created_at',
   })
+  
   @IsOptional()
   @IsIn(['name', 'email_id', 'mobile_no', 'created_at'])
   sort_by?: string = 'created_at';

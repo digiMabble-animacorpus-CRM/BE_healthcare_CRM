@@ -11,6 +11,7 @@ import {
 import { Type } from 'class-transformer';
 
 export class CreatePatientDto {
+
   @ApiProperty({ example: 'John' })
   @IsOptional()
   @IsString()
@@ -95,6 +96,8 @@ export class CreatePatientDto {
   @IsOptional()
   @IsString()
   zipcode?: string;
+
+  
 
   @ApiProperty({ example: '1994-06-07' })
   @IsOptional()

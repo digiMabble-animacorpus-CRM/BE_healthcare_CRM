@@ -5,7 +5,7 @@ export class CreateAddressDto {
   @ApiProperty({
     example: '123 Main Street',
     description: 'The street address',
-    required: true,
+    required: true
   })
   @IsNotEmpty()
   @IsString()
@@ -14,7 +14,7 @@ export class CreateAddressDto {
   @ApiProperty({
     example: 'New York',
     description: 'The city name',
-    required: true,
+    required: true
   })
   @IsNotEmpty()
   @IsString()
@@ -23,7 +23,7 @@ export class CreateAddressDto {
   @ApiProperty({
     example: 'NY',
     description: 'The state name',
-    required: false,
+    required: false
   })
   @IsOptional()
   @IsString()
@@ -32,7 +32,7 @@ export class CreateAddressDto {
   @ApiProperty({
     example: '10001',
     description: 'The postal/zip code',
-    required: true,
+    required: true
   })
   @IsNotEmpty()
   @IsString()
@@ -41,7 +41,7 @@ export class CreateAddressDto {
   @ApiProperty({
     example: 'USA',
     description: 'The country name',
-    required: true,
+    required: true
   })
   @IsNotEmpty()
   @IsString()

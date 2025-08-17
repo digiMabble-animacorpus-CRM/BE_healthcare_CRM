@@ -40,6 +40,7 @@ export class UpdateCompanyProfileDto {
   @IsString()
   company_name: string;
 
+
   @ApiProperty({ example: '+1234567890' })
   @IsOptional()
   @IsString()

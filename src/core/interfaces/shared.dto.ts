@@ -1,6 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, IsDateString } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsString,
+  IsDateString
+} from 'class-validator';
 
 export enum BlockingUserType {
   USER = 'USER',

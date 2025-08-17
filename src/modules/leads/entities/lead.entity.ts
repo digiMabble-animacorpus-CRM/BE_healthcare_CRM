@@ -10,7 +10,7 @@ export enum LeadSource {
   WALK_IN = 'Walk-in',
   SOCIAL_MEDIA = 'Social Media',
   PHONE_CALL = 'Phone Call',
-  EMAIL = 'Email',
+  EMAIL = 'Email'
 }
 
 export enum LeadStatus {
@@ -21,7 +21,7 @@ export enum LeadStatus {
   NEGOTIATION = 'Negotiation',
   CLOSED_WON = 'Closed Won',
   CLOSED_LOST = 'Closed Lost',
-  FOLLOW_UP = 'Follow Up',
+  FOLLOW_UP = 'Follow Up'
 }
 
 @Entity({ name: 'leads' })
@@ -29,14 +29,14 @@ export class Lead extends BaseModel {
   @Column({
     type: 'enum',
     enum: LeadSource,
-    default: LeadSource.WEBSITE,
+    default: LeadSource.WEBSITE
   })
   lead_source: LeadSource;
 
   @Column({
     type: 'enum',
     enum: LeadStatus,
-    default: LeadStatus.NEW,
+    default: LeadStatus.NEW
   })
   lead_status: LeadStatus;
 

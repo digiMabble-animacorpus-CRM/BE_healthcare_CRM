@@ -16,7 +16,7 @@ import { Address } from 'src/modules/addresses/entities/address.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { Permission } from 'src/modules/permissions/entities/permission.entity';
 import { Role } from 'src/modules/roles/entities/role.entity';
-import { Token } from 'src/modules/users/entities/token.entity';
+import  { Token }  from 'src/modules/users/entities/token.entity'; 
 import User from 'src/modules/users/entities/user.entity'; // Adjust the import path as necessary
 export enum AccessLevel {
   STAFF = 'staff',
@@ -57,7 +57,8 @@ export interface LoginDetails {
 @Entity('therapists')
 export class Staff {
   @Column({ name: '_key', type: 'int', primary: true })
-  _key: number;
+_key: number;
+
 
   @Column({ name: 'id_pro', type: 'integer', nullable: true })
   idPro: number;

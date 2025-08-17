@@ -49,6 +49,8 @@ export class PermissionsService {
     await this.permissionRepository.remove(permission);
   }
 
+
+
   // async getEffectivePermissions(staff: Staff): Promise<Permission[]> {
   //   const staffPermissions = staff.permissions || [];
   //   const rolePermissions = staff.role?.permissions || [];
@@ -72,4 +74,5 @@ export class PermissionsService {
   //   const permissions = await this.getEffectivePermissions(staff);
   //   return permissions.some(p => p.action === action && p.resource === resource);
   // }
+  
 }

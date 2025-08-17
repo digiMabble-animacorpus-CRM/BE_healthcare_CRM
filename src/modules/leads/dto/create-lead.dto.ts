@@ -10,7 +10,7 @@ import {
   MaxLength,
   IsPositive,
   IsInt,
-  IsBoolean,
+  IsBoolean
 } from 'class-validator';
 import { LeadSource, LeadStatus } from '../entities/lead.entity';
 
@@ -18,7 +18,7 @@ export class CreateLeadDto {
   @ApiProperty({
     example: LeadSource.WEBSITE,
     enum: LeadSource,
-    description: 'Source of the lead',
+    description: 'Source of the lead'
   })
   @IsNotEmpty({ message: 'Select a lead source.' })
   @IsEnum(LeadSource, { message: 'Select a lead source.' })
@@ -27,7 +27,7 @@ export class CreateLeadDto {
   @ApiProperty({
     example: LeadStatus.NEW,
     enum: LeadStatus,
-    description: 'Current status of the lead',
+    description: 'Current status of the lead'
   })
   @IsNotEmpty({ message: 'Select the current status of the lead.' })
   @IsEnum(LeadStatus, { message: 'Select the current status of the lead.' })

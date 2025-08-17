@@ -1,42 +1,18 @@
 // src/modules/properties/properties.controller.ts
 
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UsePipes,
-  ValidationPipe,
-  HttpException,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, HttpException, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { PropertiesService } from './properties.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import HandleResponse from 'src/core/utils/handle_response';
-import {
-  EC200,
-  EC201,
-  EC204,
-  EC404,
-  EC500,
-  EM100,
-  EM104,
-  EM106,
-  EM116,
-  EM119,
-  EM127,
-} from 'src/core/constants';
+import { EC200, EC201, EC204, EC404, EC500, EM100, EM104, EM106, EM116, EM119, EM127 } from 'src/core/constants';
 import { PaginationDto } from 'src/core/interfaces/shared.dto';
 
 @ApiTags('Properties')
 @Controller('properties')
 export class PropertiesController {
-  constructor(private readonly propertiesService: PropertiesService) {}
+  constructor(private readonly propertiesService: PropertiesService) { }
 
   @Post()
   @UsePipes(new ValidationPipe())
@@ -58,7 +34,7 @@ export class PropertiesController {
       if (paginationDto.pagNo && paginationDto.limit) {
         const { data, total } = await this.propertiesService.findAllWithPagination(
           paginationDto.pagNo,
-          paginationDto.limit,
+          paginationDto.limit
         );
         return HandleResponse.buildSuccessObj(EC200, EM106, { data, total });
       } else {

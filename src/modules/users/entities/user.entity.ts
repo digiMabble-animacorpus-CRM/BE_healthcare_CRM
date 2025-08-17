@@ -146,29 +146,29 @@ export default class User extends BaseModel {
   @JoinColumn()
   address: Address;
 
-  @OneToOne(() => SocialLinks, (socialLinks) => socialLinks.user, {
-    cascade: true,
-    eager: false,
-    nullable: true,
-  })
+  @OneToOne(() => SocialLinks, (socialLinks) => socialLinks.user, { cascade: true, eager: false, nullable: true })
   social_links: SocialLinks;
 
-  @ManyToMany(() => Role, (role) => role.users)
+  
+  @ManyToMany(() => Role, role => role.users)
   @JoinTable({
     name: 'user_roles',
     joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' }
   })
   roles: Role[];
 
   @ManyToMany(() => Permission, (permission) => permission.users, { eager: true }) // Optional: eager loading
-  @JoinTable({
-    name: 'user_permissions',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'permission_id', referencedColumnName: 'id' },
-  })
-  permissions: Permission[];
+@JoinTable({
+  name: 'user_permissions',
+  joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+  inverseJoinColumn: { name: 'permission_id', referencedColumnName: 'id' },
+})
+permissions: Permission[];
 
-  // @OneToOne(() => Staff, (staff) => staff.user)
-  // staff: Staff;
+// @OneToOne(() => Staff, (staff) => staff.user)
+// staff: Staff;
+
+
 }
+

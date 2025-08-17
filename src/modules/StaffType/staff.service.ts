@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Staff } from './entities/staff.entity';
@@ -21,7 +16,7 @@ export class StaffService {
   async create(dto: CreateStaffDto): Promise<Staff> {
     // Remove _key if present, so DB generates it automatically
     const { _key, ...dtoWithoutKey } = dto;
-    const staff = this.staffRepository.create(dtoWithoutKey);
+    const staff = this.staffRepository.create(dtoWithoutKey); 
     return this.staffRepository.save(staff);
   }
 
@@ -56,13 +51,15 @@ export class StaffService {
     return { deleted: true };
   }
 
-  async findOneByEmail(email: string): Promise<Staff> {
-    const staff = await this.staffRepository.findOne({
-      // where: { email },
-      // relations: ['selected_branch'], // include relations if needed
-    });
 
-    if (!staff) throw new NotFoundException(`Staff with email ${email} not found`);
-    return staff;
-  }
+
+   async findOneByEmail(email: string): Promise<Staff> {
+  const staff = await this.staffRepository.findOne({
+    // where: { email },
+    // relations: ['selected_branch'], // include relations if needed
+  });
+
+  if (!staff) throw new NotFoundException(`Staff with email ${email} not found`);
+  return staff;
+}
 }

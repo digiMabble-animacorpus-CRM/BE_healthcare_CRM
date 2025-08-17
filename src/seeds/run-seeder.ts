@@ -6,7 +6,7 @@ import { DataSource } from 'typeorm';
 async function runSeeder() {
   const app = await NestFactory.createApplicationContext(AppModule);
   // const seeder = app.get(DatabaseSeeder);
-  const dataSource = app.get(DataSource);
+  const dataSource = app.get(DataSource)
   // await seeder.seed(dataSource);
   await app.close();
 }

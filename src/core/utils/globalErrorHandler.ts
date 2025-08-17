@@ -8,7 +8,7 @@ export class GlobalErrorHandler implements ExceptionFilter {
   catch(error: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    response.json({
+      response.json({
       statusCode: error.statusCode || 500,
       timestamp: new Date().toISOString(),
       message: error.message || 'Internal Server Error',

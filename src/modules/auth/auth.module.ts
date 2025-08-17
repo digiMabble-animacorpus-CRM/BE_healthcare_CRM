@@ -15,7 +15,7 @@ import { HomeService } from '../users/home.service';
 import { AddressesModule } from '../addresses/addresses.module';
 import { AgentsModule } from '../agents/agents.module';
 import { Role } from 'src/modules/roles/entities/role.entity';
-import { StaffModule } from '../StaffType/staff.module';
+import {StaffModule} from '../StaffType/staff.module';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { APP_GUARD } from '@nestjs/core';
@@ -35,26 +35,21 @@ import { Token } from 'src/modules/users/entities/token.entity';
     //   signOptions: { expiresIn: process.env.TOKEN_EXPIRATION },
     // }),
     JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (config: ConfigService) => ({
-        secret: config.get('JWTKEY'),
-        signOptions: { expiresIn: config.get('TOKEN_EXPIRATION') || '48h' },
-      }),
-      inject: [ConfigService],
-    }),
+  imports: [ConfigModule],
+  useFactory: async (config: ConfigService) => ({
+    secret: config.get('JWTKEY'),
+    signOptions: { expiresIn: config.get('TOKEN_EXPIRATION') || '48h' },
+  }),
+  inject: [ConfigService],
+}),
 
     TypeOrmModule.forFeature([Role]),
   ],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    JwtStrategy,
-    MailUtils,
-    HomeService,
-    {
+  providers: [AuthService, LocalStrategy, JwtStrategy, MailUtils, HomeService
+     ,{
       provide: APP_GUARD,
       useClass: RolesGuard,
-    },
+    }
   ],
   controllers: [AuthController, UsersController],
   exports: [AuthService],

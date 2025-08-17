@@ -28,13 +28,13 @@ export class Menu extends BaseModel {
   @Column({ type: 'boolean', default: false })
   is_visible: boolean;
 
-  @ManyToOne(() => Menu, (menu) => menu.children)
+  @ManyToOne(() => Menu, menu => menu.children)
   @JoinColumn({ name: 'parent_id' })
   parent: Menu;
 
-  @OneToMany(() => Menu, (menu) => menu.parent)
+  @OneToMany(() => Menu, menu => menu.parent)
   children: Menu[];
 
-  @ManyToMany(() => Permission, (permission) => permission.menus)
+  @ManyToMany(() => Permission, permission => permission.menus)
   permissions: Permission[];
 }

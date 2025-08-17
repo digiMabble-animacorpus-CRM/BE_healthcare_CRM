@@ -18,17 +18,17 @@ export class Permission extends BaseModel {
   @Column({ type: 'varchar', length: 100 })
   resource: string; // The resource this permission applies to
 
-  @ManyToMany(() => Role, (role) => role.permissions)
+  @ManyToMany(() => Role, role => role.permissions)
   roles: Role[];
 
-  @ManyToMany(() => Menu, (menu) => menu.permissions)
+  @ManyToMany(() => Menu, menu => menu.permissions)
   @JoinTable({
     name: 'permission_menus',
     joinColumn: { name: 'permission_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'menu_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'menu_id', referencedColumnName: 'id' }
   })
   menus: Menu[];
 
   @ManyToMany(() => User, (user) => user.permissions)
-  users: User[];
+users: User[];
 }
