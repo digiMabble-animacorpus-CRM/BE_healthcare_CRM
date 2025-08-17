@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: ghcr.io/digimabble/healthcare_crm:latest
+    env_file:
+      - .env
+    ports:
+      - "7000:7000"
+    command: node dist/src/main
+    restart: always
+    networks:
+      - app_network
+
+  # healthcare-db:
+  #   image: postgres:16
+  #   volumes:
+  #     - postgres_db_data:/var/lib/postgresql/data
+  #     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   ports:
+  #     - "5432:5432"
+  #   expose:
+  #     - 5432
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - app_network
+
+volumes:
+  postgres_db_data:
+    driver: local
+    labels:
+      - "io.vendure.create.name=healthcare-shop"
+
+networks:
+  app_network:
+    driver: bridge
