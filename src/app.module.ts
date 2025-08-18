@@ -30,6 +30,9 @@ import { TokenModule } from './modules/users/token.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { TeamMemberModule } from './team-member/team-member.module';
+import { AppointmentsModule } from './modules/appointment/appointment.module';
+import { CalendarsModule } from './modules/calendars/calendars.module';
+import { FunctionDescriptionModule } from './modules/function-description/function-description.module';
 config();
 
 console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
@@ -77,6 +80,9 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     SeederModule,
     TokenModule,
     TeamMemberModule,
+    AppointmentsModule,
+    CalendarsModule,
+    FunctionDescriptionModule
   ],
   controllers: [AppController],
   providers: [AppService,
