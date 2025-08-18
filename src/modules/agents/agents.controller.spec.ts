@@ -15,7 +15,7 @@ const mockAgentsService = () => ({
 
 const mockAgentResponse = {
   id: 1,
-  name: 'John Agent',
+  name: 'John Agent', 
   email_id: 'john@agent.com',
   mobile_no: '+1234567890',
   properties_count: 0,
@@ -58,7 +58,7 @@ describe('AgentsController', () => {
         page: 1,
         limit: 10,
         sort_by: 'created_at',
-        order: 'desc',
+        order: 'desc'
       };
 
       const mockResult = {
@@ -87,7 +87,7 @@ describe('AgentsController', () => {
         page: 1,
         limit: 10,
         sort_by: 'created_at',
-        order: 'desc',
+        order: 'desc'
       };
 
       const mockResult = {
@@ -115,7 +115,7 @@ describe('AgentsController', () => {
         page: 1,
         limit: 10,
         sort_by: 'created_at',
-        order: 'desc',
+        order: 'desc'
       };
 
       jest.spyOn(service, 'getAllAgents').mockRejectedValue(new Error('Database error'));
@@ -147,9 +147,7 @@ describe('AgentsController', () => {
     });
 
     it('should handle not found error', async () => {
-      jest
-        .spyOn(service, 'getAgentById')
-        .mockRejectedValue(new NotFoundException('Agent not found'));
+      jest.spyOn(service, 'getAgentById').mockRejectedValue(new NotFoundException('Agent not found'));
 
       const result = await controller.getAgentById(999);
 
@@ -167,8 +165,8 @@ describe('AgentsController', () => {
       const updateDto: UpdateAgentDto = {
         name: 'Updated Agent Name', // Changed from user_name to name
         social_links: {
-          facebook: 'https://facebook.com/updated',
-        },
+          facebook: 'https://facebook.com/updated'
+        }
       };
 
       const updatedAgent = {
@@ -194,9 +192,7 @@ describe('AgentsController', () => {
         name: 'Updated Agent Name', // Changed from user_name to name
       };
 
-      jest
-        .spyOn(service, 'updateAgent')
-        .mockRejectedValue(new NotFoundException('Agent not found'));
+      jest.spyOn(service, 'updateAgent').mockRejectedValue(new NotFoundException('Agent not found'));
 
       const result = await controller.updateAgent(999, updateDto);
 

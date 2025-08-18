@@ -1,9 +1,10 @@
 import { BaseModel } from 'src/core/database/BaseModel';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column , PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity({ name: 'patients' })
-export class Patient {
-  @Column({ type: 'uuid', primary: true })
+export class Patient  {
+
+    @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })

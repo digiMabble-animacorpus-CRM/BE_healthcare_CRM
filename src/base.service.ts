@@ -137,7 +137,7 @@ import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity
 export abstract class BaseService<T> {
   protected abstract repository: Repository<T>;
 
-  constructor(protected readonly entityManager: EntityManager) {}
+  constructor(protected readonly entityManager: EntityManager) { }
 
   /**
    * Create a new record.
@@ -166,11 +166,7 @@ export abstract class BaseService<T> {
     limit: number,
     options?: FindManyOptions<T>,
   ): Promise<{ data: T[]; total: number }> {
-    let [data, total] = await this.repository.findAndCount({
-      ...options,
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    let [data, total] = await this.repository.findAndCount({ ...options, skip: (page - 1) * limit, take: limit });
     return { data, total };
   }
 

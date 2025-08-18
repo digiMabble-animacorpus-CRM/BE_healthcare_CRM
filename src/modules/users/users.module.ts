@@ -8,8 +8,8 @@ import { Token } from './entities/token.entity';
 import { Address } from '../addresses/entities/address.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Token, Address])],
+  imports: [TypeOrmModule.forFeature([User, Token,Address])],
   providers: [UsersService],
   exports: [UsersService],
 })
-export class UsersModule {}
+export class UsersModule { }

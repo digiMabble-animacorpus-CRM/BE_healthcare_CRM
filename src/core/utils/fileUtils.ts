@@ -36,7 +36,9 @@ export class FileUtils {
     // const pdfOptions = {
     //   path: `pdfs/${pdfFileName}`,
     // };
+
     // await page.pdf(pdfOptions);
+
     // await browser.close();
   }
 }

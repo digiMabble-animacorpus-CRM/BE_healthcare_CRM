@@ -4,8 +4,9 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AppService {
-  constructor() // @InjectDataSource() private dataSource: DataSource, // Inject DataSource
-  {}
+  constructor(
+    // @InjectDataSource() private dataSource: DataSource, // Inject DataSource
+  ) {}
 
   getHello(): string {
     return 'Hello World!!!   ';

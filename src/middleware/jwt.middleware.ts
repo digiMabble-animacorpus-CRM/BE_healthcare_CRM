@@ -37,12 +37,11 @@ export class JwtMiddleware implements NestMiddleware {
         console.log(decodedToken, 'authTokenHeader');
 
         req.user = decodedToken; // Set the decoded token in the request object for further use in the route handler
+
       } catch (error) {
+
         // Handle token verification errors
-        logger.error(
-          'Token_Expiry_Error: ' +
-            JSON.stringify(error?.message || error?.stack || error?.name || error),
-        );
+        logger.error('Token_Expiry_Error: ' + JSON.stringify(error?.message || error?.stack || error?.name || error));
         if (error.name === 'TokenExpiredError') {
           logger.error('Token_Expiry_exit: ' + JSON.stringify('Token has expired.'));
           return res.status(403).json({ code: 401, message: 'Token has expired.' });

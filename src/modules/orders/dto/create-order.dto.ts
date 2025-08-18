@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsString,
-  IsNumber,
-  IsDateString,
-  IsOptional,
-  IsBoolean,
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateOrderDto {
   @ApiProperty({ example: 101, description: 'Unique order identifier' })
@@ -29,7 +22,7 @@ export class CreateOrderDto {
   @IsDateString()
   purchase_date: string;
 
-  @ApiProperty({ example: 45842.0, description: 'Purchase amount' })
+  @ApiProperty({ example: 45842.00, description: 'Purchase amount' })
   @IsNotEmpty()
   @IsNumber()
   amount: number;
@@ -39,12 +32,9 @@ export class CreateOrderDto {
   @IsString()
   currency: string;
 
-  @ApiProperty({
-    example: 'Paid',
-    description: 'Payment status',
-    enum: ['Pending', 'Paid', 'Failed'],
-  })
+  @ApiProperty({ example: 'Paid', description: 'Payment status', enum: ['Pending', 'Paid', 'Failed'] })
   @IsOptional()
   @IsString()
   amount_status?: string;
+
 }

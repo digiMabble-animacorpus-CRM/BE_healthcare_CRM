@@ -12,7 +12,7 @@ export class CompanyProfileService {
     private userRepository: Repository<User>,
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
-  ) {}
+  ) { }
 
   async getCompanyProfile(req: any): Promise<User> {
     const userId = req.user.user_id;
@@ -28,10 +28,7 @@ export class CompanyProfileService {
     return companyProfile;
   }
 
-  async updateCompanyProfile(
-    req: any,
-    updateCompanyProfileDto: UpdateCompanyProfileDto,
-  ): Promise<User> {
+  async updateCompanyProfile(req: any, updateCompanyProfileDto: UpdateCompanyProfileDto): Promise<User> {
     try {
       const userId = req.user.user_id;
       const companyProfile = await this.userRepository.findOne({
