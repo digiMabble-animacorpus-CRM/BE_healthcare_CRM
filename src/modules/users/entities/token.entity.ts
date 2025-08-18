@@ -61,4 +61,3 @@ expires_at: Date;
   @JoinColumn({ name: 'user_id' })
   user?: User;
 }
-

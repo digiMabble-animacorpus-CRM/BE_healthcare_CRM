@@ -3,7 +3,6 @@ import * as bcrypt from 'bcrypt';
 import { logger } from './logger';
 
 export default class Encryption {
-
   static encryptValue = (input_data: any) => {
     try {
       let cipher = crypto.createCipheriv(

@@ -26,14 +26,12 @@ export class FileUtils {
 
   static async generatePDF(invoiceContent, pdfFileName) {
     // await fs.mkdir('pdfs', { recursive: true });
-
     // const browser = await puppeteer.launch({
     //   headless: true,
     //   args: ['--no-sandbox'],
     // });
     // const page = await browser.newPage();
     // await page.setContent(invoiceContent);
-
     // // Adjust the options as needed (e.g., format, margin, etc.).
     // const pdfOptions = {
     //   path: `pdfs/${pdfFileName}`,

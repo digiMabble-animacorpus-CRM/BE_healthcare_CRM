@@ -17,7 +17,6 @@ import { GlobalExceptionFilter } from './core/utils/customValidation';
 import { GlobalErrorHandler } from './core/utils/globalErrorHandler';
 import { AES } from 'src/core/utils//encryption.util';
 
-
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // one minutes
   max: 100, // 100 requests only allowed per one minutes

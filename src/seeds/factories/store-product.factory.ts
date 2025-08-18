@@ -3,7 +3,6 @@
 // import { StoreProduct } from 'src/modules/store-products/entities/store-product.entity';
 // import { Store } from 'src/modules/store/entities/store.entity';
 
-
 // export const createFakeStoreProduct = (store: Store, product: Product): Partial<StoreProduct> => {
 //   const pickupTimes = ["07:00", "09:00", "11:00", "13:00", "15:00", "17:00", "19:00", "20:00"];
 
@@ -33,4 +32,3 @@
 //     is_surprise: faker.datatype.boolean(),
 //   };
 // };
-

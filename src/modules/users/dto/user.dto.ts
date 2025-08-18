@@ -87,7 +87,6 @@ export class UpdateUserDto {
   is_active?: boolean = true;
 }
 
-
 export class GetBranchAndServiceSearch {
   @ApiProperty({ example: 'Some text' })
   @IsNotEmpty()

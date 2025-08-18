@@ -191,7 +191,6 @@ async findOneById(id: string | number, options?: FindOneOptions<User>): Promise<
       expires_at: moment().add(30, 'minutes').utc().toDate(),
     };
 
-
     const newToken = this.tokenRepository.create(tokenData);
     return await this.tokenRepository.save(newToken);
   }
@@ -234,7 +233,6 @@ async findOneById(id: string | number, options?: FindOneOptions<User>): Promise<
 
     return { valid: true, email: tokenRecord.user_email };
   }
-
 
   async findOneByIdForAddress(id: number): Promise<User | null> {
     return this.userRepository.findOne({

@@ -29,7 +29,6 @@ export const EM141 = 'Mail sent successfully';
 export const EM149 = 'Logout successfully';
 export const EM150 = 'Please verify the email';
 
-
 export const EC500 = 500; //Internal server error
 export const EC100 = 100; //Continue
 export const EC200 = 200; //Success
