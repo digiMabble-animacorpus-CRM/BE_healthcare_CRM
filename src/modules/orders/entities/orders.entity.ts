@@ -1,7 +1,7 @@
 import { BaseModel } from 'src/core/database/BaseModel';
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import Property from 'src/modules/properties/entities/property.entity';
-import { Patient } from 'src/modules/customers/entities/customer.entity';
+import { Patient } from 'src/modules/customers/entities/patient.entity';
 
 @Entity({ name: 'orders' })
 export default class Order extends BaseModel {

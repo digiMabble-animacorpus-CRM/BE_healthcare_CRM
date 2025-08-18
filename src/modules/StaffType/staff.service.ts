@@ -13,12 +13,14 @@ export class StaffService {
   ) {}
 
   // CREATE
-  async create(dto: CreateStaffDto): Promise<Staff> {
-    // Remove _key if present, so DB generates it automatically
-    const { _key, ...dtoWithoutKey } = dto;
-    const staff = this.staffRepository.create(dtoWithoutKey); 
-    return this.staffRepository.save(staff);
-  }
+async create(dto: CreateStaffDto): Promise<Staff> {
+  console.log('DTO Received:', dto);   // check values coming from frontend
+  const staff = this.staffRepository.create(dto);
+  console.log('Entity Before Save:', staff);  // check if mapped correctly
+  return this.staffRepository.save(staff);
+}
+
+
 
   // GET ALL
   async findAll(): Promise<Staff[]> {

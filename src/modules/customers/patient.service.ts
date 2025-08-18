@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, HttpException,HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindManyOptions } from 'typeorm';
-import { Patient } from './entities/customer.entity';
-import { CreatePatientDto } from './dto/create-customer.dto';
-import { UpdatePatientDto } from './dto/update-customer.dto';
+import { Patient } from './entities/patient.entity';
+import { CreatePatientDto } from './dto/create-Patient.dto';
+import { UpdatePatientDto } from './dto/update-Patient.dto';
 import { BaseService } from 'src/base.service';
 import { logger } from 'src/core/utils/logger';
 import { EC500, EM100 } from 'src/core/constants';

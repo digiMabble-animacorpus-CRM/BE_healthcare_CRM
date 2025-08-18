@@ -67,9 +67,9 @@ export class StaffController {
   @ApiResponse({ status: 201, description: 'Staff created successfully', type: Staff })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async create(@Body() dto: CreateStaffDto): Promise<Staff> {
-    return this.staffService.create(dto);
-  }
-
+  console.log('📥 Incoming DTO:', dto);
+  return this.staffService.create(dto);
+}
   // GET ALL
   @Get()
   @Permissions('read:staff')

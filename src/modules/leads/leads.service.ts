@@ -5,7 +5,7 @@ import { BaseService } from 'src/base.service';
 import { Lead } from './entities/lead.entity';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
-import { Patient } from '../customers/entities/customer.entity';
+import { Patient } from '../customers/entities/patient.entity';
 import Property from '../properties/entities/property.entity';
 import { logger } from 'src/core/utils/logger';
 import { EC404, EM119, EC500, EM100 } from 'src/core/constants';

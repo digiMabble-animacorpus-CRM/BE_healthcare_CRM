@@ -2,7 +2,7 @@
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { DBconfig } from './src/config';
-import { Patient } from './src/modules/customers/entities/customer.entity';
+import { Patient } from './src/modules/customers/entities/patient.entity';
 import { Address } from './src/modules/addresses/entities/address.entity';
 import { Therapist } from './src/modules/therapist/entities/therapist.entity';
 import { Staff } from './src/modules/StaffType/entities/staff.entity';

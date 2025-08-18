@@ -1,5 +1,5 @@
 import { BaseModel } from 'src/core/database/BaseModel';
-import { Patient } from 'src/modules/customers/entities/customer.entity';
+import { Patient } from 'src/modules/customers/entities/patient.entity';
 import Property from 'src/modules/properties/entities/property.entity';
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 

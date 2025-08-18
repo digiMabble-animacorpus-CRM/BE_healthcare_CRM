@@ -22,9 +22,9 @@ import {
   ApiParam,
 
 } from '@nestjs/swagger';
-import { PatientsService } from './customers.service';
-import { CreatePatientDto } from './dto/create-customer.dto';
-import { UpdatePatientDto } from './dto/update-customer.dto';
+import { PatientsService } from './patient.service';
+import { CreatePatientDto } from './dto/create-Patient.dto';
+import { UpdatePatientDto } from './dto/update-Patient.dto';
 import HandleResponse from 'src/core/utils/handle_response';
 import {
   EC200,
@@ -42,9 +42,9 @@ import { validateOrReject } from 'class-validator';
 import { plainToClass,  plainToInstance } from 'class-transformer';
 import { logger } from 'src/core/utils/logger';
 
-@ApiTags('Customers')
-@Controller('customers')
-export class CustomersController {
+@ApiTags('Patients')
+@Controller('patients')
+export class PatientsController {
   constructor(private readonly customersService: PatientsService) {}
 
   // CREATE

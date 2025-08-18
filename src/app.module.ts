@@ -13,7 +13,7 @@ import { config } from 'dotenv';
 import { AddressesModule } from './modules/addresses/addresses.module';
 import { PropertiesModule } from './modules/properties/properties.module';
 import { CompanyProfileModule } from './modules/company-profile/company-profile.module';
-import { CustomersModule } from './modules/customers/customers.module';
+import { PatientsModule } from './modules/customers/patient.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { AgentsModule } from './modules/agents/agents.module';
 import { MenusModule } from './modules/menus/menus.module';
@@ -62,7 +62,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     AddressesModule,
     PropertiesModule,
     CompanyProfileModule,
-    CustomersModule,
+    PatientsModule,
     OrdersModule,
     AgentsModule,
     MenusModule,

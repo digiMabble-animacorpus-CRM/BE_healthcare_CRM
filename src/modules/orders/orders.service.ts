@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult, Brackets } from 'typeorm';
 import { BaseService } from 'src/base.service';
 import Property from 'src/modules/properties/entities/property.entity';
-import { Patient } from 'src/modules/customers/entities/customer.entity';
+import { Patient } from 'src/modules/customers/entities/patient.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { logger } from 'src/core/utils/logger';
