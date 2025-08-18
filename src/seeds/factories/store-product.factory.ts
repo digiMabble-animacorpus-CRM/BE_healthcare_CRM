@@ -14,8 +14,8 @@
 //   const validEndTimes = pickupTimes.slice(startIndex + 1);
 
 //   // Select a random pickup end time (or default to "23:00" if none available)
-//   const pickup_end_time = validEndTimes.length > 0
-//     ? faker.helpers.arrayElement(validEndTimes)
+//   const pickup_end_time = validEndTimes.length > 0 
+//     ? faker.helpers.arrayElement(validEndTimes) 
 //     : "23:00";
 
 //   return {

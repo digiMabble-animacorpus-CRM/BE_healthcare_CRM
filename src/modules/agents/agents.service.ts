@@ -1,12 +1,6 @@
 // src/modules/agents/agents.service.ts
 
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  NotFoundException,
-  forwardRef,
-} from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import User from '../users/entities/user.entity';
@@ -33,18 +27,10 @@ export class AgentsService {
     private readonly addressesService: AddressesService,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   async createAgent(dto: CreateAgentDto) {
-    const {
-      name,
-      email_id,
-      password,
-      mobile_no,
-      profile_url,
-      social_links,
-      address: addressDto,
-    } = dto;
+    const { name, email_id, password, mobile_no, profile_url, social_links, address: addressDto } = dto;
     logger.info(`Agent_Create_Entry: Email=${email_id}`);
 
     const existingUser = await this.userRepository.findOne({ where: { email_id } });
@@ -74,11 +60,7 @@ export class AgentsService {
         await this.userRepository.save(savedUser);
       }
 
-      const payload = {
-        user_id: savedUser.id,
-        user_type: savedUser.user_type,
-        email: savedUser.email_id,
-      };
+      const payload = { user_id: savedUser.id, user_type: savedUser.user_type, email: savedUser.email_id };
       const access_token = await this.authService.generateToken(payload);
       const refresh_token = await this.authService.generateToken(payload, true);
 
@@ -102,16 +84,12 @@ export class AgentsService {
     let total: number;
 
     if (search) {
-      const qb = this.userRepository
-        .createQueryBuilder('user')
+      const qb = this.userRepository.createQueryBuilder('user')
         .leftJoinAndSelect('user.address', 'address')
         .leftJoinAndSelect('user.social_links', 'social_links')
         .where('user.user_type = :userType', { userType: 'agent' })
         .andWhere('user.is_deleted = false')
-        .andWhere(
-          '(user.name ILIKE :search OR user.email_id ILIKE :search OR address.city ILIKE :search)',
-          { search: `%${search}%` },
-        )
+        .andWhere('(user.name ILIKE :search OR user.email_id ILIKE :search OR address.city ILIKE :search)', { search: `%${search}%` })
         .orderBy(`user.${sort_by}`, order.toUpperCase() as 'ASC' | 'DESC')
         .skip(skip)
         .take(limit);
@@ -129,9 +107,9 @@ export class AgentsService {
       total = await this.userRepository.count({ where: baseWhere });
     }
 
-    const counts = await this.getPropertyCountsForAgents(agents.map((a) => a.id));
+    const counts = await this.getPropertyCountsForAgents(agents.map(a => a.id));
 
-    const data: AgentResponseDto[] = agents.map((agent) => {
+    const data: AgentResponseDto[] = agents.map(agent => {
       const { id, name, email_id, mobile_no, created_at, address, social_links } = agent;
       return {
         id,
@@ -188,11 +166,7 @@ export class AgentsService {
     if (!agent) throw new NotFoundException('Agent not found');
 
     Object.assign(agent, dto);
-    if (dto.social_links)
-      agent.social_links = await this.socialLinksRepository.save({
-        user: agent,
-        ...dto.social_links,
-      });
+    if (dto.social_links) agent.social_links = await this.socialLinksRepository.save({ user: agent, ...dto.social_links });
 
     await this.userRepository.save(agent);
     logger.info(`Agents_Update_Exit: Agent updated successfully`);
@@ -201,9 +175,7 @@ export class AgentsService {
 
   async removeAgent(id: number) {
     logger.info(`Agents_Remove_Entry: id=${id}`);
-    const agent = await this.userRepository.findOne({
-      where: { id, user_type: 'agent', is_deleted: false },
-    });
+    const agent = await this.userRepository.findOne({ where: { id, user_type: 'agent', is_deleted: false } });
     if (!agent) throw new NotFoundException('Agent not found');
 
     await this.userRepository.save({ ...agent, is_deleted: true, is_active: false });
@@ -212,6 +184,6 @@ export class AgentsService {
 
   private async getPropertyCountsForAgents(agentIds: number[]) {
     if (!agentIds.length) return {};
-    return Object.fromEntries(agentIds.map((id) => [id, 0]));
+    return Object.fromEntries(agentIds.map(id => [id, 0]));
   }
 }

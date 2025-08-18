@@ -1,32 +1,10 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  HttpException,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, Query } from '@nestjs/common';
 import { ApiTags, ApiQuery } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import HandleResponse from 'src/core/utils/handle_response';
-import {
-  EC200,
-  EC201,
-  EC204,
-  EC404,
-  EC500,
-  EM100,
-  EM104,
-  EM106,
-  EM116,
-  EM119,
-  EM127,
-} from 'src/core/constants';
+import { EC200, EC201, EC204, EC404, EC500, EM100, EM104, EM106, EM116, EM119, EM127 } from 'src/core/constants';
 import { FindAllOrdersQueryDto } from './dto/find-all-orders-query.dto';
 
 @ApiTags('Orders')
@@ -46,16 +24,12 @@ export class OrdersController {
 
   @Get()
   async findAll(@Query() query: FindAllOrdersQueryDto) {
-    const page = query.pagNo ?? 1;
-    const limit = query.limit ?? 10;
+    const page = query.pagNo ?? 1; 
+    const limit = query.limit ?? 10; 
     const search = query.search;
 
     try {
-      const { data, total } = await this.ordersService.findAllWithPaginationOrders(
-        page,
-        limit,
-        search,
-      );
+      const { data, total } = await this.ordersService.findAllWithPaginationOrders(page, limit, search);
       return HandleResponse.buildSuccessObj(EC200, EM106, {
         data,
         total,
@@ -63,7 +37,7 @@ export class OrdersController {
         limit,
       });
     } catch (error) {
-      throw error;
+      throw error; 
     }
   }
 

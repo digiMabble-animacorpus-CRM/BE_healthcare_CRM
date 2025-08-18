@@ -94,14 +94,10 @@ export class DateUtils {
   }
 
   static convertToUTC(timeString: string) {
-    return DateTime.fromFormat(timeString, 'HH:mm', { zone: this.userTimeZone })
-      .setZone('UTC')
-      .toFormat('HH:mm');
+    return DateTime.fromFormat(timeString, 'HH:mm', { zone: this.userTimeZone }).setZone('UTC').toFormat('HH:mm');
   }
 
   static convertFromUTC(timeString: string) {
-    return DateTime.fromFormat(timeString, 'HH:mm:ss', { zone: 'UTC' })
-      .setZone(this.userTimeZone)
-      .toFormat('HH:mm:ss');
+    return DateTime.fromFormat(timeString, 'HH:mm:ss', { zone: 'UTC' }).setZone(this.userTimeZone).toFormat('HH:mm:ss');
   }
 }

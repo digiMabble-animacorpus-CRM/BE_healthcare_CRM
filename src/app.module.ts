@@ -13,7 +13,7 @@ import { config } from 'dotenv';
 import { AddressesModule } from './modules/addresses/addresses.module';
 import { PropertiesModule } from './modules/properties/properties.module';
 import { CompanyProfileModule } from './modules/company-profile/company-profile.module';
-import { CustomersModule } from './modules/customers/customers.module';
+import { PatientsModule } from './modules/customers/patient.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { AgentsModule } from './modules/agents/agents.module';
 import { MenusModule } from './modules/menus/menus.module';
@@ -31,31 +31,27 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 config();
 
-console.log(
-  'env--->',
-  DBconfig.host,
-  DBconfig.port,
-  DBconfig.username,
-  DBconfig.password,
-  DBconfig.database,
-);
+console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
 
-@Module({
+
+@Module({ 
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: DBconfig.host,
-      port: DBconfig.port,
-      username: DBconfig.username,
-      password: DBconfig.password,
-      database: DBconfig.database,
-      entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
-      synchronize: false,
-      logging: true,
-      ssl: {
-        rejectUnauthorized: false, // <--- allow self-signed certs
-      },
-    }),
+    TypeOrmModule.forRoot(
+      {
+          type: 'postgres',
+          host: DBconfig.host,
+          port: DBconfig.port,
+          username: DBconfig.username,
+          password: DBconfig.password,
+          database: DBconfig.database,
+          entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
+          synchronize: false,
+          logging: true,   
+           ssl: {
+    rejectUnauthorized: false, // <--- allow self-signed certs
+  },
+        }
+    ),
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
     MulterModule.register({
@@ -66,7 +62,7 @@ console.log(
     AddressesModule,
     PropertiesModule,
     CompanyProfileModule,
-    CustomersModule,
+    PatientsModule,
     OrdersModule,
     AgentsModule,
     MenusModule,
@@ -81,16 +77,18 @@ console.log(
     TokenModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
+  providers: [AppService,
     //   {
     //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard,
+    //   useClass: JwtAuthGuard, 
     // },
   ],
+
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes('*');
+    consumer
+      .apply(JwtMiddleware)
+      .forRoutes('*');
   }
 }

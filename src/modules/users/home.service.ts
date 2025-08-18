@@ -4,7 +4,9 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class HomeService {
-  constructor() {}
+  constructor(
+
+  ) {}
 
   // async getHomePageData(dto: TimeSensitiveProductsDto): Promise<any> {
   //   const selectedProductIds: number[] = []; // Track selected product IDs

@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException,HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindManyOptions } from 'typeorm';
-import { Patient } from './entities/customer.entity';
-import { CreatePatientDto } from './dto/create-customer.dto';
-import { UpdatePatientDto } from './dto/update-customer.dto';
+import { Patient } from './entities/patient.entity';
+import { CreatePatientDto } from './dto/create-Patient.dto';
+import { UpdatePatientDto } from './dto/update-Patient.dto';
 import { BaseService } from 'src/base.service';
 import { logger } from 'src/core/utils/logger';
 import { EC500, EM100 } from 'src/core/constants';
@@ -45,19 +45,20 @@ export class PatientsService extends BaseService<Patient> {
     }
   }
 
-  async findAll(options?: FindManyOptions<Patient>): Promise<Patient[]> {
-    try {
-      logger.info('Patient_FindAll_Entry');
-      const patients = await this.patientRepository.find({
-        ...(options || {}),
-      });
-      logger.info(`Patient_FindAll_Exit: Found ${patients.length} patients`);
-      return patients;
-    } catch (error) {
-      logger.error(`Patient_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
-    }
+async findAll(options?: FindManyOptions<Patient>): Promise<Patient[]> {
+  try {
+    logger.info('Patient_FindAll_Entry');
+    const patients = await this.patientRepository.find({
+      ...(options || {}),
+    });
+    logger.info(`Patient_FindAll_Exit: Found ${patients.length} patients`);
+    return patients;
+  } catch (error) {
+    logger.error(`Patient_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
 
   async findAllWithPagination(
     page: number,
@@ -126,30 +127,30 @@ export class PatientsService extends BaseService<Patient> {
     }
   }
 
-  async updatePatient(id: string, updatePatientDto: UpdatePatientDto): Promise<Patient> {
-    try {
-      logger.info(
-        `Patient_Service_Update_Entry: id=${id}, data=${JSON.stringify(updatePatientDto)}`,
-      );
+async updatePatient(id: string, updatePatientDto: UpdatePatientDto): Promise<Patient> {
+  try {
+    logger.info(`Patient_Service_Update_Entry: id=${id}, data=${JSON.stringify(updatePatientDto)}`);
 
-      const patient = await this.findOne(id);
-      if (!patient) {
-        throw new HttpException(`Patient with ID ${id} not found`, HttpStatus.NOT_FOUND);
-      }
-
-      // Directly update — DTO already ensures only valid fields
-      await this.patientRepository.update(id, updatePatientDto);
-
-      const updatedPatient = await this.findOne(id);
-      logger.info(`Patient_Service_Update_Exit: ${JSON.stringify(updatedPatient)}`);
-
-      return updatedPatient;
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      logger.error(`Patient_Service_Update_Error: ${error?.message || error}`);
-      throw new HttpException(EM100, EC500);
+    const patient = await this.findOne(id);
+    if (!patient) {
+      throw new HttpException(`Patient with ID ${id} not found`, HttpStatus.NOT_FOUND);
     }
+
+    // Directly update — DTO already ensures only valid fields
+    await this.patientRepository.update(id, updatePatientDto);
+
+    const updatedPatient = await this.findOne(id);
+    logger.info(`Patient_Service_Update_Exit: ${JSON.stringify(updatedPatient)}`);
+
+    return updatedPatient;
+  } catch (error) {
+    if (error instanceof HttpException) throw error;
+    logger.error(`Patient_Service_Update_Error: ${error?.message || error}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
+
 
   async removePatient(id: string): Promise<void> {
     try {

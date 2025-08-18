@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult, Brackets } from 'typeorm';
 import { BaseService } from 'src/base.service';
 import Property from 'src/modules/properties/entities/property.entity';
-import { Patient } from 'src/modules/customers/entities/customer.entity';
+import { Patient } from 'src/modules/customers/entities/patient.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { logger } from 'src/core/utils/logger';
@@ -24,8 +24,7 @@ export class OrdersService extends BaseService<Order> {
   }
 
   private getBaseQuery() {
-    return this.repository
-      .createQueryBuilder('o')
+    return this.repository.createQueryBuilder('o')
       .leftJoinAndSelect('o.customer', 'customer')
       .leftJoinAndSelect('customer.address', 'customerAddress')
       .leftJoinAndSelect('o.property', 'property')
@@ -38,13 +37,10 @@ export class OrdersService extends BaseService<Order> {
     throw new HttpException(EM100, EC500);
   }
 
-  private async validateRelations(
-    customerId: number,
-    propertyId: number,
-  ): Promise<{ customer: Patient; property: Property }> {
+  private async validateRelations(customerId: number, propertyId: number): Promise<{ customer: Patient, property: Property }> {
     const [customer, property] = await Promise.all([
-      this.customerRepository.findOne({ where: { id: customerId.toString() } }),
-      this.propertyRepository.findOne({ where: { id: propertyId, is_deleted: false } }),
+      this.customerRepository.findOne({ where: { id: customerId.toString(),  } }),
+      this.propertyRepository.findOne({ where: { id: propertyId, is_deleted: false } })
     ]);
 
     if (!customer) throw new BadRequestException(`Customer with ID ${customerId} not found`);
@@ -59,11 +55,11 @@ export class OrdersService extends BaseService<Order> {
 
       const { customer, property } = await this.validateRelations(
         createOrderDto.customer_id,
-        createOrderDto.property_id,
+        createOrderDto.property_id
       );
 
       const existingOrder = await this.repository.findOne({
-        where: { order_id: createOrderDto.order_id, is_deleted: false },
+        where: { order_id: createOrderDto.order_id, is_deleted: false }
       });
 
       if (existingOrder) {
@@ -85,11 +81,7 @@ export class OrdersService extends BaseService<Order> {
     }
   }
 
-  async findAllWithPaginationOrders(
-    page: number,
-    limit: number,
-    search?: string,
-  ): Promise<{ data: Order[]; total: number }> {
+  async findAllWithPaginationOrders(page: number, limit: number, search?: string): Promise<{ data: Order[], total: number }> {
     try {
       logger.info(`Order_FindAllPaginated_Entry: page=${page}, limit=${limit}, search=${search}`);
 
@@ -98,11 +90,10 @@ export class OrdersService extends BaseService<Order> {
       if (search?.trim()) {
         const searchTerm = search.trim();
         query.andWhere(
-          new Brackets((qb) => {
-            qb.where('o.order_id::text ILIKE :search').orWhere(
-              'customer.customer_name ILIKE :search',
-            );
-          }),
+          new Brackets(qb => {
+            qb.where('o.order_id::text ILIKE :search')
+              .orWhere('customer.customer_name ILIKE :search');
+          })
         );
         query.setParameter('search', `%${searchTerm}%`);
       }
@@ -125,7 +116,9 @@ export class OrdersService extends BaseService<Order> {
     try {
       logger.info(`Order_FindOne_Entry: id=${id}`);
 
-      const order = await this.getBaseQuery().andWhere('o.id = :id', { id }).getOne();
+      const order = await this.getBaseQuery()
+        .andWhere('o.id = :id', { id })
+        .getOne();
 
       if (!order) {
         throw new HttpException(EM119, EC404);
@@ -149,7 +142,7 @@ export class OrdersService extends BaseService<Order> {
       if (updateOrderDto.customer_id || updateOrderDto.property_id) {
         const { customer, property } = await this.validateRelations(
           Number(updateOrderDto.customer_id ?? existingOrder.customer.id),
-          Number(updateOrderDto.property_id ?? existingOrder.property.id),
+          Number(updateOrderDto.property_id ?? existingOrder.property.id)
         );
 
         if (updateOrderDto.customer_id) {
@@ -165,7 +158,7 @@ export class OrdersService extends BaseService<Order> {
 
       if (updateOrderDto.order_id && updateOrderDto.order_id !== existingOrder.order_id) {
         const conflict = await this.repository.findOne({
-          where: { order_id: updateOrderDto.order_id, is_deleted: false },
+          where: { order_id: updateOrderDto.order_id, is_deleted: false }
         });
 
         if (conflict) {
@@ -190,7 +183,7 @@ export class OrdersService extends BaseService<Order> {
       const result = await this.repository.update(id, {
         is_deleted: true,
         is_active: false,
-        deleted_at: new Date(),
+        deleted_at: new Date()
       });
 
       logger.info(`Order_Remove_Exit: ${JSON.stringify(result)}`);

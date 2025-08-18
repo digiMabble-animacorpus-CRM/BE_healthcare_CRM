@@ -27,7 +27,7 @@ const limiter = rateLimit({
   validate: { xForwardedForHeader: false },
 });
 const corsOption = Object.freeze({
-  origin: '*', // Add your allowed IP addresses and ports
+  origin: "*", // Add your allowed IP addresses and ports
   methods: ALLOWED_METHODS,
   preflightContinue: false,
   optionsSuccessStatus: 204,
@@ -40,33 +40,27 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.use((req, res, next) => {
-    if (
-      req.method !== 'GET' &&
-      req.headers['content-type']?.includes('application/json') &&
-      req.body?.data
-    ) {
-      try {
-        const decrypted = AES.decrypt(req.body.data);
-        req.body = JSON.parse(decrypted);
-      } catch (error) {
-        console.error('AES decryption failed:', error.message);
-        return res.status(400).json({ message: 'Invalid encrypted request body' });
-      }
+  if (req.method !== 'GET' && req.headers['content-type']?.includes('application/json') && req.body?.data) {
+    try {
+      const decrypted = AES.decrypt(req.body.data);
+      req.body = JSON.parse(decrypted);
+    } catch (error) {
+      console.error('AES decryption failed:', error.message);
+      return res.status(400).json({ message: 'Invalid encrypted request body' });
     }
-    next();
-  });
+  }
+  next();
+});
   /*-------- security headers --------*/
   // app.enableCors({ origin: '*', methods: ALLOWED_METHODS }); //need to change enable allowed cors url only
   app.enableCors(corsOption);
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
-  );
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+  transformOptions: {
+    enableImplicitConversion: true,
+  },
+  }));
   app.getHttpAdapter().getInstance().set('trust proxy', false);
   // process.env.NODE_ENV == PRODUCTION ? app.use(helmet()) : "";
   app.use(helmet());
@@ -82,11 +76,6 @@ async function bootstrap() {
   expressApp.disable('x-powered-by');
   expressApp.set('etag', 'strong');
   /*-------- security headers --------*/
-  console.log(__dirname);
-  
-  app.useStaticAssets(join(__dirname, '..','..', 'public'), {
-    prefix: '/public/',
-  });
   app.setGlobalPrefix('api/v1');
   app.useStaticAssets(join(__dirname, '..', 'pdfs'));
 
@@ -98,11 +87,12 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseLoggingInterceptor());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  await app.listen(Number(process.env.USER_PORT || 8080));
+  await app.listen(Number(process.env.USER_PORT||8080));
   app.use((req, res, next) => {
-    console.log(`[Incoming Request] ${req.method} ${req.originalUrl}`);
-    next();
-  });
+  console.log(`[Incoming Request] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 
   process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error?.message);
@@ -110,9 +100,9 @@ async function bootstrap() {
   });
   process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    logger.error(
-      'Unhandled Rejection at: ' + JSON.stringify(promise) + '_reason:' + JSON.stringify(reason),
-    );
+    logger.error('Unhandled Rejection at: ' + JSON.stringify(promise) + '_reason:' + JSON.stringify(reason));
   });
+
 }
 bootstrap();
+

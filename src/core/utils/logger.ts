@@ -50,14 +50,14 @@ const infoFilter = winston.format((info, opts) => {
 // });
 
 export const logger = winston.createLogger({
-  //   format: combine(
-  //     timestamp({
-  //       format: 'YYYY-MM-DD hh:mm:ss.SSS A',
-  //     }),
-  //     align(),
-  //     printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`),
-  //   ),
-  //   transports: [combinedFileRotateTransport, infoFileRotateTransport, errorFileRotateTransport],
+//   format: combine(
+//     timestamp({
+//       format: 'YYYY-MM-DD hh:mm:ss.SSS A',
+//     }),
+//     align(),
+//     printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`),
+//   ),
+//   transports: [combinedFileRotateTransport, infoFileRotateTransport, errorFileRotateTransport],
 });
 
 if (process.env.NODE_ENV != PRODUCTION) {

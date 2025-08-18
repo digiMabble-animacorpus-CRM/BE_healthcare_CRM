@@ -64,69 +64,54 @@ export class PermissionDto {
   enabled: boolean;
 }
 
-export class CreateStaffDto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  _key: number;
 
+export class CreateStaffDto {
   @ApiProperty({ required: false, example: 123 })
   @IsOptional()
   @IsInt()
-  id_pro?: number;
+  idPro?: number;
 
-  @ApiProperty({
-    required: false,
-    example: '2025-08-15T10:00:00Z',
-    description: 'ISO 8601 start datetime',
-  })
+  @ApiProperty({ required: false, example: '2025-08-15T10:00:00Z', description: 'ISO 8601 start datetime' })
   @IsOptional()
   @Type(() => Date)
   @IsDate()
-  appointment_start?: Date;
+  appointmentStart?: Date;
 
-  @ApiProperty({
-    required: false,
-    example: '2025-08-15T12:00:00Z',
-    description: 'ISO 8601 end datetime',
-  })
+  @ApiProperty({ required: false, example: '2025-08-15T12:00:00Z', description: 'ISO 8601 end datetime' })
   @IsOptional()
   @Type(() => Date)
   @IsDate()
-  appointment_end?: Date;
+  appointmentEnd?: Date;
 
-  @ApiProperty({
-    required: false,
-    example: 30,
-    description: 'Alert time in minutes before appointment',
-  })
+  @ApiProperty({ required: false, example: 30, description: 'Alert time in minutes before appointment' })
   @IsOptional()
   @IsInt()
-  appointment_alert?: number;
+  appointmentAlert?: number;
 
   @ApiProperty({ required: false, example: 'John Doe' })
   @IsOptional()
   @IsString()
-  full_name?: string;
+  fullName?: string;
 
   @ApiProperty({ required: false, example: 'Therapist' })
   @IsOptional()
   @IsString()
-  job_title?: string;
+  jobTitle?: string;
 
   @ApiProperty({ required: false, example: 'Adults, Teens' })
   @IsOptional()
   @IsString()
-  target_audience?: string;
+  targetAudience?: string;
 
   @ApiProperty({ required: false, example: 'Psychotherapy' })
   @IsOptional()
   @IsString()
-  specialization_1?: string;
+  specialization1?: string;
 
   @ApiProperty({ required: false, example: 'I provide individual therapy sessions.' })
   @IsOptional()
   @IsString()
-  about_me?: string;
+  aboutMe?: string;
 
   @ApiProperty({ required: false, example: 'Consultations available Mon-Fri 10am-5pm' })
   @IsOptional()
@@ -136,27 +121,27 @@ export class CreateStaffDto {
   @ApiProperty({ required: false, example: '123 Main St, City' })
   @IsOptional()
   @IsString()
-  center_address?: string;
+  centerAddress?: string;
 
   @ApiProperty({ required: false, example: 'center@example.com' })
   @IsOptional()
   @IsString()
-  center_email?: string;
+  centerEmail?: string;
 
   @ApiProperty({ required: false, example: '+1234567890' })
   @IsOptional()
   @IsString()
-  center_phone_number?: string;
+  centerPhoneNumber?: string;
 
   @ApiProperty({ required: false, example: 'contact@example.com' })
   @IsOptional()
   @IsString()
-  contact_email?: string;
+  contactEmail?: string;
 
   @ApiProperty({ required: false, example: '+0987654321' })
   @IsOptional()
   @IsString()
-  contact_phone?: string;
+  contactPhone?: string;
 
   @ApiProperty({ required: false, example: 'Mon-Fri 9am-5pm' })
   @IsOptional()
@@ -171,17 +156,17 @@ export class CreateStaffDto {
   @ApiProperty({ required: false, example: 'English, Spanish' })
   @IsOptional()
   @IsString()
-  spoken_languages?: string;
+  spokenLanguages?: string;
 
   @ApiProperty({ required: false, example: 'Cash, Card, Insurance' })
   @IsOptional()
   @IsString()
-  payment_methods?: string;
+  paymentMethods?: string;
 
   @ApiProperty({ required: false, example: 'MA Psychology, PhD Counselling' })
   @IsOptional()
   @IsString()
-  degrees_and_training?: string;
+  degreesAndTraining?: string;
 
   @ApiProperty({ required: false, example: 'Psychotherapy, CBT' })
   @IsOptional()
@@ -201,37 +186,37 @@ export class CreateStaffDto {
   @ApiProperty({ required: false, example: 'https://calendar.example.com' })
   @IsOptional()
   @IsString()
-  agenda_links?: string;
+  agendaLinks?: string;
 
   @ApiProperty({ required: false, example: 'Imported value 1' })
   @IsOptional()
   @IsString()
-  imported_table_2?: string;
+  importedTable2?: string;
 
   @ApiProperty({ required: false, example: 'Field 27 value' })
   @IsOptional()
   @IsString()
-  field_27?: string;
+  field27?: string;
 
   @ApiProperty({ required: false, example: 'Imported value 2' })
   @IsOptional()
   @IsString()
-  imported_table_2_2?: string;
+  importedTable22?: string;
 
   @ApiProperty({ required: false, example: 'Team Namur 1' })
   @IsOptional()
   @IsString()
-  team_namur_1?: string;
+  teamNamur1?: string;
 
   @ApiProperty({ required: false, example: 'Imported value 3' })
   @IsOptional()
   @IsString()
-  imported_table_2_3?: string;
+  importedTable23?: string;
 
   @ApiProperty({ required: false, example: 'Team Namur 2' })
   @IsOptional()
   @IsString()
-  team_namur_2?: string;
+  teamNamur2?: string;
 
   @ApiProperty({ required: false, example: 'Site information' })
   @IsOptional()
@@ -246,17 +231,17 @@ export class CreateStaffDto {
   @ApiProperty({ required: false, example: 'Specialization 2' })
   @IsOptional()
   @IsString()
-  specialization_2?: string;
+  specialization2?: string;
 
   @ApiProperty({ required: false, example: 'https://rosa-link.com' })
   @IsOptional()
   @IsString()
-  rosa_link?: string;
+  rosaLink?: string;
 
   @ApiProperty({ required: false, example: 'https://google-agenda-link.com' })
   @IsOptional()
   @IsString()
-  google_agenda_link?: string;
+  googleAgendaLink?: string;
 
   @ApiProperty({ required: false, example: 'https://photo.example.com/photo.jpg' })
   @IsOptional()
@@ -266,10 +251,10 @@ export class CreateStaffDto {
   @ApiProperty({ required: false, example: 'Doe' })
   @IsOptional()
   @IsString()
-  last_name?: string;
+  lastName?: string;
 
   @ApiProperty({ required: false, example: 'John' })
   @IsOptional()
   @IsString()
-  first_name?: string;
+  firstName?: string;
 }
