@@ -1,11 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { 
-  IsOptional, 
-  IsInt, 
-  IsString, 
-  IsDate 
-} from 'class-validator';
+import { IsOptional, IsInt, IsString, IsDate } from 'class-validator';
 
 export class CreateTherapistDto {
   @ApiProperty({ required: false, example: 123 })
@@ -13,19 +8,19 @@ export class CreateTherapistDto {
   @IsInt()
   idPro?: number;
 
-  @ApiProperty({ required: false, example: '2025-08-15T10:00:00Z', description: 'ISO 8601 start datetime' })
+  @ApiProperty({ required: false, example: '2025-08-15T10:00:00Z' })
   @IsOptional()
   @Type(() => Date)
   @IsDate()
   appointmentStart?: Date;
 
-  @ApiProperty({ required: false, example: '2025-08-15T12:00:00Z', description: 'ISO 8601 end datetime' })
+  @ApiProperty({ required: false, example: '2025-08-15T12:00:00Z' })
   @IsOptional()
   @Type(() => Date)
   @IsDate()
   appointmentEnd?: Date;
 
-  @ApiProperty({ required: false, example: 30, description: 'Alert time in minutes before appointment' })
+  @ApiProperty({ required: false, example: 30 })
   @IsOptional()
   @IsInt()
   appointmentAlert?: number;
@@ -50,12 +45,12 @@ export class CreateTherapistDto {
   @IsString()
   specialization1?: string;
 
-  @ApiProperty({ required: false, example: 'I provide individual therapy sessions.' })
+  @ApiProperty({ required: false, example: 'I provide therapy...' })
   @IsOptional()
   @IsString()
   aboutMe?: string;
 
-  @ApiProperty({ required: false, example: 'Consultations available Mon-Fri 10am-5pm' })
+  @ApiProperty({ required: false, example: 'Consultations available Mon-Fri' })
   @IsOptional()
   @IsString()
   consultations?: string;
@@ -143,7 +138,7 @@ export class CreateTherapistDto {
   @ApiProperty({ required: false, example: 'Imported value 2' })
   @IsOptional()
   @IsString()
-  importedTable22?: string;
+  importedTable2_2?: string;
 
   @ApiProperty({ required: false, example: 'Team Namur 1' })
   @IsOptional()
@@ -153,7 +148,7 @@ export class CreateTherapistDto {
   @ApiProperty({ required: false, example: 'Imported value 3' })
   @IsOptional()
   @IsString()
-  importedTable23?: string;
+  importedTable2_3?: string;
 
   @ApiProperty({ required: false, example: 'Team Namur 2' })
   @IsOptional()
@@ -199,4 +194,9 @@ export class CreateTherapistDto {
   @IsOptional()
   @IsString()
   firstName?: string;
+
+  @ApiProperty({ required: false, example: 'https://photo.example.com/image.jpg' })
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }

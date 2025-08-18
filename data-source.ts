@@ -2,23 +2,14 @@
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { DBconfig } from './src/config';
-<<<<<<< HEAD
 import { Patient } from './src/modules/customers/entities/patient.entity';
-=======
-import { Patient } from './src/modules/customers/entities/customer.entity';
->>>>>>> origin/main
 import { Address } from './src/modules/addresses/entities/address.entity';
 import { Therapist } from './src/modules/therapist/entities/therapist.entity';
 import { Staff } from './src/modules/StaffType/entities/staff.entity';
 import { Role } from 'src/modules/roles/entities/role.entity';
 import { Permission } from 'src/modules/permissions/entities/permission.entity';
-<<<<<<< HEAD
 import User from 'src/modules/users/entities/user.entity';
 import { SocialLinks } from 'src/modules/social-links/entities/social-links.entity';
-=======
-import User from '../BE_healthcare_CRM/src/modules/users/entities/user.entity';
-import { SocialLinks } from '../BE_healthcare_CRM/src/modules/social-links/entities/social-links.entity';
->>>>>>> origin/main
 import { Menu } from 'src/modules/menus/entities/menu.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { Token } from 'src/modules/users/entities/token.entity';
