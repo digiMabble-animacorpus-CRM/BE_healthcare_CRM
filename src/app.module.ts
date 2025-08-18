@@ -29,6 +29,7 @@ import { SeederModule } from './seeds/seeder.module';
 import { TokenModule } from './modules/users/token.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { TeamMemberModule } from './team-member/team-member.module';
 config();
 
 console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
@@ -75,6 +76,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     StaffModule,
     SeederModule,
     TokenModule,
+    TeamMemberModule,
   ],
   controllers: [AppController],
   providers: [AppService,
