@@ -54,9 +54,6 @@ FROM node:18-alpine AS production
 
 WORKDIR /usr/src/app
 
-RUN npm install \
-    && npm cache clean --force \
-    && rm -rf /tmp/*
 # Copy the production node_modules and dist from build stage
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist

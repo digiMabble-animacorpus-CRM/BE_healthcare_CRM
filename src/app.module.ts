@@ -50,10 +50,8 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
           database: DBconfig.database,
           entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
           synchronize: false,
-          logging: true,   
-           ssl: {
-    rejectUnauthorized: false, // <--- allow self-signed certs
-  },
+          logging: true,
+          ssl: {rejectUnauthorized: false},
         }
     ),
     ConfigModule.forRoot({ isGlobal: true }),

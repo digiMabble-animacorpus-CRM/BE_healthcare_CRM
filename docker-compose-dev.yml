@@ -12,7 +12,7 @@ services:
     command: npm run start:dev
     restart: always
 
-  postgres_db:
+  healthcare-db:
     image: postgis/postgis:16-3.5
     volumes:
       - postgres_db_data:/var/lib/postgresql/data
