@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
 import { Patient } from 'src/modules/customers/entities/patient.entity';
-import { TeamMember } from 'src/team-member/entities/team-member.entity';
+import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
 
 
 // Mock enum for "purpose of visit"
