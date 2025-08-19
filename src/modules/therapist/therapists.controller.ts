@@ -97,12 +97,22 @@ export class TherapistController {
   }
 
   // DELETE ALL
-  @Delete()
-  // @Permissions('delete:therapist')
-  // @Roles('super-admin', 'branch-admin')
-  @ApiOperation({ summary: 'Delete all therapists' })
-  @ApiResponse({ status: 200, description: 'All therapists deleted successfully' })
-  async removeAll(): Promise<{ deleted: boolean }> {
-    return this.therapistService.removeAll();
-  }
+  // @Delete()
+  // // @Permissions('delete:therapist')
+  // // @Roles('super-admin', 'branch-admin')
+  // @ApiOperation({ summary: 'Delete all therapists' })
+  // @ApiResponse({ status: 200, description: 'All therapists deleted successfully' })
+  // async removeAll(): Promise<{ deleted: boolean }> {
+  //   return this.therapistService.removeAll();
+  // }
+
+
+
+@Patch(':key/restore')
+@ApiOperation({ summary: 'Restore a soft-deleted therapist' })
+@ApiParam({ name: 'key', type: Number })
+async restore(@Param('key', ParseIntPipe) key: number): Promise<Therapist> {
+  return this.therapistService.restore(key);
+}
+
 }

@@ -32,7 +32,7 @@
 
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseModel } from 'src/core/database/BaseModel';
-import { Staff } from 'src/modules/StaffType/entities/staff.entity';
+// import { Staff } from 'src/modules/StaffType/entities/staff.entity';
 import User  from 'src/modules/users/entities/user.entity'; // Adjust the import path as necessary
 
 // token.entity.ts
@@ -52,9 +52,9 @@ expires_at: Date;
 
 
  // Relation to Staff
-  @ManyToOne(() => Staff, { nullable: true })
-  @JoinColumn({ name: 'staff_id' })
-  staff?: Staff;
+  // @ManyToOne(() => Staff, { nullable: true })
+  // @JoinColumn({ name: 'staff_id' })
+  // staff?: Staff;
 
   // Relation to User
   @ManyToOne(() => User, { nullable: true })

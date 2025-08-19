@@ -12,7 +12,7 @@ import { MailUtils } from 'src/core/utils/mailUtils';
 import Encryption from 'src/core/utils/encryption';
 import { AddressesService } from '../addresses/addresses.service';
 import { SignupAdminDto } from './dto/signup.dto';
-import { Staff } from 'src/modules/StaffType/entities/staff.entity';
+// import { Staff } from 'src/modules/StaffType/entities/staff.entity';
 import { Token } from 'src/modules/users/entities/token.entity';
 
 @Injectable()
@@ -23,8 +23,8 @@ export class AuthService {
     private readonly addressesService: AddressesService,
      @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
-       @InjectRepository(Staff)
-    private readonly staffRepository: Repository<Staff>,
+    //    @InjectRepository(Staff)
+    // private readonly staffRepository: Repository<Staff>,
 
     @InjectRepository(Token)
     private readonly tokenRepo: Repository<Token>,
@@ -237,20 +237,20 @@ async forgotPassword(email_id: string) {
     logger.debug(`Token saved to DB (old logic)`);
 
     //  NEW: Also save token in Token entity for staff linkage
-    const staffEntity = await this.staffRepository.findOne({
-      where: { contactEmail: user.email_id },
-    });
-    if (staffEntity) {
-      const tokenEntity = this.tokenRepo.create({
-        user_email: user.email_id,
-        token: resetToken,
-        type: 'password_reset',
-        expires_at: new Date(Date.now() + 15 * 60 * 1000),
-        staff: staffEntity
-      });
-      await this.tokenRepo.save(tokenEntity);
-      logger.debug(`Token saved in Token entity for staff`);
-    }
+    // const staffEntity = await this.staffRepository.findOne({
+    //   where: { contactEmail: user.email_id },
+    // });
+    // if (staffEntity) {
+    //   const tokenEntity = this.tokenRepo.create({
+    //     user_email: user.email_id,
+    //     token: resetToken,
+    //     type: 'password_reset',
+    //     expires_at: new Date(Date.now() + 15 * 60 * 1000),
+    //     staff: staffEntity
+    //   });
+    //   await this.tokenRepo.save(tokenEntity);
+    //   logger.debug(`Token saved in Token entity for staff`);
+    // }
 
     //  Continue as before
     const resetUrl = `${process.env.FRONTEND_BASE_URL}/auth/reset-password?token=${resetToken}`;

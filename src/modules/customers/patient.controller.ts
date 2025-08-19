@@ -197,32 +197,30 @@ async update(
 
 
 
-// DELETE
+
+// DELETE (Soft Delete)
 @Delete(':id')
-@ApiOperation({ summary: 'Delete a customer by ID' })
+@ApiOperation({ summary: 'Soft delete a patient by ID' })
 @ApiParam({
   name: 'id',
   required: true,
   type: String,
   example: 'a973e85c-c9d3-4566-b1a5-43b2ab61b614',
 })
-@ApiResponse({ status: 204, description: 'Customer deleted successfully' })
+@ApiResponse({ status: 204, description: 'Patient soft deleted successfully' })
 @ApiResponse({ status: 400, description: 'Invalid ID or input' })
 @ApiResponse({ status: 500, description: 'Internal server error' })
-async remove(@Param('id') id: string) { // Removed ParseIntPipe
+async remove(@Param('id') id: string) {
   try {
     await this.customersService.removePatient(id);
     return HandleResponse.buildSuccessObj(EC204, EM127, null);
   } catch (error) {
     console.error('Delete error:', error);
     if (error instanceof HttpException) {
-      return HandleResponse.buildErrObj(
-        error.getStatus(),
-        error.message,
-        error,
-      );
+      return HandleResponse.buildErrObj(error.getStatus(), error.message, error);
     }
     return HandleResponse.buildErrObj(EC500, EM100, error);
   }
 }
+
 }

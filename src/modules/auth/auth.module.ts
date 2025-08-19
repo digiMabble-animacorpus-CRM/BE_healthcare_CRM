@@ -15,20 +15,20 @@ import { HomeService } from '../users/home.service';
 import { AddressesModule } from '../addresses/addresses.module';
 import { AgentsModule } from '../agents/agents.module';
 import { Role } from 'src/modules/roles/entities/role.entity';
-import {StaffModule} from '../StaffType/staff.module';
+// import {StaffModule} from '../StaffType/staff.module';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Staff } from 'src/modules/StaffType/entities/staff.entity';
+// import { Staff } from 'src/modules/StaffType/entities/staff.entity';
 import { Token } from 'src/modules/users/entities/token.entity';
 @Module({
   imports: [
     PassportModule,
     AddressesModule,
     UsersModule,
-    StaffModule,
-    TypeOrmModule.forFeature([Role, Staff, Token]),
+    // StaffModule,
+    TypeOrmModule.forFeature([Role, Token]),
     forwardRef(() => AgentsModule),
     // JwtModule.register({
     //   secret: process.env.JWTKEY,

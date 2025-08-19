@@ -11,14 +11,14 @@ export class TeamMemberController {
   constructor(private readonly service: TeamMemberService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all team members' })
+  @ApiOperation({ summary: 'Get all active (non-deleted) team members' })
   @ApiResponse({ status: 200, description: 'List of team members', type: [TeamMember] })
   findAll(): Promise<TeamMember[]> {
     return this.service.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get team member by ID' })
+  @ApiOperation({ summary: 'Get team member by ID (only if not deleted)' })
   @ApiResponse({ status: 200, description: 'Team member found', type: TeamMember })
   @ApiResponse({ status: 404, description: 'Team member not found' })
   findOne(@Param('id') id: string): Promise<TeamMember> {
@@ -41,10 +41,16 @@ export class TeamMemberController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a team member' })
-  @ApiResponse({ status: 200, description: 'Team member deleted' })
+  @ApiOperation({ summary: 'Soft delete a team member' })
+  @ApiResponse({ status: 200, description: 'Team member soft deleted' })
   @ApiResponse({ status: 404, description: 'Team member not found' })
   remove(@Param('id') id: string): Promise<void> {
     return this.service.remove(id);
+  }
+
+  @Patch(':id/restore')
+  @ApiOperation({ summary: 'Restore a soft-deleted team member' })
+  restore(@Param('id') id: string): Promise<TeamMember> {
+    return this.service.restore(id);
   }
 }

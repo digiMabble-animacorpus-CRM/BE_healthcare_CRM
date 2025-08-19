@@ -79,7 +79,7 @@ import { Role } from 'src/modules/roles/entities/role.entity';
 import { Address } from 'src/modules/addresses/entities/address.entity';
 import { SocialLinks } from 'src/modules/social-links/entities/social-links.entity';
 import { Permission } from 'src/modules/permissions/entities/permission.entity';
-import { Staff } from 'src/modules/StaffType/entities/staff.entity';
+// import { Staff } from 'src/modules/StaffType/entities/staff.entity';
 
 @Entity({ name: 'users' })
 export default class User extends BaseModel {
