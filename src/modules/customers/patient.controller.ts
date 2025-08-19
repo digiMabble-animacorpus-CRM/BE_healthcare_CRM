@@ -23,8 +23,8 @@ import {
 
 } from '@nestjs/swagger';
 import { PatientsService } from './patient.service';
-import { CreatePatientDto } from './dto/create-Patient.dto';
-import { UpdatePatientDto } from './dto/update-Patient.dto';
+import { CreatePatientDto } from './dto/create-patient.dto';
+import { UpdatePatientDto } from './dto/update-patient.dto';
 import HandleResponse from 'src/core/utils/handle_response';
 import {
   EC200,
