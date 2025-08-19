@@ -38,7 +38,7 @@ import { Token } from 'src/modules/users/entities/token.entity';
   imports: [ConfigModule],
   useFactory: async (config: ConfigService) => ({
     secret: config.get('JWTKEY'),
-    signOptions: { expiresIn: config.get('TOKEN_EXPIRATION') || '48h' },
+    // signOptions: { expiresIn: config.get('TOKEN_EXPIRATION') || '48h' },
   }),
   inject: [ConfigService],
 }),
