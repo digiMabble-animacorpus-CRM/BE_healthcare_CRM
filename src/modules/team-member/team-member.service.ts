@@ -13,11 +13,16 @@ export class TeamMemberService {
   ) {}
 
   async findAll(): Promise<TeamMember[]> {
-    return this.repo.find();
+    // Only return non-deleted members
+    return this.repo.find({
+      where: { is_delete: false },
+    });
   }
 
   async findOne(id: string): Promise<TeamMember> {
-    const member = await this.repo.findOneBy({ team_id: id });
+    const member = await this.repo.findOne({
+      where: { team_id: id, is_delete: false },
+    });
     if (!member) throw new NotFoundException(`Team member with ID ${id} not found`);
     return member;
   }
@@ -28,15 +33,24 @@ export class TeamMemberService {
   }
 
   async update(id: string, data: UpdateTeamMemberDto): Promise<TeamMember> {
-    const member = await this.findOne(id); // ensures record exists
+    const member = await this.findOne(id); // ensures record exists & not deleted
     Object.assign(member, data);
     return this.repo.save(member);
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.repo.delete({ team_id: id });
-    if (result.affected === 0) {
-      throw new NotFoundException(`Team member with ID ${id} not found`);
-    }
+    const member = await this.findOne(id);
+    member.is_delete = true;
+    member.deleted_at = new Date();
+    await this.repo.save(member);
+  }
+
+  // Optional: Restore soft-deleted record
+  async restore(id: string): Promise<TeamMember> {
+    const member = await this.repo.findOne({ where: { team_id: id, is_delete: true } });
+    if (!member) throw new NotFoundException(`Team member with ID ${id} not found or not deleted`);
+    member.is_delete = false;
+    member.deleted_at = null;
+    return this.repo.save(member);
   }
 }
