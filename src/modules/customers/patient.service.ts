@@ -2,8 +2,8 @@ import { Injectable, NotFoundException, HttpException,HttpStatus } from '@nestjs
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindManyOptions } from 'typeorm';
 import { Patient } from './entities/patient.entity';
-import { CreatePatientDto } from './dto/create-Patient.dto';
-import { UpdatePatientDto } from './dto/update-Patient.dto';
+import { CreatePatientDto } from './dto/create-patient.dto';
+import { UpdatePatientDto } from './dto/update-patient.dto';
 import { BaseService } from 'src/base.service';
 import { logger } from 'src/core/utils/logger';
 import { EC500, EM100 } from 'src/core/constants';
@@ -30,7 +30,8 @@ export class PatientsService extends BaseService<Patient> {
         status: createPatientDto.status ?? 'ACTIVE',
       });
 
-      const savedPatient = await this.patientRepository.save(patient);
+      // const savedPatient = await this.patientRepository.save(patient);
+      const savedPatient: Patient = await this.patientRepository.save(patient);
 
       const result = await this.patientRepository.findOne({
         where: { id: savedPatient.id },
