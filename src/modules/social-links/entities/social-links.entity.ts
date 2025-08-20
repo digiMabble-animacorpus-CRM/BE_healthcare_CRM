@@ -15,7 +15,7 @@ export class SocialLinks extends BaseModel {
   @Column({ type: 'varchar', nullable: true })
   twitter: string;
 
-  @OneToOne(() => User, (user) => user.social_links)
-  @JoinColumn()
-  user: User;
+  // @OneToOne(() => User, (user) => user.social_links)
+  // @JoinColumn()
+  // user: User;
 }

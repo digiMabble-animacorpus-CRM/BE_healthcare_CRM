@@ -29,6 +29,6 @@ export class Permission extends BaseModel {
   })
   menus: Menu[];
 
-  @ManyToMany(() => User, (user) => user.permissions)
-users: User[];
+//   @ManyToMany(() => User, (user) => user.permissions)
+// users: User[];
 }

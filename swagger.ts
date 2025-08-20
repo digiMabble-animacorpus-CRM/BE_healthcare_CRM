@@ -4,7 +4,7 @@ import fs from "fs";
 import { PRODUCTION } from './src/core/constants';
 export function setupSwagger(app: INestApplication, type: string) {
     const options = new DocumentBuilder()
-        .setTitle('Real Estate Agent API')
+        .setTitle('Anima API')
         .setDescription('API Documentation')
         .setVersion('1.0')
         .addBearerAuth()

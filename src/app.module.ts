@@ -12,10 +12,10 @@ import { JwtMiddleware } from './middleware/jwt.middleware';
 import { config } from 'dotenv';
 import { AddressesModule } from './modules/addresses/addresses.module';
 import { PropertiesModule } from './modules/properties/properties.module';
-import { CompanyProfileModule } from './modules/company-profile/company-profile.module';
+// import { CompanyProfileModule } from './modules/company-profile/company-profile.module';
 import { PatientsModule } from './modules/customers/patient.module';
 import { OrdersModule } from './modules/orders/orders.module';
-import { AgentsModule } from './modules/agents/agents.module';
+// import { AgentsModule } from './modules/agents/agents.module';
 import { MenusModule } from './modules/menus/menus.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
@@ -23,16 +23,18 @@ import { LeadsModule } from './modules/leads/leads.module';
 import { LocationModule } from './modules/location/location.module';
 import { SocialLinks } from './modules/social-links/entities/social-links.entity';
 import { TherapistsModule } from './modules/therapist/therapists.module';
-import { StaffModule } from './modules/StaffType/staff.module';
+// import { StaffModule } from './modules/StaffType/staff.module';
 import { SeederModule } from './seeds/seeder.module';
 // import { FirebaseModule } from './core/database/config/firebase/firebase.module';
 import { TokenModule } from './modules/users/token.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
-import { TeamMemberModule } from './team-member/team-member.module';
+import { TeamMemberModule } from './modules/team-member/team-member.module';
 import { AppointmentsModule } from './modules/appointment/appointment.module';
 import { CalendarsModule } from './modules/calendars/calendars.module';
 import { FunctionDescriptionModule } from './modules/function-description/function-description.module';
+import { ProfileModule } from './modules/profile/profile.module';
+
 config();
 
 console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
@@ -65,10 +67,10 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     UsersModule,
     AddressesModule,
     PropertiesModule,
-    CompanyProfileModule,
+    // CompanyProfileModule,
     PatientsModule,
     OrdersModule,
-    AgentsModule,
+    // AgentsModule,
     MenusModule,
     PermissionsModule,
     RolesModule,
@@ -76,13 +78,14 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     LocationModule,
     SocialLinks,
     TherapistsModule,
-    StaffModule,
+    // StaffModule,
     SeederModule,
     TokenModule,
     TeamMemberModule,
     AppointmentsModule,
     CalendarsModule,
-    FunctionDescriptionModule
+    FunctionDescriptionModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService,

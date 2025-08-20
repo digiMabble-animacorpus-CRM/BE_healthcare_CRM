@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,6 +16,7 @@ import {
   ApiBody,
   ApiResponse,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { TherapistService } from './therapists.service';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
@@ -28,7 +30,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Therapist } from './entities/therapist.entity';
 
 @ApiTags('Therapists')
-@UseGuards(AuthGuard('jwt'), PermissionGuard, RolesGuard) // Protect all routes
+@UseGuards(AuthGuard('jwt')) // Protect all routes
 @Controller('therapists')
 export class TherapistController {
   constructor(private readonly therapistService: TherapistService) {}
@@ -84,6 +86,30 @@ export class TherapistController {
     return this.therapistService.update(key, dto);
   }
 
+
+   @Get('search')
+  @ApiOperation({ summary: 'Search therapists by name, job title, or specialization' })
+  @ApiQuery({
+    name: 'q',
+    required: true,
+    description: 'Search keyword (name, job title, specialization, etc.)',
+    example: 'psychologist',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of therapists matching search criteria',
+    type: Therapist,
+    isArray: true,
+  })
+  async search(@Query('q') q: string) {
+    if (!q) {
+      return [];
+    }
+    return this.therapistService.search(q);
+  }
+
+
+
   // DELETE BY ID
   @Delete(':key')
   // @Permissions('delete:therapist')
@@ -97,12 +123,22 @@ export class TherapistController {
   }
 
   // DELETE ALL
-  @Delete()
-  // @Permissions('delete:therapist')
-  // @Roles('super-admin', 'branch-admin')
-  @ApiOperation({ summary: 'Delete all therapists' })
-  @ApiResponse({ status: 200, description: 'All therapists deleted successfully' })
-  async removeAll(): Promise<{ deleted: boolean }> {
-    return this.therapistService.removeAll();
-  }
+  // @Delete()
+  // // @Permissions('delete:therapist')
+  // // @Roles('super-admin', 'branch-admin')
+  // @ApiOperation({ summary: 'Delete all therapists' })
+  // @ApiResponse({ status: 200, description: 'All therapists deleted successfully' })
+  // async removeAll(): Promise<{ deleted: boolean }> {
+  //   return this.therapistService.removeAll();
+  // }
+
+
+
+@Patch(':key/restore')
+@ApiOperation({ summary: 'Restore a soft-deleted therapist' })
+@ApiParam({ name: 'key', type: Number })
+async restore(@Param('key', ParseIntPipe) key: number): Promise<Therapist> {
+  return this.therapistService.restore(key);
+}
+
 }

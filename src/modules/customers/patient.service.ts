@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException, HttpException,HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindManyOptions } from 'typeorm';
 import { Patient } from './entities/patient.entity';
-import { CreatePatientDto } from './dto/create-Patient.dto';
-import { UpdatePatientDto } from './dto/update-Patient.dto';
+import { CreatePatientDto } from './dto/create-patient.dto';
+import { UpdatePatientDto } from './dto/update-patient.dto';
 import { BaseService } from 'src/base.service';
 import { logger } from 'src/core/utils/logger';
 import { EC500, EM100 } from 'src/core/constants';
@@ -28,12 +28,13 @@ export class PatientsService extends BaseService<Patient> {
       const patient = this.patientRepository.create({
         ...createPatientDto,
         status: createPatientDto.status ?? 'ACTIVE',
+        is_delete: false, // ensure new patients are not marked deleted
       });
 
-      const savedPatient = await this.patientRepository.save(patient);
+      const savedPatient: Patient = await this.patientRepository.save(patient);
 
       const result = await this.patientRepository.findOne({
-        where: { id: savedPatient.id },
+        where: { id: savedPatient.id, is_delete: false },
       });
 
       logger.info(`Patient_Create_Exit: ${JSON.stringify(result)}`);
@@ -45,20 +46,20 @@ export class PatientsService extends BaseService<Patient> {
     }
   }
 
-async findAll(options?: FindManyOptions<Patient>): Promise<Patient[]> {
-  try {
-    logger.info('Patient_FindAll_Entry');
-    const patients = await this.patientRepository.find({
-      ...(options || {}),
-    });
-    logger.info(`Patient_FindAll_Exit: Found ${patients.length} patients`);
-    return patients;
-  } catch (error) {
-    logger.error(`Patient_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
-    throw new HttpException(EM100, EC500);
+  async findAll(options?: FindManyOptions<Patient>): Promise<Patient[]> {
+    try {
+      logger.info('Patient_FindAll_Entry');
+      const patients = await this.patientRepository.find({
+        where: { is_delete: false }, // exclude soft-deleted
+        ...(options || {}),
+      });
+      logger.info(`Patient_FindAll_Exit: Found ${patients.length} patients`);
+      return patients;
+    } catch (error) {
+      logger.error(`Patient_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
+      throw new HttpException(EM100, EC500);
+    }
   }
-}
-
 
   async findAllWithPagination(
     page: number,
@@ -73,15 +74,24 @@ async findAll(options?: FindManyOptions<Patient>): Promise<Patient[]> {
     try {
       const query = this.patientRepository.createQueryBuilder('patient');
 
-      if (options?.searchText) {
-        query.andWhere(
-          `(patient.first_name ILIKE :search 
-          OR patient.last_name ILIKE :search 
-          OR patient.emails ILIKE :search 
-          OR patient.phone_numbers ILIKE :search)`,
-          { search: `%${options.searchText}%` },
-        );
-      }
+      // Always exclude deleted
+      query.where('patient.is_delete = false');
+
+   if (options?.searchText) {
+  const search = `%${options.searchText}%`;
+
+  query.andWhere(
+    `(patient.firstname ILIKE :search 
+      OR patient.lastname ILIKE :search 
+      OR patient.emails ILIKE :search 
+      OR EXISTS (
+        SELECT 1
+        FROM unnest(patient.phones) AS phone
+        WHERE phone ILIKE :search
+      ))`,
+    { search },
+  );
+}
 
       if (options?.branch) {
         query.andWhere('patient.source = :branch', { branch: options.branch });
@@ -110,7 +120,7 @@ async findAll(options?: FindManyOptions<Patient>): Promise<Patient[]> {
     try {
       logger.info(`Patient_FindOne_Entry: id=${id}`);
       const patient = await this.patientRepository.findOne({
-        where: { id },
+        where: { id, is_delete: false }, // only fetch non-deleted
       });
 
       if (!patient) {
@@ -127,37 +137,46 @@ async findAll(options?: FindManyOptions<Patient>): Promise<Patient[]> {
     }
   }
 
-async updatePatient(id: string, updatePatientDto: UpdatePatientDto): Promise<Patient> {
-  try {
-    logger.info(`Patient_Service_Update_Entry: id=${id}, data=${JSON.stringify(updatePatientDto)}`);
+  async updatePatient(id: string, updatePatientDto: UpdatePatientDto): Promise<Patient> {
+    try {
+      logger.info(`Patient_Service_Update_Entry: id=${id}, data=${JSON.stringify(updatePatientDto)}`);
 
-    const patient = await this.findOne(id);
-    if (!patient) {
-      throw new HttpException(`Patient with ID ${id} not found`, HttpStatus.NOT_FOUND);
+      const patient = await this.findOne(id);
+      if (!patient) {
+        throw new HttpException(`Patient with ID ${id} not found`, HttpStatus.NOT_FOUND);
+      }
+
+      await this.patientRepository.update(id, updatePatientDto);
+
+      const updatedPatient = await this.findOne(id);
+      logger.info(`Patient_Service_Update_Exit: ${JSON.stringify(updatedPatient)}`);
+
+      return updatedPatient;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      logger.error(`Patient_Service_Update_Error: ${error?.message || error}`);
+      throw new HttpException(EM100, EC500);
     }
-
-    // Directly update — DTO already ensures only valid fields
-    await this.patientRepository.update(id, updatePatientDto);
-
-    const updatedPatient = await this.findOne(id);
-    logger.info(`Patient_Service_Update_Exit: ${JSON.stringify(updatedPatient)}`);
-
-    return updatedPatient;
-  } catch (error) {
-    if (error instanceof HttpException) throw error;
-    logger.error(`Patient_Service_Update_Error: ${error?.message || error}`);
-    throw new HttpException(EM100, EC500);
   }
-}
-
-
 
   async removePatient(id: string): Promise<void> {
     try {
       logger.info(`Patient_Remove_Entry: id=${id}`);
-      await this.findOne(id);
-      await this.patientRepository.delete(id);
-      logger.info('Patient_Remove_Exit: Successfully deleted');
+
+      const patient = await this.findOne(id);
+      if (!patient) {
+        throw new HttpException(
+          `Patient with ID ${id} not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      await this.patientRepository.update(id, {
+        is_delete: true,
+        deleted_at: new Date(),
+      });
+
+      logger.info(`Patient_Remove_Exit: Patient ${id} soft deleted`);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       logger.error(`Patient_Remove_Error: ${JSON.stringify(error?.message || error)}`);

@@ -9,7 +9,7 @@ import Appointment from './entities/appointment.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Therapist } from '../therapist/entities/therapist.entity';
-import { TeamMember } from 'src/team-member/entities/team-member.entity';
+import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
 
 @Injectable()
 export class AppointmentsService extends BaseService<Appointment> {
