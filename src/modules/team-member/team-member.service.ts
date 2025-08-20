@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { TeamMember } from './entities/team-member.entity';
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
 import { UpdateTeamMemberDto } from './dto/update-team-member.dto';
+
 
 @Injectable()
 export class TeamMemberService {
@@ -37,6 +38,27 @@ export class TeamMemberService {
     Object.assign(member, data);
     return this.repo.save(member);
   }
+
+
+  async search(query: string): Promise<TeamMember[]> {
+  return this.repo.find({
+    where: [
+      { first_name: ILike(`%${query}%`), is_delete: false },
+      { last_name: ILike(`%${query}%`), is_delete: false },
+      { full_name: ILike(`%${query}%`), is_delete: false },
+      { job_1: ILike(`%${query}%`), is_delete: false },
+      { job_2: ILike(`%${query}%`), is_delete: false },
+      { job_3: ILike(`%${query}%`), is_delete: false },
+      { job_4: ILike(`%${query}%`), is_delete: false },
+      { specialization_1: ILike(`%${query}%`), is_delete: false },
+      { office_address: ILike(`%${query}%`), is_delete: false },
+      { contact_email: ILike(`%${query}%`), is_delete: false },
+      { contact_phone: ILike(`%${query}%`), is_delete: false },
+      { about: ILike(`%${query}%`), is_delete: false },
+    ],
+  });
+}
+
 
   async remove(id: string): Promise<void> {
     const member = await this.findOne(id);

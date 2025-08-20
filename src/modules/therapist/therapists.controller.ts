@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,6 +16,7 @@ import {
   ApiBody,
   ApiResponse,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { TherapistService } from './therapists.service';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
@@ -83,6 +85,30 @@ export class TherapistController {
   ): Promise<Therapist> {
     return this.therapistService.update(key, dto);
   }
+
+
+   @Get('search')
+  @ApiOperation({ summary: 'Search therapists by name, job title, or specialization' })
+  @ApiQuery({
+    name: 'q',
+    required: true,
+    description: 'Search keyword (name, job title, specialization, etc.)',
+    example: 'psychologist',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of therapists matching search criteria',
+    type: Therapist,
+    isArray: true,
+  })
+  async search(@Query('q') q: string) {
+    if (!q) {
+      return [];
+    }
+    return this.therapistService.search(q);
+  }
+
+
 
   // DELETE BY ID
   @Delete(':key')
