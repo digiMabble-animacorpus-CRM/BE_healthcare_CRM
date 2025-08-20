@@ -77,15 +77,21 @@ export class PatientsService extends BaseService<Patient> {
       // Always exclude deleted
       query.where('patient.is_delete = false');
 
-      if (options?.searchText) {
-        query.andWhere(
-          `(patient.firstname ILIKE :search 
-          OR patient.lastname ILIKE :search 
-          OR patient.emails ILIKE :search 
-          OR patient.phones::text ILIKE :search)`,
-          { search: `%${options.searchText}%` },
-        );
-      }
+   if (options?.searchText) {
+  const search = `%${options.searchText}%`;
+
+  query.andWhere(
+    `(patient.firstname ILIKE :search 
+      OR patient.lastname ILIKE :search 
+      OR patient.emails ILIKE :search 
+      OR EXISTS (
+        SELECT 1
+        FROM unnest(patient.phones) AS phone
+        WHERE phone ILIKE :search
+      ))`,
+    { search },
+  );
+}
 
       if (options?.branch) {
         query.andWhere('patient.source = :branch', { branch: options.branch });
