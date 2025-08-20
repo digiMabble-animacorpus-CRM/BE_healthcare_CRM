@@ -33,6 +33,8 @@ import { TeamMemberModule } from './modules/team-member/team-member.module';
 import { AppointmentsModule } from './modules/appointment/appointment.module';
 import { CalendarsModule } from './modules/calendars/calendars.module';
 import { FunctionDescriptionModule } from './modules/function-description/function-description.module';
+import { ProfileModule } from './modules/profile/profile.module';
+
 config();
 
 console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
@@ -82,7 +84,8 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     TeamMemberModule,
     AppointmentsModule,
     CalendarsModule,
-    FunctionDescriptionModule
+    FunctionDescriptionModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService,
