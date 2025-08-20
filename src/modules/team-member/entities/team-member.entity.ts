@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column,OneToMany } from 'typeorm';
+import  User  from 'src/modules/users/entities/user.entity'; // Adjust the import path as necessary
 
 @Entity('team_member_list')
 export class TeamMember {
@@ -82,4 +83,9 @@ export class TeamMember {
 
   @Column({ type: 'timestamp', nullable: true })
   deleted_at?: Date;
+
+  @OneToMany(() => User, (user) => user.team)
+  users: User[];
+
+
 }

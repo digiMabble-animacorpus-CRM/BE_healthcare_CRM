@@ -37,23 +37,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('User not found');
     }
 
-    const userPermissions =
-      user.roles?.flatMap((role) => role.permissions)?.map(
-        (p) => `${p.action}:${p.resource}`,
-      ) || [];
+    // const userPermissions =
+    //   user.roles?.flatMap((role) => role.permissions)?.map(
+    //     (p) => `${p.action}:${p.resource}`,
+    //   ) || [];
 
-    const roleMeta = user.roles?.map((r) => ({
-      name: r.name,
-      role_type: r.role_type,
-    })) || [];
+    // const roleMeta = user.roles?.map((r) => ({
+    //   name: r.name,
+    //   role_type: r.role_type,
+    // })) || [];
 
     console.log(' User validated:', {
       user_id: user.id,
       email: user.email_id,
-      user_type: user.user_type,
+      // user_type: user.user_type,
     });
-    console.log(' Roles:', roleMeta);
-    console.log(' Permissions:', userPermissions);
+    // console.log(' Roles:', roleMeta);
+    // console.log(' Permissions:', userPermissions);
 
     // Staff enrichment
     // if (user.user_type === 'staff') {
@@ -77,9 +77,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return {
       user_id: user.id,
       email: user.email_id,
-      user_type: user.user_type,
-      roles: user.roles || [],
-      permissions: userPermissions,
+      // user_type: user.user_type,
+      // roles: user.roles || [],
+      // permissions: userPermissions,
     };
   }
 }

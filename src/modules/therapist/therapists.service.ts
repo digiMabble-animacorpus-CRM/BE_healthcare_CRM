@@ -44,6 +44,20 @@ export class TherapistService {
     return this.therapistRepository.save(therapist);
   }
 
+
+
+  async search(term: string): Promise<Therapist[]> {
+  return this.therapistRepository
+    .createQueryBuilder('therapist')
+    .where('therapist.fullName ILIKE :term', { term: `%${term}%` })
+    .orWhere('therapist.firstName ILIKE :term', { term: `%${term}%` })
+    .orWhere('therapist.lastName ILIKE :term', { term: `%${term}%` })
+    .orWhere('therapist.jobTitle ILIKE :term', { term: `%${term}%` })
+    .orWhere('therapist.specialization1 ILIKE :term', { term: `%${term}%` })
+    .orWhere('therapist.specificAudience ILIKE :term', { term: `%${term}%` })
+    .getMany();
+}
+
   // DELETE ONE
   async remove(key: number): Promise<{ deleted: boolean }> {
     const therapist = await this.findOne(key);

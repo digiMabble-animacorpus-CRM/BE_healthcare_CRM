@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query } from '@nestjs/common';
 import { TeamMemberService } from './team-member.service';
 import { TeamMember } from './entities/team-member.entity';
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
 import { UpdateTeamMemberDto } from './dto/update-team-member.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+
 
 @ApiTags('team-members')
 @Controller('team-members')
@@ -39,6 +40,13 @@ export class TeamMemberController {
   update(@Param('id') id: string, @Body() data: UpdateTeamMemberDto): Promise<TeamMember> {
     return this.service.update(id, data);
   }
+
+  @Get('search')
+@ApiOperation({ summary: 'Search team members by name, job, specialization, etc.' })
+@ApiResponse({ status: 200, description: 'List of matching team members', type: [TeamMember] })
+search(@Query('q') q: string): Promise<TeamMember[]> {
+  return this.service.search(q);
+}
 
   @Delete(':id')
   @ApiOperation({ summary: 'Soft delete a team member' })
