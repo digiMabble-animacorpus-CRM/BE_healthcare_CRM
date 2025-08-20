@@ -29,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     const user: User = await this.userService.findOneById(userId, {
-      relations: ['roles', 'roles.permissions'],
+      // relations: ['roles', 'roles.permissions'],
     });
 
     if (!user) {
