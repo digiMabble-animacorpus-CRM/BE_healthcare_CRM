@@ -76,6 +76,9 @@ async function bootstrap() {
   expressApp.disable('x-powered-by');
   expressApp.set('etag', 'strong');
   /*-------- security headers --------*/
+  app.useStaticAssets(join(__dirname, '..','..', 'public'), {
+    prefix: '/public/',
+  });
   app.setGlobalPrefix('api/v1');
   app.useStaticAssets(join(__dirname, '..', 'pdfs'));
 
