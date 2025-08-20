@@ -241,51 +241,51 @@ async findOneById(id: string | number, options?: FindOneOptions<User>): Promise<
     });
   }
 
-  async createCompanyProfile(userId: number, dto: UpdateCompanyProfileDto): Promise<User> {
-    console.log('dto', dto);
+  // async createCompanyProfile(userId: number, dto: UpdateCompanyProfileDto): Promise<User> {
+  //   console.log('dto', dto);
 
-    const user = await this.findOneById(userId);
-    if (!user) throw new NotFoundException('User not found');
+  //   const user = await this.findOneById(userId);
+  //   if (!user) throw new NotFoundException('User not found');
 
-    if (user.company_name) {
-      throw new Error('Company profile already exists. Use PUT to update.');
-    }
+  //   if (user.company_name) {
+  //     throw new Error('Company profile already exists. Use PUT to update.');
+  //   }
 
-    const { address, ...rest } = dto;
-    Object.assign(user, rest);
-    user.address = this.addressRepository.create(address);
+  //   const { address, ...rest } = dto;
+  //   Object.assign(user, rest);
+  //   user.address = this.addressRepository.create(address);
 
-    await this.addressRepository.save(user.address);
-    await this.userRepository.save(user);
+  //   await this.addressRepository.save(user.address);
+  //   await this.userRepository.save(user);
 
-    return user;
-  }
+  //   return user;
+  // }
 
-  async updateCompanyProfile(userId: number, dto: UpdateCompanyProfileDto): Promise<User> {
-    const user = await this.findOneById(userId);
-    if (!user) throw new NotFoundException('User not found');
+  // async updateCompanyProfile(userId: number, dto: UpdateCompanyProfileDto): Promise<User> {
+  //   const user = await this.findOneById(userId);
+  //   if (!user) throw new NotFoundException('User not found');
 
-    const { address, ...rest } = dto;
-    Object.assign(user, rest);
+  //   const { address, ...rest } = dto;
+  //   Object.assign(user, rest);
 
-    if (!user.address) {
-      user.address = this.addressRepository.create(address);
-    } else {
-      this.addressRepository.merge(user.address, address);
-    }
+  //   if (!user.address) {
+  //     user.address = this.addressRepository.create(address);
+  //   } else {
+  //     this.addressRepository.merge(user.address, address);
+  //   }
 
-    await this.addressRepository.save(user.address);
-    await this.userRepository.save(user);
+  //   await this.addressRepository.save(user.address);
+  //   await this.userRepository.save(user);
 
-    return user;
-  }
+  //   return user;
+  // }
 
-  async updateLogo(userId: number, logo: string): Promise<User> {
-    const user = await this.findOneById(userId);
-    if (!user) throw new NotFoundException('User not found');
-    user.logo = logo;
-    return this.userRepository.save(user);
-  }
+  // async updateLogo(userId: number, logo: string): Promise<User> {
+  //   const user = await this.findOneById(userId);
+  //   if (!user) throw new NotFoundException('User not found');
+  //   user.logo = logo;
+  //   return this.userRepository.save(user);
+  // }
 
   async findOneByRole(roleName: string): Promise<User | undefined> {
   return this.userRepository

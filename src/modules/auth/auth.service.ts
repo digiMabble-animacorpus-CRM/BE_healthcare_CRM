@@ -1,8 +1,6 @@
-import { ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException ,} from '@nestjs/common';
+import { ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Role } from 'src/modules/roles/entities/role.entity';
+
 import { UsersService } from '../users/users.service';
 import User from 'src/modules/users/entities/user.entity';
 import { logger } from 'src/core/utils/logger';
@@ -12,160 +10,102 @@ import { MailUtils } from 'src/core/utils/mailUtils';
 import Encryption from 'src/core/utils/encryption';
 import { AddressesService } from '../addresses/addresses.service';
 import { SignupAdminDto } from './dto/signup.dto';
-// import { Staff } from 'src/modules/StaffType/entities/staff.entity';
-import { Token } from 'src/modules/users/entities/token.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UsersService, 
     private readonly jwtService: JwtService,
-    private readonly addressesService: AddressesService,
-     @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>,
-    //    @InjectRepository(Staff)
-    // private readonly staffRepository: Repository<Staff>,
-
-    @InjectRepository(Token)
-    private readonly tokenRepo: Repository<Token>,
+    private readonly addressesService: AddressesService
   ) { }
 
+  async signup(signupData: SignupAdminDto, user_type: 'admin'): Promise<any> {
+    logger.info(`Signup_Entry: Email=${signupData.email_id} | UserType=${user_type}`);
 
-
-async signup(signupData: SignupAdminDto, user_type: 'admin' | 'branch-admin' | 'staff' | 'super-admin'): Promise<any> {
-  logger.info(`Signup_Entry: Email=${signupData.email_id} | UserType=${user_type}`);
-
-  //  Check for unique email only
-  const existingUser = await this.userService.findOneByEmail(signupData.email_id);
-  if (existingUser) {
-    logger.warn(`Signup_Failure: Email=${signupData.email_id} | Reason=EmailAlreadyExists`);
-    throw new ConflictException(Errors.EMAIL_ID_ALREADY_EXISTS);
-  }
-
-  try {
-    // Get Role based on user_type
-    const role = await this.roleRepository.findOne({ where: { name: user_type } });
-
-    if (!role) {
-      logger.warn(`Signup_Failure: Role not found for user_type=${user_type}`);
-      throw new NotFoundException(`Role "${user_type}" not found`);
+    const existingUser = await this.userService.findOneByEmail(signupData.email_id);
+    if (existingUser) {
+      logger.warn(`Signup_Failure: Email=${signupData.email_id} | Reason=EmailAlreadyExists`);
+      throw new ConflictException(Errors.EMAIL_ID_ALREADY_EXISTS);
     }
 
-    // Prepare user object with role
-    const userData: Partial<User> = {
-      ...signupData,
-      user_type,
-      email_verified: false,
-      last_login: new Date(),
-      is_blocked: false,
-      preferences: [],
-      roles: [role],
-      company_name: null,
-      website: null,
-      tax_id: null,
-    };
+    try {
+      const userData: Partial<User> = {
+        ...signupData,
+        // user_type,
+        // email_verified: false,
+        // last_login: new Date(),
+        // is_blocked: false,
+        // preferences: [],
+        // company_name: null,
+        // website: null,
+        // tax_id: null,
+      };
+      
+      const newUser = await this.userService.create(userData);
 
-    
-    // Create user
-    const newUser = await this.userService.create(userData);
-    newUser.roles = [role];
-    //  Generate tokens
-    // const { access_token, refresh_token } = await this.generateTokens({
-    //   user_id: newUser.id,
-    //   user_type: newUser.user_type,
-    //   email: newUser.email_id,
-    // });
+      const { access_token, refresh_token } = await this.generateTokens({
+        user_id: newUser.id,
+        // user_type: newUser.user_type,
+        email: newUser.email_id,
+      });
+      
+      const { password, ...userResponse } = newUser;
 
-    const userWithRoles = await this.userService.findOneById(newUser.id, {
-  relations: ['roles'],
-});
 
-const { access_token, refresh_token } = await this.generateTokens({
-  user_id: newUser.id,
-  user_type: newUser.user_type,
-  email: newUser.email_id,
-  roles: userWithRoles.roles?.map(r => ({
-    name: r.name,
-    role_type: r.role_type,
-  })) || [],
-});
-
-    const { password, ...userResponse } = newUser;
-
-    return {
-      ...userResponse,
-      access_token,
-      refresh_token,
-    };
-  } catch (error) {
-    logger.error('Signup_Error:', error);
-    throw error;
+      return {
+        ...userResponse,
+        access_token,
+        refresh_token
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
-  
+
+
+
+
+async loginWithEmail(
+  { email_id, password, remember_me }: LoginDto
+): Promise<{ user: Partial<User>, accessToken: string, refreshToken: string }> {
+  logger.info(`Login_Entry: ` + JSON.stringify({ email_id, remember_me }));
+
+  const user: User = await this.userService.findOneByEmail(email_id);
+
+  if (!user) {
+    logger.info(`Login_User_Not_Found: ${email_id}`);
+    throw new NotFoundException(Errors.USER_NOT_EXISTS);
+  }
+
+  if (!user.password) {
+    logger.info(`Login_Password_Missing: ${email_id}`);
+    throw new UnauthorizedException(Errors.INVALID_USER_DETAILS);
+  }
+
+  if (!Encryption.comparePassword(password, user.password)) {
+    logger.info(`Login_Invalid_Password: ${email_id}`);
+    throw new UnauthorizedException(Errors.INCORRECT_USER_PASSWORD);
+  }
+
+  // ✅ No last_login, no device_token
+  // (just proceed with token generation)
+
+  const { access_token, refresh_token } = await this.generateTokens(
+    { user_id: user.id },
+    remember_me,
+  );
+
+  const { password: _, ...userResponse } = user;
+
+  logger.info(`Login_Success: ${email_id}`);
+
+  return {
+    user: userResponse,
+    accessToken: access_token,
+    refreshToken: refresh_token,
+  };
 }
-
-
-
-
-
-
-
-
-
-  async loginWithEmail({ email_id, password, device_token, remember_me }: LoginDto): Promise<{ user: Partial<User>, accessToken: string, refreshToken: string }> {
-    logger.info(`Login_Entry: ` + JSON.stringify({ email_id, remember_me }));
-
-    const user: User = await this.userService.findOneByEmail(email_id);
-
-    if (!user) {
-      logger.info(`Login_User_Not_Found: ${email_id}`);
-      throw new NotFoundException(Errors.USER_NOT_EXISTS);
-    }
-
-    if (!user.password) {
-      logger.info(`Login_Password_Missing: ${email_id}`);
-      throw new UnauthorizedException(Errors.INVALID_USER_DETAILS);
-    }
-
-    if (!Encryption.comparePassword(password, user.password)) {
-      logger.info(`Login_Invalid_Password: ${email_id}`);
-      throw new UnauthorizedException(Errors.INCORRECT_USER_PASSWORD);
-    }
-
-    await this.userService.update(user.id, {
-        last_login: new Date(),
-        ...(device_token && { device_token }),
-    });
-
-    //const { access_token, refresh_token } = await this.generateTokens({ user_id: user.id }, remember_me);
-    
-    const userWithRoles = await this.userService.findOneById(user.id, {
-  relations: ['roles'],
-});
-
-const { access_token, refresh_token } = await this.generateTokens({
-  user_id: user.id,
-  user_type: user.user_type,
-  email: user.email_id,
-  roles: userWithRoles.roles?.map(r => ({
-    name: r.name,
-    role_type: r.role_type,
-  })) || [],
-}, remember_me);
-
-    const { password: _, ...userResponse } = user;
-
-    logger.info(`Login_Success: ${email_id}`);
-
-    return {
-      user: userResponse,
-      accessToken: access_token,
-      refreshToken: refresh_token,
-    };
-  }
-
-
 
 
 
@@ -208,69 +148,37 @@ const { access_token, refresh_token } = await this.generateTokens({
     }
   }
 
+  async forgotPassword(email_id: string) {
+    const user: User = await this.userService.findOneByEmail(email_id);
 
+    if (!user) {
+      logger.warn(`Forgot password attempt for non-existent email: ${email_id}`);
+      throw new NotFoundException(Errors.USER_NOT_EXISTS);
+    }
 
-async forgotPassword(email_id: string) {
-  const user: User = await this.userService.findOneByEmail(email_id);
-
-  if (!user) {
-    logger.warn(`Forgot password attempt for non-existent email: ${email_id}`);
-    throw new NotFoundException(Errors.USER_NOT_EXISTS);
-  }
-
-  try {
-    logger.debug(`User found: ${user.email_id}`);
-
-    //  Generate existing token
-    const resetToken = await this.generateToken(
-      {
+    try {
+      logger.debug(`User found: ${user.email_id}`);
+      const resetToken = await this.generateToken({
         user_id: user.id,
         email: user.email_id,
         purpose: 'password_reset'
-      },
-      true
-    );
-    logger.debug(`Token generated: ${resetToken}`);
-
-    //  Save token in your old way (unchanged)
-    await this.userService.createPasswordResetToken(email_id, resetToken);
-    logger.debug(`Token saved to DB (old logic)`);
-
-    //  NEW: Also save token in Token entity for staff linkage
-    // const staffEntity = await this.staffRepository.findOne({
-    //   where: { contactEmail: user.email_id },
-    // });
-    // if (staffEntity) {
-    //   const tokenEntity = this.tokenRepo.create({
-    //     user_email: user.email_id,
-    //     token: resetToken,
-    //     type: 'password_reset',
-    //     expires_at: new Date(Date.now() + 15 * 60 * 1000),
-    //     staff: staffEntity
-    //   });
-    //   await this.tokenRepo.save(tokenEntity);
-    //   logger.debug(`Token saved in Token entity for staff`);
-    // }
-
-    //  Continue as before
-    const resetUrl = `${process.env.FRONTEND_BASE_URL}/auth/reset-password?token=${resetToken}`;
+      }, true);
+  logger.debug(`Token generated: ${resetToken}`);
+      await this.userService.createPasswordResetToken(email_id, resetToken);
+logger.debug(`Token saved to DB`);
+      const resetUrl = `${process.env.FRONTEND_BASE_URL}/reset-password?token=${resetToken}`;
     logger.debug(`Reset URL: ${resetUrl}`);
-
-    await MailUtils.sendPasswordResetEmail(email_id, resetUrl);
-    logger.debug(`Email sent`);
-
-    return { message: 'If a user with that email exists, a password reset link has been sent.' };
-  } catch (error) {
-    logger.error(`Error processing password reset for ${email_id}: ${error.message}`);
-    logger.error(error.stack);
-    throw new HttpException(
-      'An unexpected error occurred while processing your request.',
-      HttpStatus.INTERNAL_SERVER_ERROR
-    );
+      await MailUtils.sendPasswordResetEmail(email_id, resetUrl);
+       logger.debug(`Email sent`);
+      return { message: 'If a user with that email exists, a password reset link has been sent.' };
+    } catch (error) {
+      logger.error(`Error processing password reset for ${email_id}: ${error.message}`);
+       logger.error(error.stack); 
+      throw new HttpException('An unexpected error occurred while processing your request.', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
-}
 
-  async resetPassword(token: string, password: string) {
+  async resetPassword(token: string, newPassword: string) {
     const { valid, email } = await this.userService.verifyToken(token, 'password_reset');
 
     if (!valid || !email) {
@@ -286,7 +194,7 @@ async forgotPassword(email_id: string) {
 
     try {
       await this.userService.update(user.id, {
-        password: Encryption.hashPassword(password)
+        password: Encryption.hashPassword(newPassword)
       });
 
       await this.userService.deleteTokensByEmailAndType(email, 'password_reset');
