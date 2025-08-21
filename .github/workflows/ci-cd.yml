@@ -36,23 +36,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Login into Docker Hub
-        uses: docker/login-action@v2
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
         run: |
-          docker build -t re-ai-be-api:latest .
+          docker build -t healthcare_crm:latest .
 
       - name: Tag Docker image
         run: |
-          docker tag re-ai-be-api ${{ secrets.DOCKER_USERNAME }}/re_ai_be:latest
+            docker tag healthcare_crm:latest ${{ secrets.DOCKER_USERNAME }}/healthcare_crm:latest
 
       - name: Push Docker Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/re_ai_be:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/healthcare_crm:latest
 
       - name: Deploy to the server
         run: |
@@ -75,13 +76,13 @@ jobs:
                   echo "Docker is already installed."
               fi
     
-              docker pull ${{ secrets.DOCKER_USERNAME }}/re_ai_be:latest && \
-              
-              (docker stop re_ai_be || true) && \
-              (docker rm re_ai_be || true) && \
-              
+              docker pull ${{ secrets.DOCKER_USERNAME }}/healthcare_crm:latest && \
+
+              (docker stop healthcare_crm || true) && \
+              (docker rm healthcare_crm || true) && \
+
               docker image prune -a -f && \
-              
-              docker run -d --name re_ai_be -p 3500:3500 ${{ secrets.DOCKER_USERNAME }}/re_ai_be:latest
+
+              docker run -d --name healthcare_crm -p 3500:3500 ${{ secrets.DOCKER_USERNAME }}/healthcare_crm:latest
           '
 
