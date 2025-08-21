@@ -31,7 +31,8 @@ COPY src/ ./src/
 COPY tsconfig*.json ./
 COPY nest-cli.json ./
 COPY user-swagger.json ./
-
+COPY swagger.ts ./
+COPY data-source.ts ./
 # Build the application
 RUN npm run build
 
@@ -79,4 +80,4 @@ USER node
 EXPOSE 8080
 
 # Start the server using the production build
-CMD ["node", "dist/src/main"]
+CMD ["node", "dist/main.js"]
