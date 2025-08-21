@@ -12,12 +12,12 @@ services:
     image: ghcr.io/ananddigimabble/healthcare_crm:latest
     env_file:
       - .env
-  ports:
-    - "7000:8080"
-  command: node dist/main.js
-  restart: always
-  networks:
-    - app_network
+    ports:
+      - "7000:8080"
+    command: node dist/main.js
+    restart: always
+    networks:
+      - app_network
 
   # healthcare-db:
   #   image: postgres:16
