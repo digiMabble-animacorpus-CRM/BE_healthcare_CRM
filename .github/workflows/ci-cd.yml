@@ -46,11 +46,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/healthcare_crm:latest .
+          docker build -t ghcr.io/ananddigimabble/healthcare_crm:latest .
 
       - name: Push Docker Image
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/healthcare_crm:latest
+          docker push ghcr.io/ananddigimabble/healthcare_crm:latest
       - name: Deploy to the server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} '
@@ -66,10 +66,10 @@ jobs:
             else
               echo "Docker is already installed."
             fi
-            docker pull ghcr.io/${{ github.repository_owner }}/healthcare_crm:latest && \
+            docker pull ghcr.io/ananddigimabble/healthcare_crm:latest && \
             (docker stop healthcare_crm || true) && \
             (docker rm healthcare_crm || true) && \
             docker image prune -a -f && \
-            docker run -d --name healthcare_crm -p 5000:8080 ghcr.io/${{ github.repository_owner }}/healthcare_crm:latest
+            docker run -d --name healthcare_crm -p 5000:8080 ghcr.io/ananddigimabble/healthcare_crm:latest
           '
 
