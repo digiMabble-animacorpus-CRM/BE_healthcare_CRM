@@ -43,46 +43,33 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+
       - name: Build Docker image
         run: |
-          docker build -t healthcare_crm:latest .
-
-      - name: Tag Docker image
-        run: |
-            docker tag healthcare_crm:latest ${{ secrets.DOCKER_USERNAME }}/healthcare_crm:latest
+          docker build -t ghcr.io/${{ github.repository_owner }}/healthcare_crm:latest .
 
       - name: Push Docker Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/healthcare_crm:latest
-
+          docker push ghcr.io/${{ github.repository_owner }}/healthcare_crm:latest
       - name: Deploy to the server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} '
-              if ! command -v docker &> /dev/null; then
-                  echo "Docker is not installed. Installing Docker..."
-                  
-                  sudo apt-get update -y && \
-                  sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-                  
-                  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-
-                  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-                  
-                  sudo apt-get update -y && \
-                  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-                  
-                  docker --version || { echo "Docker installation failed"; exit 1; }
-              else
-                  echo "Docker is already installed."
-              fi
-    
-              docker pull ${{ secrets.DOCKER_USERNAME }}/healthcare_crm:latest && \
-
-              (docker stop healthcare_crm || true) && \
-              (docker rm healthcare_crm || true) && \
-
-              docker image prune -a -f && \
-
-              docker run -d --name healthcare_crm -p 3500:3500 ${{ secrets.DOCKER_USERNAME }}/healthcare_crm:latest
+            if ! command -v docker &> /dev/null; then
+              echo "Docker is not installed. Installing Docker..."
+              sudo apt-get update -y && \
+              sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+              echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+              sudo apt-get update -y && \
+              sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+              docker --version || { echo "Docker installation failed"; exit 1; }
+            else
+              echo "Docker is already installed."
+            fi
+            docker pull ghcr.io/${{ github.repository_owner }}/healthcare_crm:latest && \
+            (docker stop healthcare_crm || true) && \
+            (docker rm healthcare_crm || true) && \
+            docker image prune -a -f && \
+            docker run -d --name healthcare_crm -p 5000:8080 ghcr.io/${{ github.repository_owner }}/healthcare_crm:latest
           '
 
