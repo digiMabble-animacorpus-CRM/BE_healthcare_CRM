@@ -6,11 +6,14 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    image: ghcr.io/digimabble/healthcare_crm:latest
+      cache_from:
+        - node:18-alpine
+        - ghcr.io/ananddigimabble/healthcare_crm:latest
+    image: ghcr.io/ananddigimabble/healthcare_crm:latest
     env_file:
       - .env
     ports:
-      - "7000:7000"
+      - "7000:8080"
     command: node dist/src/main
     restart: always
     networks:

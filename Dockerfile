@@ -1,23 +1,16 @@
 ###################
-# BUILD FOR LOCAL DEVELOPMENT
+# DEPENDENCIES
 ###################
 
-FROM node:18-alpine AS development
+FROM node:18-alpine AS dependencies
 
-# Create app directory
 WORKDIR /usr/src/app
 
-# Copy application dependency manifests to the container image.
+# Copy package files
 COPY package*.json ./
 
-# Install app dependencies using the `npm ci` command instead of `npm install`
-RUN npm ci
-
-# Bundle app source
-COPY . .
-
-# Use the node user from the image (instead of the root user)
-USER node
+# Install all dependencies (dev + prod)
+RUN npm ci --frozen-lockfile
 
 ###################
 # BUILD FOR PRODUCTION
@@ -27,24 +20,34 @@ FROM node:18-alpine AS build
 
 WORKDIR /usr/src/app
 
-# Copy dependency manifests
+# Copy package files
 COPY package*.json ./
 
-# Copy node_modules from development stage
-COPY --from=development /usr/src/app/node_modules ./node_modules
+# Copy node_modules from dependencies stage
+COPY --from=dependencies /usr/src/app/node_modules ./node_modules
 
-# Copy the rest of the application code
-COPY . .
-# COPY .env .env
-COPY user-swagger.json user-swagger.json
-# Run the build command which creates the production bundle
+# Copy source code and configuration files
+COPY src/ ./src/
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+COPY user-swagger.json ./
+
+# Build the application
 RUN npm run build
 
-# Set NODE_ENV environment variable
-ENV NODE_ENV production
+###################
+# PRODUCTION DEPENDENCIES
+###################
 
-# Clean up dev dependencies
-RUN npm ci --only=production && npm cache clean --force
+FROM node:18-alpine AS prod-dependencies
+
+WORKDIR /usr/src/app
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --frozen-lockfile --only=production && npm cache clean --force
 
 ###################
 # PRODUCTION
@@ -54,11 +57,21 @@ FROM node:18-alpine AS production
 
 WORKDIR /usr/src/app
 
-# Copy the production node_modules and dist from build stage
-COPY --from=build /usr/src/app/node_modules ./node_modules
+# Copy production dependencies
+COPY --from=prod-dependencies /usr/src/app/node_modules ./node_modules
+
+# Copy built application
 COPY --from=build /usr/src/app/dist ./dist
-COPY user-swagger.json user-swagger.json
+
+# Copy necessary files
+COPY user-swagger.json ./
+
+# Create logs directory
 RUN mkdir -p /usr/src/app/logs && chmod -R 777 /usr/src/app/logs
+
+# Set NODE_ENV
+ENV NODE_ENV=production
+
 # Use the node user from the image (instead of the root user)
 USER node
 
