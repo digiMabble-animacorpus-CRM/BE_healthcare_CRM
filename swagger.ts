@@ -13,7 +13,20 @@ export function setupSwagger(app: INestApplication, type: string) {
     const document = SwaggerModule.createDocument(app, options);
     document.security = [{ bearer: [] }];
 
-    SwaggerModule.setup('api-docs', app, document);
+    // SwaggerModule.setup('api-docs', app, document);
+
+      // Mount Swagger UI, and point it to /api-json instead of default /api-docs-json
+  SwaggerModule.setup('api-docs', app, document, {
+    swaggerOptions: {
+      url: '/api-json',
+    },
+  });
+
+  // Manually mount the JSON at /api-json
+  app.getHttpAdapter().get('/api-json', (req, res) => {
+    res.json(document);
+  });
+
     // if (type == 'user') process.env.NODE_ENV != PRODUCTION && fs.writeFileSync('user-swagger.json', JSON.stringify(document, null, 2));
     // else process.env.NODE_ENV != PRODUCTION && fs.writeFileSync('admin-swagger.json', JSON.stringify(document, null, 2));
 }
