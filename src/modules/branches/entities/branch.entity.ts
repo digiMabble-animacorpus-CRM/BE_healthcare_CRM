@@ -1,16 +1,24 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseModel } from 'src/core/database/BaseModel';
+import { Consultation } from 'src/modules/consultations/entities/consultation.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
-@Entity('branches')
-export class Branch {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Entity({ name: 'branches' })
+export class Branch  {
+  @PrimaryGeneratedColumn('uuid')
+  branch_id: string;
 
-  @Column({ length: 100 })
+  @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ nullable: true })
-  location: string;
+  @Column({ type: 'varchar', length: 255 })
+  address: string;
 
-  @Column({ type: 'boolean', default: true })
-  is_active: boolean;
+  @Column({ type: 'varchar', length: 100, unique: true })
+  email: string;
+
+  @Column({ type: 'varchar', length: 20 })
+  phone: string;
+
+@OneToMany(() => Consultation, (consultation) => consultation.branch)
+  consultations: Consultation[];
 }
