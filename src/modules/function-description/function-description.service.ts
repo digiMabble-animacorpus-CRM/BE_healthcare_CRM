@@ -1,64 +1,92 @@
-// src/modules/function-description/function-description.service.ts
-
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository } from 'typeorm';
-import { logger } from 'src/core/utils/logger';
-import { EM100, EC500 } from 'src/core/constants';
+import { In, Repository } from 'typeorm';
 import { FunctionDescription } from './entities/function-description.entity';
+import { CreateFunctionDescriptionDto } from './dto/create-function-description.dto';
+import { UpdateFunctionDescriptionDto } from './dto/update-function-description.dto';
+import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
+import { EM119, EM100 } from 'src/core/constants';
 
 @Injectable()
 export class FunctionDescriptionService {
   constructor(
     @InjectRepository(FunctionDescription)
     private readonly functionDescriptionRepository: Repository<FunctionDescription>,
+    @InjectRepository(Therapist)
+    private readonly therapistRepository: Repository<Therapist>,
   ) {}
 
-  /**
-   * Handles errors, logs them, and throws a standardized HttpException.
-   */
-  private handleError(operation: string, error: any): never {
-    logger.error(`FunctionDescription_${operation}_Error: ${JSON.stringify(error?.message || error)}`);
-    if (error instanceof HttpException) throw error;
-    throw new HttpException(EM100, EC500);
-  }
-
-  /**
-   * Finds all function descriptions with pagination and search functionality.
-   * @param page - Page number.
-   * @param limit - Number of items per page.
-   * @param search - Optional search term.
-   * @returns A list of function descriptions and the total count.
-   */
-  async findAllWithPagination(
-    page: number,
-    limit: number,
-    search?: string,
-  ): Promise<{ data: FunctionDescription[]; total: number }> {
+ async create(createDto: CreateFunctionDescriptionDto): Promise<FunctionDescription> {
     try {
-      logger.info(`FunctionDescription_FindAllPaginated_Entry: page=${page}, limit=${limit}, search=${search}`);
+      const { consultation_id, therapist_ids, ...rest } = createDto;
 
-      const query = this.functionDescriptionRepository.createQueryBuilder('fd');
 
-      if (search?.trim()) {
-        const searchTerm = `%${search.trim()}%`;
-        query.where(
-          new Brackets((qb) => {
-            qb.where('fd.fonction ILIKE :search', { search: searchTerm });
-          }),
-        );
+      const functionDescription = this.functionDescriptionRepository.create({
+        ...rest,
+        consultation: {
+          consultation_id: consultation_id,
+        },
+      });
+
+      if (therapist_ids && therapist_ids.length > 0) {
+        const therapists = await this.therapistRepository.findBy({
+          _key: In(therapist_ids),
+        });
+        functionDescription.therapists = therapists;
       }
 
-      const [data, total] = await query
-        .orderBy('fd.fonction', 'ASC')
-        .skip((page - 1) * limit)
-        .take(limit)
-        .getManyAndCount();
-
-      logger.info(`FunctionDescription_FindAllPaginated_Exit: Found ${data.length} descriptions, total: ${total}`);
-      return { data, total };
+      return await this.functionDescriptionRepository.save(functionDescription);
     } catch (error) {
-      this.handleError('FindAllPaginated', error);
+      console.error(error); // Good for debugging
+      throw new InternalServerErrorException(EM100);
     }
+  }
+
+  async findAll(consultationId?: string): Promise<FunctionDescription[]> {
+    if (consultationId) {
+      return this.functionDescriptionRepository.find({
+        where: {
+          consultation: {
+            consultation_id: consultationId,
+          },
+        },
+        relations: ['therapists'],
+      });
+    }
+    return this.functionDescriptionRepository.find({ relations: ['therapists'] });
+  }
+
+  async findOne(function_id: string): Promise<FunctionDescription> {
+    const service = await this.functionDescriptionRepository.findOne({
+      where: { function_id },
+      relations: ['therapists'],
+    });
+    if (!service) {
+      throw new NotFoundException(EM119);
+    }
+    return service;
+  }
+
+  async update(
+    function_id: string,
+    updateDto: UpdateFunctionDescriptionDto,
+  ): Promise<FunctionDescription> {
+    const service = await this.findOne(function_id);
+    const { therapist_ids, ...rest } = updateDto;
+
+    if (therapist_ids) {
+      const therapists = await this.therapistRepository.findBy({
+        _key: In(therapist_ids),
+      });
+      service.therapists = therapists;
+    }
+
+    this.functionDescriptionRepository.merge(service, rest);
+    return this.functionDescriptionRepository.save(service);
+  }
+
+  async remove(function_id: string): Promise<void> {
+    const service = await this.findOne(function_id);
+    await this.functionDescriptionRepository.remove(service);
   }
 }
