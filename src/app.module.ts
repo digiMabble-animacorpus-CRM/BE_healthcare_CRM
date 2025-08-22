@@ -35,6 +35,8 @@ import { CalendarsModule } from './modules/calendars/calendars.module';
 import { FunctionDescriptionModule } from './modules/function-description/function-description.module';
 import { BranchesModule } from './modules/branches/branches.module';
 import { ConsultationsModule } from './modules/consultations/consultations.module';
+import { ProfileModule } from './modules/profile/profile.module';
+
 config();
 
 console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig.password, DBconfig.database);
@@ -84,7 +86,8 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     CalendarsModule,
     FunctionDescriptionModule,
     BranchesModule,
-    ConsultationsModule
+    ConsultationsModule,
+    ProfileModule
   ],
   controllers: [AppController],
   providers: [AppService,
