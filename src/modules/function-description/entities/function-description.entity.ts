@@ -1,14 +1,26 @@
-// src/modules/function-description/entities/function-description.entity.ts
-
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { BaseModel } from 'src/core/database/BaseModel';
+import { Consultation } from 'src/modules/consultations/entities/consultation.entity';
+import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 
 @Entity({ name: 'function_description' })
-export class FunctionDescription {
-  @PrimaryColumn({ type: 'text' })
-  fonction: string;
+export class FunctionDescription  {
+  @PrimaryGeneratedColumn('uuid')
+  function_id: string;
 
   @Column({ type: 'text', nullable: true })
-  function_description: string;
+  fonction: string;
+
+  @Column({ name: 'function_description', type: 'text', nullable: true })
+  function_description_text: string;
 
   @Column({ type: 'text', nullable: true })
   simplification_description: string;
@@ -45,4 +57,19 @@ export class FunctionDescription {
 
   @Column({ type: 'text', nullable: true })
   professional_9: string;
+
+  // --- Relationships ---
+
+  @ManyToOne(() => Consultation, (consultation) => consultation.function_descriptions)
+  @JoinColumn({ name: 'consultation_id' })
+  consultation: Consultation;
+
+
+  @ManyToMany(() => Therapist)
+  @JoinTable({
+    name: 'function_description_therapists',
+    joinColumn: { name: 'function_id', referencedColumnName: 'function_id' },
+    inverseJoinColumn: { name: '_key', referencedColumnName: '_key' },
+  })
+  therapists: Therapist[];
 }

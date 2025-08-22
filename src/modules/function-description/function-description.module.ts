@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FunctionDescriptionController } from './function-description.controller';
 import { FunctionDescriptionService } from './function-description.service';
 import { FunctionDescription } from './entities/function-description.entity';
+import { Therapist } from '../therapist/entities/therapist.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([FunctionDescription])],
+  imports: [TypeOrmModule.forFeature([FunctionDescription, Therapist])],
   controllers: [FunctionDescriptionController],
   providers: [FunctionDescriptionService],
   exports: [FunctionDescriptionService],
