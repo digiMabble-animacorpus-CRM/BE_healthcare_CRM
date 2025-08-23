@@ -166,7 +166,7 @@ async loginWithEmail(
   logger.debug(`Token generated: ${resetToken}`);
       await this.userService.createPasswordResetToken(email_id, resetToken);
 logger.debug(`Token saved to DB`);
-      const resetUrl = `${process.env.FRONTEND_BASE_URL}/reset-password?token=${resetToken}`;
+      const resetUrl = `${process.env.FRONTEND_BASE_URL}/auth/reset-password?token=${resetToken}`;
     logger.debug(`Reset URL: ${resetUrl}`);
       await MailUtils.sendPasswordResetEmail(email_id, resetUrl);
        logger.debug(`Email sent`);

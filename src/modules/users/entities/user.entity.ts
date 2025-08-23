@@ -96,6 +96,9 @@ export default class User  {
   @Column({ type: 'varchar', select: true })
   password: string;
 
+  @Column({ type: 'uuid' })
+  team_id: string;
+  
   @BeforeInsert()
   async hashPassword() {
     if (this.password) {

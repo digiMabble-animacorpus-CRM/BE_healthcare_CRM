@@ -287,13 +287,13 @@ async findOneById(id: string | number, options?: FindOneOptions<User>): Promise<
   //   return this.userRepository.save(user);
   // }
 
-  async findOneByRole(roleName: string): Promise<User | undefined> {
-  return this.userRepository
-    .createQueryBuilder('user')
-    .leftJoinAndSelect('user.roles', 'role')
-    .where('role.name = :roleName', { roleName })
-    .getOne();
-}
+//   async findOneByRole(roleName: string): Promise<User | undefined> {
+//   return this.userRepository
+//     .createQueryBuilder('user')
+//     .leftJoinAndSelect('user.roles', 'role')
+//     .where('role.name = :roleName', { roleName })
+//     .getOne();
+// }
 
 /**
  * Create an email verification token for a user
