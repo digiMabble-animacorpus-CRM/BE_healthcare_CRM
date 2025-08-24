@@ -9,8 +9,11 @@ import {
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { BranchesService } from './branches.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
@@ -23,18 +26,36 @@ export class BranchesController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new branch' })
-  @ApiResponse({ status: 201, description: 'The branch has been successfully created.', type: Branch })
+  @ApiResponse({
+    status: 201,
+    description: 'The branch has been successfully created.',
+    type: Branch,
+  })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
-  @ApiResponse({ status: 409, description: 'Branch with this email already exists.' })
+  @ApiResponse({
+    status: 409,
+    description: 'Branch with this email already exists.',
+  })
   create(@Body() createBranchDto: CreateBranchDto) {
     return this.branchesService.create(createBranchDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve all branches' })
-  @ApiResponse({ status: 200, description: 'A list of all branches.', type: [Branch] })
-  findAll() {
-    return this.branchesService.findAll();
+  @ApiOperation({ summary: 'Retrieve all branches with pagination and search' })
+  @ApiResponse({
+    status: 200,
+    description: 'A list of all branches.',
+    type: [Branch],
+  })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
+  @ApiQuery({ name: 'search', required: false, description: 'Search by name, email, or phone', type: String })
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('search') search?: string,
+  ) {
+    return this.branchesService.findAll(page, limit, search);
   }
 
   @Get(':id')
@@ -47,17 +68,30 @@ export class BranchesController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a branch' })
-  @ApiResponse({ status: 200, description: 'The branch has been successfully updated.', type: Branch })
+  @ApiResponse({
+    status: 200,
+    description: 'The branch has been successfully updated.',
+    type: Branch,
+  })
   @ApiResponse({ status: 404, description: 'Branch not found.' })
-  @ApiResponse({ status: 409, description: 'Branch with this email already exists.' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateBranchDto: UpdateBranchDto) {
+  @ApiResponse({
+    status: 409,
+    description: 'Branch with this email already exists.',
+  })
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateBranchDto: UpdateBranchDto,
+  ) {
     return this.branchesService.update(id, updateBranchDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT) //
   @ApiOperation({ summary: 'Delete a branch' })
-  @ApiResponse({ status: 204, description: 'The branch has been successfully deleted.' })
+  @ApiResponse({
+    status: 204,
+    description: 'The branch has been successfully deleted.',
+  })
   @ApiResponse({ status: 404, description: 'Branch not found.' })
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.branchesService.remove(id);

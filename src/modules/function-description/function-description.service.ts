@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, ILike, Repository } from 'typeorm';
 import { FunctionDescription } from './entities/function-description.entity';
 import { CreateFunctionDescriptionDto } from './dto/create-function-description.dto';
 import { UpdateFunctionDescriptionDto } from './dto/update-function-description.dto';
@@ -16,10 +20,11 @@ export class FunctionDescriptionService {
     private readonly therapistRepository: Repository<Therapist>,
   ) {}
 
- async create(createDto: CreateFunctionDescriptionDto): Promise<FunctionDescription> {
+  async create(
+    createDto: CreateFunctionDescriptionDto,
+  ): Promise<FunctionDescription> {
     try {
       const { consultation_id, therapist_ids, ...rest } = createDto;
-
 
       const functionDescription = this.functionDescriptionRepository.create({
         ...rest,
@@ -42,18 +47,31 @@ export class FunctionDescriptionService {
     }
   }
 
-  async findAll(consultationId?: string): Promise<FunctionDescription[]> {
-    if (consultationId) {
-      return this.functionDescriptionRepository.find({
-        where: {
-          consultation: {
-            consultation_id: consultationId,
-          },
-        },
-        relations: ['therapists'],
-      });
+  async findAll(
+    page: number,
+    limit: number,
+    search?: string,
+    consultationId?: string,
+  ): Promise<{ data: FunctionDescription[]; total: number }> {
+    const skip = (page - 1) * limit;
+    const where: any = consultationId
+      ? { consultation: { consultation_id: consultationId } }
+      : {};
+
+    if (search) {
+      where.fonction = ILike(`%${search}%`);
     }
-    return this.functionDescriptionRepository.find({ relations: ['therapists'] });
+
+    const [data, total] = await this.functionDescriptionRepository.findAndCount(
+      {
+        where,
+        skip,
+        take: limit,
+        relations: ['therapists'],
+      },
+    );
+
+    return { data, total };
   }
 
   async findOne(function_id: string): Promise<FunctionDescription> {
