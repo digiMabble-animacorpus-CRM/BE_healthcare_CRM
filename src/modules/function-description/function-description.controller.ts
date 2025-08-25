@@ -30,10 +30,30 @@ export class FunctionDescriptionController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve all services, optionally filtered by consultation' })
-  @ApiQuery({ name: 'consultationId', required: false, type: String, description: 'Filter services by consultation ID' })
-  findAll(@Query('consultationId') consultationId?: string) {
-    return this.functionDescriptionService.findAll(consultationId);
+  @ApiOperation({
+    summary: 'Retrieve all services, optionally filtered by consultation',
+  })
+  @ApiQuery({
+    name: 'consultationId',
+    required: false,
+    type: String,
+    description: 'Filter services by consultation ID',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search term' })
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('search') search?: string,
+    @Query('consultationId') consultationId?: string,
+  ) {
+    return this.functionDescriptionService.findAll(
+      page,
+      limit,
+      search,
+      consultationId,
+    );
   }
 
   @Get(':id')

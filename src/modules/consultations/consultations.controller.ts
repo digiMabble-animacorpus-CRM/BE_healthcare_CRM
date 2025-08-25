@@ -28,10 +28,25 @@ export class ConsultationsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve all consultations, optionally filtered by branch' })
-  @ApiQuery({ name: 'branchId', required: false, type: String, description: 'Filter consultations by branch ID' })
-  findAll(@Query('branchId') branchId?: string) {
-    return this.consultationsService.findAll(branchId);
+  @ApiOperation({
+    summary: 'Retrieve all consultations, optionally filtered by branch',
+  })
+  @ApiQuery({
+    name: 'branchId',
+    required: false,
+    type: String,
+    description: 'Filter consultations by branch ID',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search term' })
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('search') search?: string,
+    @Query('branchId') branchId?: string,
+  ) {
+    return this.consultationsService.findAll(page, limit, search, branchId);
   }
 
   @Get(':id')
