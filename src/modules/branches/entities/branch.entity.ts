@@ -1,9 +1,16 @@
-import { BaseModel } from 'src/core/database/BaseModel';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { Consultation } from 'src/modules/consultations/entities/consultation.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity({ name: 'branches' })
-export class Branch  {
+export class Branch {
   @PrimaryGeneratedColumn('uuid')
   branch_id: string;
 
@@ -19,6 +26,24 @@ export class Branch  {
   @Column({ type: 'varchar', length: 20 })
   phone: string;
 
-@OneToMany(() => Consultation, (consultation) => consultation.branch)
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  location: string;
+
+  @OneToMany(() => Consultation, (consultation) => consultation.branch)
   consultations: Consultation[];
+
+  @Column({ type: 'boolean', default: true, select: true })
+  is_active: boolean;
+
+  @Column({ type: 'boolean', default: false, select: false })
+  is_deleted: boolean;
+
+  @CreateDateColumn({ type: 'timestamp', select: true })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', select: false })
+  updated_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true, select: false })
+  deleted_at: Date;
 }
