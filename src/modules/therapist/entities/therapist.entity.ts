@@ -10,7 +10,7 @@ export class Therapist {
   _key: number;
 
   @Column({ name: 'id_pro', generated: 'increment' })
-  idPro: number;  // keep nullable (number should allow null)
+  idPro: number; 
 
   @Column({ name: 'photo', type: 'text', default: '' })
   photo: string;
