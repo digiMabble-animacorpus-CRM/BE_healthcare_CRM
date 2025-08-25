@@ -1,46 +1,77 @@
-// src/modules/function-description/function-description.controller.ts
-
-import { Controller, Get, HttpException, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import HandleResponse from 'src/core/utils/handle_response';
-import { EC200, EC404, EC500, EM100, EM119 } from 'src/core/constants';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FunctionDescriptionService } from './function-description.service';
-import { FindAllFunctionDescriptionsQueryDto } from './dto/find-all-function-descriptions-query.dto';
+import { CreateFunctionDescriptionDto } from './dto/create-function-description.dto';
+import { UpdateFunctionDescriptionDto } from './dto/update-function-description.dto';
 
-@ApiTags('Function Descriptions')
+@ApiTags('Function Descriptions (Services)')
 @Controller('function-descriptions')
 export class FunctionDescriptionController {
-  constructor(private readonly functionDescriptionService: FunctionDescriptionService) {}
+  constructor(
+    private readonly functionDescriptionService: FunctionDescriptionService,
+  ) {}
 
-  /**
-   * Handles common error responses.
-   */
-  private handleError(error: any) {
-    if (error instanceof HttpException) {
-      return HandleResponse.buildErrObj(error.getStatus(), error.message, error);
-    }
-    if (error.message?.includes('not found')) {
-      return HandleResponse.buildErrObj(EC404, EM119, error);
-    }
-    return HandleResponse.buildErrObj(EC500, EM100, error);
+  @Post()
+  @ApiOperation({ summary: 'Create a new service (function description)' })
+  create(@Body() createDto: CreateFunctionDescriptionDto) {
+    return this.functionDescriptionService.create(createDto);
   }
 
   @Get()
-  async findAll(@Query() query: FindAllFunctionDescriptionsQueryDto) {
-    const page = query.pagNo ?? 1;
-    const limit = query.limit ?? 10;
-    const search = query.search;
+  @ApiOperation({
+    summary: 'Retrieve all services, optionally filtered by consultation',
+  })
+  @ApiQuery({
+    name: 'consultationId',
+    required: false,
+    type: String,
+    description: 'Filter services by consultation ID',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search term' })
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('search') search?: string,
+    @Query('consultationId') consultationId?: string,
+  ) {
+    return this.functionDescriptionService.findAll(
+      page,
+      limit,
+      search,
+      consultationId,
+    );
+  }
 
-    try {
-      const { data, total } = await this.functionDescriptionService.findAllWithPagination(page, limit, search);
-      return HandleResponse.buildSuccessObj(EC200, 'Function descriptions retrieved successfully.', {
-        data,
-        total,
-        page,
-        limit,
-      });
-    } catch (error) {
-      return this.handleError(error);
-    }
+  @Get(':id')
+  @ApiOperation({ summary: 'Retrieve a single service by ID' })
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.functionDescriptionService.findOne(id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a service' })
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateDto: UpdateFunctionDescriptionDto) {
+    return this.functionDescriptionService.update(id, updateDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a service' })
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.functionDescriptionService.remove(id);
   }
 }
