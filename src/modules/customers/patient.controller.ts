@@ -45,7 +45,7 @@ import { logger } from 'src/core/utils/logger';
 @ApiTags('Patients')
 @Controller('patients')
 export class PatientsController {
-  constructor(private readonly customersService: PatientsService) {}
+  constructor(private readonly patientsService: PatientsService) {}
 
   // CREATE
   @Post()
@@ -59,7 +59,7 @@ export class PatientsController {
       const createCustomerDto = plainToClass(CreatePatientDto, reqBody);
       await validateOrReject(createCustomerDto);
 
-      const data = await this.customersService.create(createCustomerDto);
+      const data = await this.patientsService.create(createCustomerDto);
       return HandleResponse.buildSuccessObj(EC201, EM104, data);
     } catch (error) {
       if (error instanceof HttpException) {
@@ -94,7 +94,7 @@ async findAll(@Query() queryParams: PaginationDto) {
 
     if (paginationDto.pagNo && paginationDto.limit) {
       const { data, total } =
-        await this.customersService.findAllWithPagination(
+        await this.patientsService.findAllWithPagination(
           paginationDto.pagNo,
           paginationDto.limit,
           {
@@ -106,7 +106,7 @@ async findAll(@Query() queryParams: PaginationDto) {
         );
       return HandleResponse.buildSuccessObj(EC200, EM106, { data, total });
     } else {
-      const data = await this.customersService.findAll();
+      const data = await this.patientsService.findAll();
       return HandleResponse.buildSuccessObj(EC200, EM106, data);
     }
   } catch (error) {
@@ -132,7 +132,7 @@ async findAll(@Query() queryParams: PaginationDto) {
 @ApiResponse({ status: 500, description: 'Internal server error' })
 async findOne(@Param('id') id: string) {
   try {
-    const data = await this.customersService.findOne(id);
+    const data = await this.patientsService.findOne(id);
     return HandleResponse.buildSuccessObj(EC200, EM106, data);
   } catch (error) {
     console.error('FindOne error:', error);
@@ -146,6 +146,52 @@ async findOne(@Param('id') id: string) {
     return HandleResponse.buildErrObj(EC500, EM100, error);
   }
 }
+
+
+
+ @Get('find/:value')
+  @ApiOperation({ summary: 'Get patient by ID, email, or phone' })
+  @ApiParam({
+    name: 'value',
+    description: 'Patient ID (UUID), email, or phone number',
+    example: 'a973e85c-c9d3-4566-b1a5-43b2ab61b614',
+  })
+  @ApiResponse({ status: 200, description: 'Patient fetched successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid request parameters' })
+  @ApiResponse({ status: 404, description: 'Patient not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  async findPatient(@Param('value') value: string) {
+    try {
+      let patient;
+
+      if (this.isUUID(value)) {
+        patient = await this.patientsService.findOneByIdentifier({ id: value });
+      } else if (value.includes('@')) {
+        patient = await this.patientsService.findOneByIdentifier({ email: value });
+      } else {
+        patient = await this.patientsService.findOneByIdentifier({ phone: value });
+      }
+
+      return HandleResponse.buildSuccessObj(EC200, EM106, patient);
+    } catch (error) {
+      console.error('FindPatient error:', error);
+      if (error instanceof HttpException) {
+        return HandleResponse.buildErrObj(
+          error.getStatus(),
+          error.message,
+          error,
+        );
+      }
+      return HandleResponse.buildErrObj(EC500, EM100, error);
+    }
+  }
+
+  private isUUID(value: string): boolean {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(value);
+  }
+
 
 
 @Patch(':id')
@@ -179,7 +225,7 @@ async update(
     await validateOrReject(dto, { skipMissingProperties: true });
 
     // Perform update
-    const data = await this.customersService.updatePatient(id, dto);
+    const data = await this.patientsService.updatePatient(id, dto);
 
     logger.info(`Patient_Update_Exit: ${JSON.stringify(data)}`);
     return HandleResponse.buildSuccessObj(EC200, EM116, data);
@@ -212,7 +258,7 @@ async update(
 @ApiResponse({ status: 500, description: 'Internal server error' })
 async remove(@Param('id') id: string) {
   try {
-    await this.customersService.removePatient(id);
+    await this.patientsService.removePatient(id);
     return HandleResponse.buildSuccessObj(EC204, EM127, null);
   } catch (error) {
     console.error('Delete error:', error);
