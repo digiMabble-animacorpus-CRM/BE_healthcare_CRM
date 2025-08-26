@@ -10,7 +10,7 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
-import { FunctionDescription } from 'src/modules/function-description/entities/function-description.entity';
+import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
 
 @Entity({ name: 'consultations' })
 export class Consultation {
@@ -39,10 +39,10 @@ export class Consultation {
   branch: Branch;
 
   @OneToMany(
-    () => FunctionDescription,
-    (functionDescription) => functionDescription.consultation,
+    () => Specialization,
+    (specialization) => specialization.consultation,
   )
-  function_descriptions: FunctionDescription[];
+  specializations: Specialization[];
 
   @Column({ type: 'boolean', default: true, select: true })
   is_active: boolean;
