@@ -137,6 +137,44 @@ export class PatientsService extends BaseService<Patient> {
     }
   }
 
+
+async findOneByIdentifier(identifier: {
+  id?: string;
+  email?: string;
+  phone?: string;
+}): Promise<Patient> {
+  try {
+    let patient: Patient | null = null;
+
+    if (identifier.id) {
+      patient = await this.patientRepository.findOne({
+        where: { id: identifier.id, is_delete: false },
+      });
+    } else if (identifier.email) {
+      patient = await this.patientRepository.findOne({
+        where: { emails: identifier.email, is_delete: false },
+      });
+    } else if (identifier.phone) {
+      patient = await this.patientRepository
+        .createQueryBuilder('patient')
+        .where('patient.is_delete = false')
+        .andWhere(':phone = ANY(patient.phones)', { phone: identifier.phone })
+        .getOne();
+    }
+
+    if (!patient) {
+      throw new HttpException('Patient not found', HttpStatus.NOT_FOUND);
+    }
+
+    return patient;
+  } catch (error) {
+    if (error instanceof HttpException) throw error;
+    throw new HttpException(EM100, EC500);
+  }
+}
+
+
+
   async updatePatient(id: string, updatePatientDto: UpdatePatientDto): Promise<Patient> {
     try {
       logger.info(`Patient_Service_Update_Entry: id=${id}, data=${JSON.stringify(updatePatientDto)}`);

@@ -36,6 +36,7 @@ import { SpecializationModule } from './modules/specialization/specialization.mo
 import { BranchesModule } from './modules/branches/branches.module';
 import { ConsultationsModule } from './modules/consultations/consultations.module';
 import { ProfileModule } from './modules/profile/profile.module';
+import { DepartmentsModule } from './modules/Department/departments.module';
 
 config();
 
@@ -87,7 +88,8 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     SpecializationModule,
     BranchesModule,
     ConsultationsModule,
-    ProfileModule
+    ProfileModule,
+    DepartmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService,

@@ -9,8 +9,8 @@ export class Therapist {
   @PrimaryGeneratedColumn({ name: '_key', type: 'int' })
   _key: number;
 
-  @Column({ name: 'id_pro', type: 'integer', nullable: true })
-  idPro: number;  // keep nullable (number should allow null)
+  @Column({ name: 'id_pro', generated: 'increment' })
+  idPro: number; 
 
   @Column({ name: 'photo', type: 'text', default: '' })
   photo: string;

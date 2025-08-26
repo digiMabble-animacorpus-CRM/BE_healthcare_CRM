@@ -3,10 +3,10 @@ import { Type } from 'class-transformer';
 import { IsOptional, IsInt, IsString, IsDate } from 'class-validator';
 
 export class CreateTherapistDto {
-  @ApiProperty({ required: false, example: 123 })
-  @IsOptional()
-  @IsInt()
-  idPro?: number;
+  // @ApiProperty({ required: false, example: 123 })
+  // @IsOptional()
+  // @IsInt()
+  // idPro?: number;
 
   @ApiProperty({ required: false, example: '2025-08-15T10:00:00Z' })
   @IsOptional()
