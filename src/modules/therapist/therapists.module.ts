@@ -5,9 +5,10 @@ import { TherapistController } from './therapists.controller';
 import { Therapist } from './entities/therapist.entity';
 import { Address } from '../addresses/entities/address.entity';
 import { Language } from 'src/modules/Language/entities/Language.entity';
+import { Branch } from 'src/modules/branches/entities/branch.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Therapist, Address, Language])],
+  imports: [TypeOrmModule.forFeature([Therapist, Address, Language,Branch])],
   controllers: [TherapistController],
   providers: [TherapistService],
   exports: [TherapistService],

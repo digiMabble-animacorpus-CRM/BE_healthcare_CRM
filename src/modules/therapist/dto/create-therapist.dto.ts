@@ -104,26 +104,22 @@ export class CreateTherapistDto {
   languages: string[];
 
 
- @ApiProperty({
-    type: [BranchDto],
+  @ApiProperty({ example: [1, 2], description: 'Array of branch IDs for therapist' })
+  @IsArray()
+  @IsInt({ each: true })
+  branches: number[];
+
+  @ApiProperty({
+    type: [Object],
+    required: false,
     example: [
-      {
-        branch_id: 1,
-        branch_name: 'Main Clinic',
-        availability: [
-          { day: 'Monday', startTime: '09:00', endTime: '17:00' },
-          { day: 'Wednesday', startTime: '10:00', endTime: '16:00' },
-        ],
-      },
-      {
-        branch_id: 2,
-        branch_name: 'Secondary Clinic',
-        availability: [{ day: 'Friday', startTime: '09:00', endTime: '14:00' }],
-      },
+      { day: 'Monday', startTime: '09:00', endTime: '17:00' },
+      { day: 'Wednesday', startTime: '10:00', endTime: '16:00' },
     ],
   })
+  @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => BranchDto)
-  branches: BranchDto[];
+  availability?: { day: string; startTime: string; endTime: string }[];
+
+
 }

@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Therapist } from './entities/therapist.entity';
 import { Language } from 'src/modules/Language/entities/Language.entity';
+import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
 import { UpdateTherapistDto } from './dto/update-therapist.dto';
 import { TherapistFilterDto } from './dto/therapist-filter.dto';
@@ -15,13 +16,16 @@ export class TherapistService {
 
     @InjectRepository(Language)
     private languageRepository: Repository<Language>,
+
+    @InjectRepository(Branch)
+    private branchRepository: Repository<Branch>,
   ) {}
 
   // CREATE
   async create(dto: CreateTherapistDto): Promise<Therapist> {
-    // Handle languages: check if exist, create if not
+    // Handle languages
     const languages = await Promise.all(
-      dto.languages.map(async (name) => {
+      (dto.languages || []).map(async (name) => {
         let lang = await this.languageRepository.findOne({ where: { name } });
         if (!lang) {
           lang = this.languageRepository.create({ name });
@@ -31,11 +35,16 @@ export class TherapistService {
       }),
     );
 
+    // Handle branches (ManyToMany)
+    const branches = dto.branches?.length
+      ? await this.branchRepository.findBy({ branch_id: In(dto.branches) })
+      : [];
+
     const therapist = this.therapistRepository.create({
       ...dto,
       specializationIds: dto.specializationIds ?? [],
-      languages, // attach resolved languages
-      branches: dto.branches ?? [],
+      languages,
+      branches,
       isDelete: false,
       deletedAt: null,
     });
@@ -45,8 +54,10 @@ export class TherapistService {
 
   // GET ALL WITH FILTERS
   async findAll(filter?: TherapistFilterDto): Promise<Therapist[]> {
-    const query = this.therapistRepository.createQueryBuilder('therapist')
+    const query = this.therapistRepository
+      .createQueryBuilder('therapist')
       .leftJoinAndSelect('therapist.languages', 'language')
+      .leftJoinAndSelect('therapist.branches', 'branch')
       .where('therapist.is_delete = false');
 
     // Search by text
@@ -59,7 +70,9 @@ export class TherapistService {
 
     // Filter by department
     if (filter?.departmentId) {
-      query.andWhere('therapist.department_id = :departmentId', { departmentId: filter.departmentId });
+      query.andWhere('therapist.department_id = :departmentId', {
+        departmentId: filter.departmentId,
+      });
     }
 
     // Specialization filter
@@ -71,13 +84,20 @@ export class TherapistService {
 
     // Language filter by IDs
     if (filter?.languageIds?.length) {
-      query.andWhere('language.id IN (:...languageIds)', { languageIds: filter.languageIds });
+      query.andWhere('language.id IN (:...languageIds)', {
+        languageIds: filter.languageIds,
+      });
     }
 
-    // Branch filter (JSON)
-    if (filter?.branch) {
-      query.andWhere('therapist.branches::text ILIKE :branch', {
-        branch: `%${filter.branch}%`,
+    // Branch filter by ID or name
+    if (filter?.branchIds?.length) {
+      query.andWhere('branch.branch_id IN (:...branchIds)', {
+        branchIds: filter.branchIds,
+      });
+    }
+    if (filter?.branchName) {
+      query.andWhere('branch.name ILIKE :branchName', {
+        branchName: `%${filter.branchName}%`,
       });
     }
 
@@ -91,31 +111,31 @@ export class TherapistService {
     return query.getMany();
   }
 
-
   // SEARCH (free text in name, specialization_ids, language_ids, branches)
-async search(term: string): Promise<Therapist[]> {
-  if (!term) return [];
-  return this.therapistRepository
-    .createQueryBuilder('therapist')
-    .where('therapist.is_delete = false')
-    .andWhere(
-      `(therapist.first_name ILIKE :term 
-         OR therapist.last_name ILIKE :term 
-         OR therapist.full_name ILIKE :term
-         OR therapist.specialization_ids::text ILIKE :term 
-         OR therapist.language_ids::text ILIKE :term 
-         OR therapist.branches::text ILIKE :term)`,
-      { term: `%${term}%` },
-    )
-    .getMany();
-}
-
+  async search(term: string): Promise<Therapist[]> {
+    if (!term) return [];
+    return this.therapistRepository
+      .createQueryBuilder('therapist')
+      .leftJoinAndSelect('therapist.languages', 'language')
+      .leftJoinAndSelect('therapist.branches', 'branch')
+      .where('therapist.is_delete = false')
+      .andWhere(
+        `(therapist.first_name ILIKE :term 
+          OR therapist.last_name ILIKE :term 
+          OR therapist.full_name ILIKE :term
+          OR therapist.specialization_ids::text ILIKE :term 
+          OR language.name ILIKE :term 
+          OR branch.name ILIKE :term)`,
+        { term: `%${term}%` },
+      )
+      .getMany();
+  }
 
   // GET BY ID
   async findOne(id: number): Promise<Therapist> {
     const therapist = await this.therapistRepository.findOne({
       where: { therapistId: id, isDelete: false },
-      relations: ['languages'],
+      relations: ['languages', 'branches'],
     });
     if (!therapist) {
       throw new NotFoundException(`Therapist with ID ${id} not found`);
@@ -142,11 +162,17 @@ async search(term: string): Promise<Therapist[]> {
       );
     }
 
+    // Handle branches
+    let branches = therapist.branches;
+    if (dto.branches?.length) {
+      branches = await this.branchRepository.findBy({ branch_id: In(dto.branches) });
+    }
+
     Object.assign(therapist, {
       ...dto,
       specializationIds: dto.specializationIds ?? therapist.specializationIds,
       languages,
-      branches: dto.branches ?? therapist.branches,
+      branches,
     });
 
     return this.therapistRepository.save(therapist);

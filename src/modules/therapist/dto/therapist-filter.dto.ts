@@ -18,10 +18,16 @@ export class TherapistFilterDto {
   @IsString()
   searchText?: string;
 
-  @ApiPropertyOptional({ example: 'Main Clinic', description: 'Branch name to filter therapists' })
+ @ApiPropertyOptional({ example: [1, 2], description: 'Branch IDs to filter therapists' })
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  branchIds?: number[];
+
+   @ApiPropertyOptional({ example: 'Main Clinic', description: 'Branch name to filter therapists' })
   @IsOptional()
   @IsString()
-  branch?: string;
+  branchName?: string;
 
   @ApiPropertyOptional({ example: '1', description: 'Department ID to filter therapists' })
   @IsOptional()

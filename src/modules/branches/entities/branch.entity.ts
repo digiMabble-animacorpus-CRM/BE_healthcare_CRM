@@ -1,6 +1,7 @@
 import { BaseModel } from 'src/core/database/BaseModel';
 import { Consultation } from 'src/modules/consultations/entities/consultation.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany,ManyToMany } from 'typeorm';
+import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
 
 @Entity({ name: 'branches' })
 export class Branch  {
@@ -21,4 +22,8 @@ export class Branch  {
 
 @OneToMany(() => Consultation, (consultation) => consultation.branch)
   consultations: Consultation[];
+
+  @ManyToMany(() => Therapist, (therapist) => therapist.branches)
+therapists: Therapist[];
+
 }

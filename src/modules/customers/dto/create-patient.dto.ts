@@ -7,6 +7,7 @@ import {
   IsUUID,
   IsDateString,
   IsArray,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -109,4 +110,11 @@ export class CreatePatientDto {
   @IsArray()
   @IsString({ each: true })
   phones?: string[];
+
+
+@ApiProperty({ example: 1, description: 'Optional therapist ID' })
+@IsOptional()
+@IsNumber()
+therapistId?: number;
+
 }

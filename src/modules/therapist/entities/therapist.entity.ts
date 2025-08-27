@@ -1,19 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany,JoinTable } from 'typeorm';
 import { Department } from 'src/modules/Department/entities/department.entity'; // adjust the path
 import { Language } from 'src/modules/Language/entities/Language.entity'; // adjust the path
-
-export class BranchAvailability {
-  day: string;
-  startTime: string;
-  endTime: string;
-}
-
-export class Branch {
-  branch_id: number;
-  branch_name: string;
-  availability: BranchAvailability[];
-}
-
+import { Branch } from 'src/modules/branches/entities/branch.entity'; // adjust the path
 
 
 
@@ -85,8 +73,19 @@ export class Therapist {
   })
   languages: Language[];
 
-  @Column({ name: 'branches', type: 'jsonb', default: () => "'[]'::jsonb", nullable: false })
-  branches: Branch[];
+  @ManyToMany(() => Branch, { cascade: true })
+@JoinTable({
+  name: 'therapist_branches',
+  joinColumn: { name: 'therapist_id', referencedColumnName: 'therapistId' },
+  inverseJoinColumn: { name: 'branch_id', referencedColumnName: 'branch_id' },
+})
+branches: Branch[];
+
+
+  // <-- availability as JSON array directly
+  @Column({ name: 'availability', type: 'jsonb', default: () => "'[]'::jsonb" })
+  availability: { day: string; startTime: string; endTime: string }[];
+
 
   @Column({ name: 'is_delete', type: 'boolean', default: false })
   isDelete: boolean;
