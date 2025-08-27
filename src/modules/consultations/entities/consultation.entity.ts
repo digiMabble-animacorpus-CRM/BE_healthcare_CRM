@@ -1,7 +1,3 @@
-import { IsUUID } from 'class-validator';
-import { BaseModel } from 'src/core/database/BaseModel';
-import { Branch } from 'src/modules/branches/entities/branch.entity';
-import { FunctionDescription } from 'src/modules/function-description/entities/function-description.entity';
 import {
   Entity,
   Column,
@@ -9,10 +5,15 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
+import { Branch } from 'src/modules/branches/entities/branch.entity';
+import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
 
 @Entity({ name: 'consultations' })
-export class Consultation  {
+export class Consultation {
   @PrimaryGeneratedColumn('uuid')
   consultation_id: string;
 
@@ -37,10 +38,24 @@ export class Consultation  {
   @JoinColumn({ name: 'branch_id' })
   branch: Branch;
 
+  // @OneToMany(
+  //   () => Specialization,
+  //   (specialization) => specialization.consultation,
+  // )
+  // specializations: Specialization[];
 
-  @OneToMany(
-    () => FunctionDescription,
-    (functionDescription) => functionDescription.consultation,
-  )
-  function_descriptions: FunctionDescription[];
+  @Column({ type: 'boolean', default: true, select: true })
+  is_active: boolean;
+
+  @Column({ type: 'boolean', default: false, select: false })
+  is_deleted: boolean;
+
+  @CreateDateColumn({ type: 'timestamp', select: true })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', select: false })
+  updated_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true, select: false })
+  deleted_at: Date;
 }

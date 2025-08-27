@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateBranchDto {
   @ApiProperty({ example: 'Main Clinic' })
@@ -22,4 +22,12 @@ export class CreateBranchDto {
   @IsString()
   @IsNotEmpty()
   phone: string;
+
+  @ApiProperty({
+    example: 'https://maps.app.goo.gl/your-location',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  location: string;
 }

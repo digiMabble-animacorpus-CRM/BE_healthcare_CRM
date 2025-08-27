@@ -6,42 +6,42 @@ import { IsOptional, IsInt, IsString, IsDate, IsArray,ValidateNested } from 'cla
 
 
 
-// ---------------------- Branch DTOs ----------------------
-export class BranchAvailabilityDto {
-  @ApiProperty({ example: 'Monday' })
-  @IsString()
-  day: string;
+// // ---------------------- Branch DTOs ----------------------
+// export class BranchAvailabilityDto {
+//   @ApiProperty({ example: 'Monday' })
+//   @IsString()
+//   day: string;
 
-  @ApiProperty({ example: '09:00' })
-  @IsString()
-  startTime: string;
+//   @ApiProperty({ example: '09:00' })
+//   @IsString()
+//   startTime: string;
 
-  @ApiProperty({ example: '17:00' })
-  @IsString()
-  endTime: string;
-}
+//   @ApiProperty({ example: '17:00' })
+//   @IsString()
+//   endTime: string;
+// }
 
-export class BranchDto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  branch_id: number;
+// export class BranchDto {
+//   @ApiProperty({ example: 1 })
+//   @IsInt()
+//   branch_id: number;
 
-  @ApiProperty({ example: 'Main Clinic' })
-  @IsString()
-  branch_name: string;
+//   @ApiProperty({ example: 'Main Clinic' })
+//   @IsString()
+//   branch_name: string;
 
-  @ApiProperty({
-    type: [BranchAvailabilityDto],
-    example: [
-      { day: 'Monday', startTime: '09:00', endTime: '17:00' },
-      { day: 'Wednesday', startTime: '10:00', endTime: '16:00' },
-    ],
-  })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => BranchAvailabilityDto)
-  availability: BranchAvailabilityDto[];
-}
+//   @ApiProperty({
+//     type: [BranchAvailabilityDto],
+//     example: [
+//       { day: 'Monday', startTime: '09:00', endTime: '17:00' },
+//       { day: 'Wednesday', startTime: '10:00', endTime: '16:00' },
+//     ],
+//   })
+//   @IsArray()
+//   @ValidateNested({ each: true })
+//   @Type(() => BranchAvailabilityDto)
+//   availability: BranchAvailabilityDto[];
+// }
 
 
 export class CreateTherapistDto {

@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Consultation } from './entities/consultation.entity';
 import { CreateConsultationDto } from './dto/create-consultation.dto';
 
@@ -14,7 +18,9 @@ export class ConsultationsService {
     private readonly consultationRepository: Repository<Consultation>,
   ) {}
 
- async create(createConsultationDto: CreateConsultationDto): Promise<Consultation> {
+  async create(
+    createConsultationDto: CreateConsultationDto,
+  ): Promise<Consultation> {
     try {
       const { branch_id, ...restOfDto } = createConsultationDto;
 
@@ -24,25 +30,34 @@ export class ConsultationsService {
           branch_id: branch_id,
         },
       });
-      
+
       return await this.consultationRepository.save(consultation);
     } catch (error) {
-      console.error(error); 
+      console.error(error);
       throw new InternalServerErrorException(EM100);
     }
   }
 
-  async findAll(branchId?: string): Promise<Consultation[]> {
-    if (branchId) {
-      return this.consultationRepository.find({
-        where: {
-          branch: {
-            branch_id: branchId,
-          },
-        },
-      });
+  async findAll(
+    page: number,
+    limit: number,
+    search?: string,
+    branchId?: number,
+  ): Promise<{ data: Consultation[]; total: number }> {
+    const skip = (page - 1) * limit;
+    const where: any = branchId ? { branch: { branch_id: branchId } } : {};
+
+    if (search) {
+      where.our_consultations = ILike(`%${search}%`);
     }
-    return this.consultationRepository.find();
+
+    const [data, total] = await this.consultationRepository.findAndCount({
+      where,
+      skip,
+      take: limit,
+    });
+
+    return { data, total };
   }
 
   async findOne(consultation_id: string): Promise<Consultation> {

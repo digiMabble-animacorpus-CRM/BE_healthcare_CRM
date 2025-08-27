@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsUUID, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateConsultationDto {
   @ApiProperty({ example: 'General Check-up' })
@@ -28,8 +28,8 @@ export class CreateConsultationDto {
   fees_and_reimbursements?: string;
 
   @ApiProperty({ description: 'The ID of the branch this consultation belongs to.' })
-  @IsUUID()
+  @IsNumber()
   @IsNotEmpty()
-  branch_id: string;
+  branch_id: number;
 }
     

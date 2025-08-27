@@ -12,6 +12,7 @@ import {
 import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
 import { Patient } from 'src/modules/customers/entities/patient.entity';
 import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
+import { Branch } from 'src/modules/branches/entities/branch.entity';
 
 
 // Mock enum for "purpose of visit"
@@ -32,57 +33,54 @@ export enum Department {
 
 @Entity({ name: 'appointments' })
 export default class Appointment extends BaseModel {
-  // Fields for patient details are handled by this relationship
+
+  @ManyToOne(() => Branch, { nullable: false, eager: true })
+  @JoinColumn({ name: 'branch_id' })
+  branch: Branch;
+
   @ManyToOne(() => Patient, { nullable: false, eager: true })
   @JoinColumn({ name: 'patient_id' })
   patient: Patient;
 
-  // Field 6: date
+
   @Column({ type: 'date' })
   date: Date;
 
-  // Field 7: timeslot
+
   @Column({ type: 'varchar', length: 50 })
   timeslot: string;
 
-  // Field 8: purpose of visit
+
   @Column({
     type: 'enum',
     enum: PurposeOfVisit,
   })
   purposeOfVisit: PurposeOfVisit;
 
-  // Field 9: department
+
   @Column({
     type: 'enum',
     enum: Department,
   })
   department: Department;
 
-  // Field 10: description
+
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  // Field 11: appointed therapist (references the "therapists" table)
+
   @ManyToOne(() => Therapist, { nullable: false, eager: true })
   @JoinColumn({ name: 'therapist_id' })
   therapist: Therapist;
 
-  // Field 13: created by (references the "staff" table)
+
   @ManyToOne(() => TeamMember, { nullable: false })
   @JoinColumn({ name: 'created_by_id' })
   createdBy: TeamMember;
 
-  // Field 14: modified by (references the "staff" table)
+
   @ManyToOne(() => TeamMember, { nullable: true })
   @JoinColumn({ name: 'modified_by_id' })
   modifiedBy: TeamMember;
 
-  // Field 12: created timestamp (handled automatically by @CreateDateColumn)
-  @CreateDateColumn({ type: 'timestamp with time zone' })
-  createdAt: Date;
-
-  // Field 15: modified timestamp (handled automatically by @UpdateDateColumn)
-  @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updatedAt: Date;
 }
