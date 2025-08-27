@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany,JoinTable } from 'typeorm';
 import { Department } from 'src/modules/Department/entities/department.entity'; // adjust the path
-import { Language } from 'src/modules/Language/entities/Language.entity'; // adjust the path
+import { Language } from 'src/modules/language/entities/language.entity'; // adjust the path
 import { Branch } from 'src/modules/branches/entities/branch.entity'; // adjust the path
-
+import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
 
 
 @Entity('therapists')
@@ -57,12 +57,16 @@ export class Therapist {
   @JoinColumn({ name: 'department_id' })
   department: Department;
 
-  @Column({ name: 'specialization_ids', type: 'jsonb', default: () => "'[]'::jsonb", nullable: false })
-  specializationIds: number[];
+   // <-- Many-to-Many with Specialization
+  @ManyToMany(() => Specialization, { cascade: true })
+  @JoinTable({
+    name: 'therapist_specializations',
+    joinColumn: { name: 'therapist_id', referencedColumnName: 'therapistId' },
+    inverseJoinColumn: { name: 'specialization_id', referencedColumnName: 'specialization_id' },
+  })
+  specializations: Specialization[];
 
 
-  // @Column({ name: 'language_ids', type: 'jsonb', default: () => "'[]'::jsonb", nullable: false })
-  // languageIds: number[];
 
 
     @ManyToMany(() => Language, (language) => language.therapists, { cascade: true })

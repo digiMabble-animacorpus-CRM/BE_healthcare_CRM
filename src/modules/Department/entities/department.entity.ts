@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column,OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Therapist } from 'src/modules/therapist/entities/therapist.entity'; // adjust the path
 
 @Entity({ name: 'departments' })
 export class Department {
@@ -18,4 +19,9 @@ export class Department {
   @ApiProperty({ example: 'Handles heart-related treatments', required: false })
   @Column({ type: 'text', nullable: true })
   description: string | null;
+
+
+  @OneToMany(() => Therapist, (therapist) => therapist.department)
+therapists: Therapist[];
+
 }

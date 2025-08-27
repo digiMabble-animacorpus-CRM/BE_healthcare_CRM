@@ -1,48 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, IsInt, IsString, IsDate, IsArray,ValidateNested } from 'class-validator';
+import { IsOptional, IsInt, IsString, IsArray, ValidateNested } from 'class-validator';
 
+export class AvailabilityDto {
+  @ApiProperty({ example: 'Monday' })
+  @IsString()
+  day: string;
 
+  @ApiProperty({ example: '09:00' })
+  @IsString()
+  startTime: string;
 
-
-
-// // ---------------------- Branch DTOs ----------------------
-// export class BranchAvailabilityDto {
-//   @ApiProperty({ example: 'Monday' })
-//   @IsString()
-//   day: string;
-
-//   @ApiProperty({ example: '09:00' })
-//   @IsString()
-//   startTime: string;
-
-//   @ApiProperty({ example: '17:00' })
-//   @IsString()
-//   endTime: string;
-// }
-
-// export class BranchDto {
-//   @ApiProperty({ example: 1 })
-//   @IsInt()
-//   branch_id: number;
-
-//   @ApiProperty({ example: 'Main Clinic' })
-//   @IsString()
-//   branch_name: string;
-
-//   @ApiProperty({
-//     type: [BranchAvailabilityDto],
-//     example: [
-//       { day: 'Monday', startTime: '09:00', endTime: '17:00' },
-//       { day: 'Wednesday', startTime: '10:00', endTime: '16:00' },
-//     ],
-//   })
-//   @IsArray()
-//   @ValidateNested({ each: true })
-//   @Type(() => BranchAvailabilityDto)
-//   availability: BranchAvailabilityDto[];
-// }
-
+  @ApiProperty({ example: '17:00' })
+  @IsString()
+  endTime: string;
+}
 
 export class CreateTherapistDto {
   @ApiProperty({ example: 'John' })
@@ -66,12 +38,12 @@ export class CreateTherapistDto {
   @IsString()
   contactPhone: string;
 
-  @ApiProperty({ required: false, example: 'Experienced psychologist specializing in cognitive therapy.' })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   aboutMe?: string;
 
-  @ApiProperty({ required: false, example: 'PhD in Clinical Psychology' })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   degreesTraining?: string;
@@ -80,12 +52,12 @@ export class CreateTherapistDto {
   @IsInt()
   inamiNumber: number;
 
-  @ApiProperty({ required: false, example: ['Cash', 'Card'] })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsArray()
   paymentMethods?: any[];
 
-  @ApiProperty({ required: false, example: 'Q: Do you offer online sessions? A: Yes' })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   faq?: string;
@@ -94,15 +66,15 @@ export class CreateTherapistDto {
   @IsInt()
   departmentId: number;
 
-  @ApiProperty({ example: [2, 3, 5], description: 'Multiple specialization IDs' })
+  @ApiProperty({ example: [1, 2, 3], description: 'Specialization IDs for therapist' })
   @IsArray()
-  specializationIds: number[];
+  @IsInt({ each: true })
+  specializations: number[];
 
   @ApiProperty({ example: ['English', 'French'], description: 'Languages spoken by therapist' })
   @IsArray()
   @IsString({ each: true })
   languages: string[];
-
 
   @ApiProperty({ example: [1, 2], description: 'Array of branch IDs for therapist' })
   @IsArray()
@@ -110,7 +82,7 @@ export class CreateTherapistDto {
   branches: number[];
 
   @ApiProperty({
-    type: [Object],
+    type: [AvailabilityDto],
     required: false,
     example: [
       { day: 'Monday', startTime: '09:00', endTime: '17:00' },
@@ -119,7 +91,7 @@ export class CreateTherapistDto {
   })
   @IsOptional()
   @IsArray()
-  availability?: { day: string; startTime: string; endTime: string }[];
-
-
+  @ValidateNested({ each: true })
+  @Type(() => AvailabilityDto)
+  availability?: AvailabilityDto[];
 }
