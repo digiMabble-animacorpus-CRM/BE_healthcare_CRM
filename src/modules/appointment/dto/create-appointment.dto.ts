@@ -5,10 +5,10 @@ import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, IsEnum } from
 import { PurposeOfVisit, Department } from '../entities/appointment.entity';
 
 export class CreateAppointmentDto {
-  @ApiProperty({ example: "db571dc0-1164-4528-bcd5-3d909aff3511", description: 'ID (UUID) of the existing branch' })
+  @ApiProperty({ example: 1, description: 'ID of the existing branch' })
   @IsNotEmpty()
-  @IsString()
-  branchId: string;
+  @IsNumber()
+  branchId: number;
 
   @ApiProperty({ example: "db571dc0-1164-4528-bcd5-3d909aff3511", description: 'ID (UUID) of the existing customer' })
   @IsNotEmpty()

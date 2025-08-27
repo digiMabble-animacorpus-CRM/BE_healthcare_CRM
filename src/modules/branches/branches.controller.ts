@@ -62,7 +62,7 @@ export class BranchesController {
   @ApiOperation({ summary: 'Retrieve a single branch by ID' })
   @ApiResponse({ status: 200, description: 'Branch details.', type: Branch })
   @ApiResponse({ status: 404, description: 'Branch not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.branchesService.findOne(id);
   }
 
@@ -79,7 +79,7 @@ export class BranchesController {
     description: 'Branch with this email already exists.',
   })
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateBranchDto: UpdateBranchDto,
   ) {
     return this.branchesService.update(id, updateBranchDto);
@@ -93,7 +93,7 @@ export class BranchesController {
     description: 'The branch has been successfully deleted.',
   })
   @ApiResponse({ status: 404, description: 'Branch not found.' })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.branchesService.remove(id);
   }
 }

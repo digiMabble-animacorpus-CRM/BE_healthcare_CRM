@@ -51,7 +51,7 @@ export class AppointmentsService extends BaseService<Appointment> {
    * Validates the existence of related entities (Patient, Therapist, TeamMember).
    */
   private async validateRelations(
-    branchId: string,
+    branchId: number,
     patientId: string, // UUID for Patient
     therapistKey: number, // _key field for Therapist
     teamMemberId: string // team_id UUID for TeamMember

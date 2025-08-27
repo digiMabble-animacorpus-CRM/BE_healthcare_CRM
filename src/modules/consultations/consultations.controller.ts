@@ -44,7 +44,7 @@ export class ConsultationsController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('search') search?: string,
-    @Query('branchId') branchId?: string,
+    @Query('branchId') branchId?: number,
   ) {
     return this.consultationsService.findAll(page, limit, search, branchId);
   }

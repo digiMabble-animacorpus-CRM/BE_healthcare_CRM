@@ -11,8 +11,8 @@ import { Consultation } from 'src/modules/consultations/entities/consultation.en
 
 @Entity({ name: 'branches' })
 export class Branch {
-  @PrimaryGeneratedColumn('uuid')
-  branch_id: string;
+  @PrimaryGeneratedColumn('increment')
+  branch_id: number;
 
   @Column({ type: 'varchar', length: 100 })
   name: string;
