@@ -27,7 +27,7 @@ export class Branch {
   phone: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  location: string;
+  location?: string;
 
   @OneToMany(() => Consultation, (consultation) => consultation.branch)
   consultations: Consultation[];

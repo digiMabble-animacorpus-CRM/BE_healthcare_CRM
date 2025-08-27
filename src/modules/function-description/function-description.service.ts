@@ -49,7 +49,7 @@ export class FunctionDescriptionService {
 
   async findAll(
     page: number,
-    limit: number,
+    limit?: number,
     search?: string,
     consultationId?: string,
   ): Promise<{ data: FunctionDescription[]; total: number }> {

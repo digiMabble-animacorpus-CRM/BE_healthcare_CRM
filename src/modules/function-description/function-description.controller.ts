@@ -32,7 +32,7 @@ export class FunctionDescriptionController {
   @Get()
   @ApiOperation({ summary: 'Retrieve all services, optionally filtered by consultation' })
   @ApiQuery({ name: 'consultationId', required: false, type: String, description: 'Filter services by consultation ID' })
-  findAll(@Query('consultationId') consultationId?: string) {
+  findAll(@Query('consultationId') consultationId?: any) {
     return this.functionDescriptionService.findAll(consultationId);
   }
 

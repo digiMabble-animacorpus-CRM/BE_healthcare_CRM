@@ -40,9 +40,9 @@ export class ConsultationsService {
 
   async findAll(
     page: number,
-    limit: number,
+    limit?: number,
     search?: string,
-    branchId?: string,
+    branchId?: any,
   ): Promise<{ data: Consultation[]; total: number }> {
     const skip = (page - 1) * limit;
     const where: any = branchId ? { branch: { branch_id: branchId } } : {};

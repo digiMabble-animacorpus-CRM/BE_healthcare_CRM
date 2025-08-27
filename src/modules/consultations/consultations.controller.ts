@@ -30,7 +30,7 @@ export class ConsultationsController {
   @Get()
   @ApiOperation({ summary: 'Retrieve all consultations, optionally filtered by branch' })
   @ApiQuery({ name: 'branchId', required: false, type: String, description: 'Filter consultations by branch ID' })
-  findAll(@Query('branchId') branchId?: string) {
+  findAll(@Query('branchId') branchId?: any) {
     return this.consultationsService.findAll(branchId);
   }
 
