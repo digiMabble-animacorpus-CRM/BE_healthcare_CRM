@@ -10,6 +10,7 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Therapist } from '../therapist/entities/therapist.entity';
 import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
+import { Branch } from 'src/modules/branches/entities/branch.entity';
 
 @Injectable()
 export class AppointmentsService extends BaseService<Appointment> {
@@ -20,6 +21,7 @@ export class AppointmentsService extends BaseService<Appointment> {
     @InjectRepository(Patient) private readonly patientRepository: Repository<Patient>,
     @InjectRepository(Therapist) private readonly therapistRepository: Repository<Therapist>,
     @InjectRepository(TeamMember) private readonly teamMemberRepository: Repository<TeamMember>,
+    @InjectRepository(Branch) private readonly branchRepository: Repository<Branch>,
   ) {
     super(appointmentRepository.manager);
     this.repository = appointmentRepository;
@@ -49,21 +51,24 @@ export class AppointmentsService extends BaseService<Appointment> {
    * Validates the existence of related entities (Patient, Therapist, TeamMember).
    */
   private async validateRelations(
+    branchId: number,
     patientId: string, // UUID for Patient
     therapistKey: number, // _key field for Therapist
     teamMemberId: string // team_id UUID for TeamMember
-  ): Promise<{ patient: Patient; therapist: Therapist; teamMember: TeamMember }> {
-    const [patient, therapist, teamMember] = await Promise.all([
+  ): Promise<{ branch: Branch; patient: Patient; therapist: Therapist; teamMember: TeamMember }> {
+    const [branch, patient, therapist, teamMember] = await Promise.all([
+      this.branchRepository.findOne({ where: { branch_id: branchId } }),
       this.patientRepository.findOne({ where: { id: patientId } }),
       this.therapistRepository.findOne({ where: { _key: therapistKey } }),
       this.teamMemberRepository.findOne({ where: { team_id: teamMemberId } }) // Using team_id instead of id
     ]);
 
+    if (!branch) throw new BadRequestException(`Branch with ID ${branchId} not found`);
     if (!patient) throw new BadRequestException(`Patient with ID ${patientId} not found`);
     if (!therapist) throw new BadRequestException(`Therapist with key ${therapistKey} not found`);
     if (!teamMember) throw new BadRequestException(`Team member with ID ${teamMemberId} not found`);
 
-    return { patient, therapist, teamMember };
+    return { branch, patient, therapist, teamMember };
   }
 
   /**
@@ -75,7 +80,8 @@ export class AppointmentsService extends BaseService<Appointment> {
     try {
       logger.info(`Appointment_Create_Entry: ${JSON.stringify(createAppointmentDto)}`);
 
-      const { patient, therapist, teamMember: createdBy } = await this.validateRelations(
+      const { branch, patient, therapist, teamMember: createdBy } = await this.validateRelations(
+        createAppointmentDto.branchId,
         createAppointmentDto.patientId, // string (UUID)
         createAppointmentDto.therapistKey, // number
         createAppointmentDto.createdById // string (UUID)
@@ -83,6 +89,7 @@ export class AppointmentsService extends BaseService<Appointment> {
 
       const appointment = this.repository.create({
         ...createAppointmentDto,
+        branch,
         patient,
         therapist,
         createdBy,
@@ -174,7 +181,7 @@ export class AppointmentsService extends BaseService<Appointment> {
       logger.info(`Appointment_Update_Entry: id=${id}, data=${JSON.stringify(updateAppointmentDto)}`);
 
       const existingAppointment = await this.findOneAppointment(id);
-      const { modifiedById, patientId, therapistKey, ...restDto } = updateAppointmentDto;
+      const { modifiedById, branchId, patientId, therapistKey, ...restDto } = updateAppointmentDto;
 
       // Validate the team member making the modification
       const modifiedBy = await this.teamMemberRepository.findOne({ where: { team_id: modifiedById } }); // Using team_id
@@ -183,6 +190,12 @@ export class AppointmentsService extends BaseService<Appointment> {
       }
 
       const updateData: any = { ...restDto, modifiedBy };
+
+      if (branchId && branchId !== existingAppointment.branch.branch_id) {
+        const branch = await this.branchRepository.findOne({ where: { branch_id: branchId } });
+        if (!branch) throw new BadRequestException(`Branch with ID ${branchId} not found`);
+        updateData.branch = branch;
+      }
 
       // If patientId is provided, validate and update the relation
       if (patientId && patientId !== existingAppointment.patient.id) {

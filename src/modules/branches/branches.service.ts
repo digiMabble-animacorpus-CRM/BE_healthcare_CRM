@@ -54,7 +54,7 @@ export class BranchesService {
     return { data, total };
   }
 
-  async findOne(branch_id: string): Promise<Branch> {
+  async findOne(branch_id: number): Promise<Branch> {
     const branch = await this.branchRepository.findOne({ where: { branch_id } });
     if (!branch) {
       throw new NotFoundException(EM119);
@@ -63,7 +63,7 @@ export class BranchesService {
   }
 
   async update(
-    branch_id: string,
+    branch_id: number,
     updateBranchDto: UpdateBranchDto,
   ): Promise<Branch> {
     const branch = await this.findOne(branch_id);
@@ -79,7 +79,7 @@ export class BranchesService {
     }
   }
 
-  async remove(branch_id: string): Promise<void> {
+  async remove(branch_id: number): Promise<void> {
     const branch = await this.findOne(branch_id);
     await this.branchRepository.remove(branch);
   }
