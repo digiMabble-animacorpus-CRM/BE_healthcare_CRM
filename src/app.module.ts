@@ -54,7 +54,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
           password: DBconfig.password,
           database: DBconfig.database,
           entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
-          synchronize: true,
+          synchronize: false,
           logging: true,
           ssl: {rejectUnauthorized: false},
         }
@@ -87,7 +87,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     CalendarsModule,
     SpecializationModule,
     BranchesModule,
-    ConsultationsModule,
+    // ConsultationsModule,
     ProfileModule,
     DepartmentsModule,
   ],

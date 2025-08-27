@@ -4,7 +4,7 @@ import { IsOptional, IsNumber, IsString, IsUUID } from 'class-validator';
 export class FindAllSpecializationsQueryDto {
   @ApiProperty({
     required: false,
-    description: 'Search by doctor name'
+    description: 'Search by specialization type, description, or department name'
   })
   @IsOptional()
   @IsString()

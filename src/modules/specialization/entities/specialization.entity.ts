@@ -8,10 +8,6 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { Consultation } from 'src/modules/consultations/entities/consultation.entity';
-
-import { Patient } from 'src/modules/customers/entities/patient.entity';
-import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
 import { Department } from 'src/modules/Department/entities/department.entity';
 
 export enum SpecializationType {
@@ -29,14 +25,6 @@ export class Specialization {
   @JoinColumn({ name: 'department_id' })
   department: Department;
 
-  @ManyToOne(() => Therapist)
-  @JoinColumn({ name: 'doctor_id', referencedColumnName: '_key' })
-  doctor: Therapist;
-
-  @ManyToOne(() => Patient)
-  @JoinColumn({ name: 'patient_id' })
-  patient: Patient;
-
   @Column({
     type: 'enum',
     enum: SpecializationType,
@@ -45,13 +33,6 @@ export class Specialization {
 
   @Column({ type: 'text', nullable: true })
   description: string;
-
-  @ManyToOne(
-    () => Consultation,
-    (consultation) => consultation.specializations,
-  )
-  @JoinColumn({ name: 'consultation_id' })
-  consultation: Consultation;
 
   @Column({ type: 'boolean', default: true })
   is_active: boolean;

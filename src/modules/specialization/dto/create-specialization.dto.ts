@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsOptional,
-  IsUUID,
   IsNotEmpty,
   IsEnum,
   IsInt,
@@ -14,16 +13,6 @@ export class CreateSpecializationDto {
   @IsInt()
   @IsNotEmpty()
   department_id: number;
-
-  @ApiProperty({ description: 'ID of the doctor (therapist)' })
-  @IsInt()
-  @IsNotEmpty()
-  doctor_id: number;
-
-  @ApiProperty({ description: 'ID of the patient' })
-  @IsUUID()
-  @IsNotEmpty()
-  patient_id: string;
 
   @ApiProperty({
     enum: SpecializationType,
@@ -40,11 +29,4 @@ export class CreateSpecializationDto {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @ApiProperty({
-    description: 'The ID of the consultation this specialization belongs to.',
-  })
-  @IsUUID()
-  @IsNotEmpty()
-  consultation_id: string;
 }

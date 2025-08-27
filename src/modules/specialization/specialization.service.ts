@@ -5,14 +5,12 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Brackets, ILike, Repository } from 'typeorm';
 import { Specialization } from './entities/specialization.entity';
 import { CreateSpecializationDto } from './dto/create-specialization.dto';
 import { UpdateSpecializationDto } from './dto/update-specialization.dto';
 import { EM119, EM100 } from 'src/core/constants';
 import { Department } from '../Department/entities/department.entity';
-import { Therapist } from '../therapist/entities/therapist.entity';
-import { Patient } from '../customers/entities/patient.entity';
 
 @Injectable()
 export class SpecializationService {
@@ -21,46 +19,34 @@ export class SpecializationService {
     private readonly specializationRepository: Repository<Specialization>,
     @InjectRepository(Department)
     private readonly departmentRepository: Repository<Department>,
-    @InjectRepository(Therapist)
-    private readonly therapistRepository: Repository<Therapist>,
-    @InjectRepository(Patient)
-    private readonly patientRepository: Repository<Patient>,
   ) {}
 
   async create(
     createDto: CreateSpecializationDto,
   ): Promise<Specialization> {
     try {
-      const { consultation_id, department_id, doctor_id, patient_id, ...rest } = createDto;
+      const { department_id, ...rest } = createDto;
 
-      const department = await this.departmentRepository.findOne({where: {id: department_id}});
+      const department = await this.departmentRepository.findOne({
+        where: { id: department_id },
+      });
       if (!department) {
-        throw new BadRequestException(`Department with ID ${department_id} not found`);
-      }
-
-      const doctor = await this.therapistRepository.findOne({where: {_key: doctor_id}});
-      if (!doctor) {
-        throw new BadRequestException(`Doctor with ID ${doctor_id} not found`);
-      }
-
-      const patient = await this.patientRepository.findOne({where: {id: patient_id}});
-      if (!patient) {
-        throw new BadRequestException(`Patient with ID ${patient_id} not found`);
+        throw new BadRequestException(
+          `Department with ID ${department_id} not found`,
+        );
       }
 
       const specialization = this.specializationRepository.create({
         ...rest,
-        consultation: {
-          consultation_id: consultation_id,
-        },
         department,
-        doctor,
-        patient,
       });
 
       return await this.specializationRepository.save(specialization);
     } catch (error) {
       console.error(error); // Good for debugging
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException(EM100);
     }
   }
@@ -69,25 +55,23 @@ export class SpecializationService {
     page: number,
     limit: number,
     search?: string,
-    consultationId?: string,
   ): Promise<{ data: Specialization[]; total: number }> {
     const skip = (page - 1) * limit;
-    const where: any = consultationId
-      ? { consultation: { consultation_id: consultationId } }
-      : {};
+    const query = this.specializationRepository.createQueryBuilder('specialization')
+      .leftJoinAndSelect('specialization.department', 'department');
 
     if (search) {
-      where.doctor = { firstName: ILike(`%${search}%`) };
+      query.andWhere(new Brackets(qb => {
+        qb.where('specialization.specialization_type::text ILIKE :search', { search: `%${search}%` })
+          .orWhere('specialization.description ILIKE :search', { search: `%${search}%` })
+          .orWhere('department.name ILIKE :search', { search: `%${search}%` });
+      }));
     }
 
-    const [data, total] = await this.specializationRepository.findAndCount(
-      {
-        where,
-        skip,
-        take: limit,
-        relations: ['department', 'doctor', 'patient'],
-      },
-    );
+    const [data, total] = await query
+      .skip(skip)
+      .take(limit)
+      .getManyAndCount();
 
     return { data, total };
   }
@@ -95,7 +79,7 @@ export class SpecializationService {
   async findOne(specialization_id: number): Promise<Specialization> {
     const specialization = await this.specializationRepository.findOne({
       where: { specialization_id },
-      relations: ['department', 'doctor', 'patient'],
+      relations: ['department'],
     });
     if (!specialization) {
       throw new NotFoundException(EM119);
@@ -108,8 +92,17 @@ export class SpecializationService {
     updateDto: UpdateSpecializationDto,
   ): Promise<Specialization> {
     const specialization = await this.findOne(specialization_id);
-    
-    this.specializationRepository.merge(specialization, updateDto);
+    const { department_id, ...rest } = updateDto;
+
+    if (department_id && department_id !== specialization.department.id) {
+        const department = await this.departmentRepository.findOne({where: {id: department_id}});
+        if (!department) {
+            throw new BadRequestException(`Department with ID ${department_id} not found`);
+        }
+        specialization.department = department;
+    }
+
+    this.specializationRepository.merge(specialization, rest);
     return this.specializationRepository.save(specialization);
   }
 

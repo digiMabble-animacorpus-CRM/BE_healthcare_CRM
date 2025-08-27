@@ -38,11 +38,11 @@ export class Consultation {
   @JoinColumn({ name: 'branch_id' })
   branch: Branch;
 
-  @OneToMany(
-    () => Specialization,
-    (specialization) => specialization.consultation,
-  )
-  specializations: Specialization[];
+  // @OneToMany(
+  //   () => Specialization,
+  //   (specialization) => specialization.consultation,
+  // )
+  // specializations: Specialization[];
 
   @Column({ type: 'boolean', default: true, select: true })
   is_active: boolean;

@@ -34,15 +34,14 @@ export class SpecializationController {
 
   @Get()
   @ApiOperation({
-    summary: 'Retrieve all specializations, optionally filtered by consultation',
+    summary: 'Retrieve all specializations',
   })
   findAll(@Query() query: FindAllSpecializationsQueryDto) {
-    const { page = 1, limit = 10, search, consultationId } = query;
+    const { page = 1, limit = 10, search } = query;
     return this.specializationService.findAll(
       page,
       limit,
       search,
-      consultationId,
     );
   }
 
