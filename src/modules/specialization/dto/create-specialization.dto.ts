@@ -15,21 +15,15 @@ export class CreateSpecializationDto {
   @IsNotEmpty()
   department_id: number;
 
-  @ApiProperty({
-    description: 'Detailed specialization name for doctors',
-    example: 'Cognitive Behavioral Therapy',
-  })
-  @IsString()
+  @ApiProperty({ description: 'ID of the doctor (therapist)' })
+  @IsInt()
   @IsNotEmpty()
-  doctor_name: string;
+  doctor_id: number;
 
-  @ApiProperty({
-    description: 'Simplified category name for patients',
-    example: 'Mental Health',
-  })
-  @IsString()
+  @ApiProperty({ description: 'ID of the patient' })
+  @IsUUID()
   @IsNotEmpty()
-  patient_name: string;
+  patient_id: string;
 
   @ApiProperty({
     enum: SpecializationType,

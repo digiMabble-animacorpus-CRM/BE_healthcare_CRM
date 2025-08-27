@@ -47,9 +47,9 @@ export class BranchesController {
     description: 'A list of all branches.',
     type: [Branch],
   })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number })
-  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
-  @ApiQuery({ name: 'search', required: false, description: 'Search by name, email, or phone', type: String })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, description: 'Search by name, email, or phone', type: String, example: 'John Doe' })
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,

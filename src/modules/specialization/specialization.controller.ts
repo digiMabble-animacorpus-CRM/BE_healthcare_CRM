@@ -17,6 +17,8 @@ import { SpecializationService } from './specialization.service';
 import { CreateSpecializationDto } from './dto/create-specialization.dto';
 import { UpdateSpecializationDto } from './dto/update-specialization.dto';
 
+import { FindAllSpecializationsQueryDto } from './dto/find-all-specializations-query.dto';
+
 @ApiTags('Specializations')
 @Controller('specializations')
 export class SpecializationController {
@@ -34,21 +36,8 @@ export class SpecializationController {
   @ApiOperation({
     summary: 'Retrieve all specializations, optionally filtered by consultation',
   })
-  @ApiQuery({
-    name: 'consultationId',
-    required: false,
-    type: String,
-    description: 'Filter specializations by consultation ID',
-  })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page' })
-  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search term' })
-  findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    @Query('search') search?: string,
-    @Query('consultationId') consultationId?: string,
-  ) {
+  findAll(@Query() query: FindAllSpecializationsQueryDto) {
+    const { page = 1, limit = 10, search, consultationId } = query;
     return this.specializationService.findAll(
       page,
       limit,

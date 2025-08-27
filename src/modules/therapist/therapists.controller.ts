@@ -30,7 +30,6 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Therapist } from './entities/therapist.entity';
 
 @ApiTags('Therapists')
-@UseGuards(AuthGuard('jwt')) // Protect all routes
 @Controller('therapists')
 export class TherapistController {
   constructor(private readonly therapistService: TherapistService) {}

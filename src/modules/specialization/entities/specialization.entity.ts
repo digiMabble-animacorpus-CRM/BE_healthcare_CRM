@@ -10,6 +10,10 @@ import {
 } from 'typeorm';
 import { Consultation } from 'src/modules/consultations/entities/consultation.entity';
 
+import { Patient } from 'src/modules/customers/entities/patient.entity';
+import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
+import { Department } from 'src/modules/Department/entities/department.entity';
+
 export enum SpecializationType {
   CONSULTATION = 'Consultation',
   OPERATION = 'Operation',
@@ -21,14 +25,17 @@ export class Specialization {
   @PrimaryGeneratedColumn('increment')
   specialization_id: number;
 
-  @Column()
-  department_id: number;
+  @ManyToOne(() => Department)
+  @JoinColumn({ name: 'department_id' })
+  department: Department;
 
-  @Column({ type: 'varchar', length: 150 })
-  doctor_name: string;
+  @ManyToOne(() => Therapist)
+  @JoinColumn({ name: 'doctor_id', referencedColumnName: '_key' })
+  doctor: Therapist;
 
-  @Column({ type: 'varchar', length: 100 })
-  patient_name: string;
+  @ManyToOne(() => Patient)
+  @JoinColumn({ name: 'patient_id' })
+  patient: Patient;
 
   @Column({
     type: 'enum',
