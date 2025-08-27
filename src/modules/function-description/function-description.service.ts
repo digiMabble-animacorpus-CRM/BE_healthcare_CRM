@@ -30,7 +30,7 @@ export class FunctionDescriptionService {
 
       if (therapist_ids && therapist_ids.length > 0) {
         const therapists = await this.therapistRepository.findBy({
-          _key: In(therapist_ids),
+          therapistId: In(therapist_ids),
         });
         functionDescription.therapists = therapists;
       }
@@ -76,7 +76,7 @@ export class FunctionDescriptionService {
 
     if (therapist_ids) {
       const therapists = await this.therapistRepository.findBy({
-        _key: In(therapist_ids),
+        therapistId: In(therapist_ids),
       });
       service.therapists = therapists;
     }

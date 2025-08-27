@@ -55,7 +55,7 @@ export class AppointmentsService extends BaseService<Appointment> {
   ): Promise<{ patient: Patient; therapist: Therapist; teamMember: TeamMember }> {
     const [patient, therapist, teamMember] = await Promise.all([
       this.patientRepository.findOne({ where: { id: patientId } }),
-      this.therapistRepository.findOne({ where: { _key: therapistKey } }),
+      this.therapistRepository.findOne({ where: { therapistId: therapistKey } }),
       this.teamMemberRepository.findOne({ where: { team_id: teamMemberId } }) // Using team_id instead of id
     ]);
 
@@ -192,8 +192,8 @@ export class AppointmentsService extends BaseService<Appointment> {
       }
 
       // If therapistKey is provided, validate and update the relation
-      if (therapistKey && therapistKey !== existingAppointment.therapist._key) {
-        const therapist = await this.therapistRepository.findOne({ where: { _key: therapistKey } });
+      if (therapistKey && therapistKey !== existingAppointment.therapist.therapistId) {
+        const therapist = await this.therapistRepository.findOne({ where: { therapistId: therapistKey } });
         if (!therapist) throw new BadRequestException(`Therapist with key ${therapistKey} not found`);
         updateData.therapist = therapist;
       }

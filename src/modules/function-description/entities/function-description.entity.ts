@@ -69,7 +69,7 @@ export class FunctionDescription  {
   @JoinTable({
     name: 'function_description_therapists',
     joinColumn: { name: 'function_id', referencedColumnName: 'function_id' },
-    inverseJoinColumn: { name: '_key', referencedColumnName: '_key' },
+    inverseJoinColumn: { name: 'therapist_id', referencedColumnName: 'therapistId' },
   })
   therapists: Therapist[];
 }
