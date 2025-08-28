@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Param, Patch , Delete } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Patch , Delete , Query} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -17,12 +17,19 @@ export class DepartmentsController {
     return await this.departmentsService.create(dto);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all departments' })
+
+
+@Get()
+@ApiOperation({ summary: 'Get departments (optionally filtered by branch)' })
   @ApiResponse({ status: 200, description: 'List of departments', type: [Department] })
-  async findAll() {
-    return await this.departmentsService.findAll();
-  }
+  @ApiQuery({ name: 'branchId', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+async findAll(
+  @Query('branchId') branchId?: number,
+  @Query('search') search?: string
+) {
+  return this.departmentsService.findAllFiltered(branchId, search);
+}
 
   @Get(':id')
   @ApiOperation({ summary: 'Get department by ID' })

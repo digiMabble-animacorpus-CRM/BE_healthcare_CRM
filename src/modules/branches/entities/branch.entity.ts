@@ -6,8 +6,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToMany,
 } from 'typeorm';
 import { Consultation } from 'src/modules/consultations/entities/consultation.entity';
+import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
 
 @Entity({ name: 'branches' })
 export class Branch {
@@ -31,6 +33,10 @@ export class Branch {
 
   @OneToMany(() => Consultation, (consultation) => consultation.branch)
   consultations: Consultation[];
+
+    @ManyToMany(() => Therapist, (therapist) => therapist.branches)
+therapists: Therapist[];
+
 
   @Column({ type: 'boolean', default: true, select: true })
   is_active: boolean;

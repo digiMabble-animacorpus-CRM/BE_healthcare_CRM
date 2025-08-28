@@ -20,6 +20,30 @@ export class DepartmentsService {
     return await this.departmentRepository.save(department);
   }
 
+// GET departments with optional branchId and search
+async findAllFiltered(branchId?: number, search?: string): Promise<Department[]> {
+  const query = this.departmentRepository
+    .createQueryBuilder('department')
+    .leftJoin('department.therapists', 't')
+    .leftJoin('t.branches', 'b'); // join the branches relation
+
+  if (branchId) {
+    query.andWhere('b.branch_id = :branchId', { branchId });
+  }
+
+  if (search) {
+    query.andWhere(
+      '(department.name ILIKE :search OR department.description ILIKE :search)',
+      { search: `%${search}%` },
+    );
+  }
+
+  query.distinct(true); // avoid duplicates
+
+  return query.getMany();
+}
+
+  
   async findAll(): Promise<Department[]> {
     return await this.departmentRepository.find();
   }
