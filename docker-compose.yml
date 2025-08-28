@@ -14,7 +14,7 @@ services:
       - .env
     ports:
       - "7000:8080"
-    command: node dist/main.js
+    command: node dist/src/main.js
     restart: always
     networks:
       - app_network
