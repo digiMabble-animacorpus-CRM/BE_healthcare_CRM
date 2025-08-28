@@ -32,7 +32,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { TeamMemberModule } from './modules/team-member/team-member.module';
 import { AppointmentsModule } from './modules/appointment/appointment.module';
 import { CalendarsModule } from './modules/calendars/calendars.module';
-import { FunctionDescriptionModule } from './modules/function-description/function-description.module';
+import { SpecializationModule } from './modules/specialization/specialization.module';
 import { BranchesModule } from './modules/branches/branches.module';
 import { ConsultationsModule } from './modules/consultations/consultations.module';
 import { ProfileModule } from './modules/profile/profile.module';
@@ -85,9 +85,9 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     TeamMemberModule,
     AppointmentsModule,
     CalendarsModule,
-    FunctionDescriptionModule,
+    SpecializationModule,
     BranchesModule,
-    ConsultationsModule,
+    // ConsultationsModule,
     ProfileModule,
     DepartmentsModule,
   ],

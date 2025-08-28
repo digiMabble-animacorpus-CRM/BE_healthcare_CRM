@@ -37,14 +37,14 @@ export class ConsultationsController {
     type: String,
     description: 'Filter consultations by branch ID',
   })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page' })
-  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search term' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number', example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page', example: 10 })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search term', example: 'John Doe' })
   findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('search') search?: string,
-    @Query('branchId') branchId?: string,
+    @Query('branchId') branchId?: number,
   ) {
     return this.consultationsService.findAll(page, limit, search, branchId);
   }

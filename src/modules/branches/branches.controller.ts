@@ -47,9 +47,9 @@ export class BranchesController {
     description: 'A list of all branches.',
     type: [Branch],
   })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number })
-  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
-  @ApiQuery({ name: 'search', required: false, description: 'Search by name, email, or phone', type: String })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, description: 'Search by name, email, or phone', type: String, example: 'John Doe' })
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -62,7 +62,7 @@ export class BranchesController {
   @ApiOperation({ summary: 'Retrieve a single branch by ID' })
   @ApiResponse({ status: 200, description: 'Branch details.', type: Branch })
   @ApiResponse({ status: 404, description: 'Branch not found.' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.branchesService.findOne(id);
   }
 
@@ -79,7 +79,7 @@ export class BranchesController {
     description: 'Branch with this email already exists.',
   })
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateBranchDto: UpdateBranchDto,
   ) {
     return this.branchesService.update(id, updateBranchDto);
@@ -93,7 +93,7 @@ export class BranchesController {
     description: 'The branch has been successfully deleted.',
   })
   @ApiResponse({ status: 404, description: 'Branch not found.' })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.branchesService.remove(id);
   }
 }
