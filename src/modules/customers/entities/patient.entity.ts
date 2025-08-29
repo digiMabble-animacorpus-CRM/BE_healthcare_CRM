@@ -72,7 +72,7 @@ export class Patient {
 @JoinColumn({ name: 'therapist_id' })
 therapist?: Therapist;
 
-@Column({ name:'therapist_id', type: 'int', nullable: true })
+@Column({ type: 'int', nullable: true })
 therapistId?: number;
 
 
