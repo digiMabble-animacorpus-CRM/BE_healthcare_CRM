@@ -2,7 +2,7 @@
 
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, IsEnum } from 'class-validator';
-import { PurposeOfVisit, Department } from '../entities/appointment.entity';
+import { PurposeOfVisit, AppointmentStatus } from '../entities/appointment.entity';
 
 export class CreateAppointmentDto {
   @ApiProperty({ example: 1, description: 'ID of the existing branch' })
@@ -20,20 +20,41 @@ export class CreateAppointmentDto {
   @IsDateString()
   date: string;
 
-  @ApiProperty({ example: '11:00 - 11:30', description: 'Time slot for the appointment' })
+  @ApiProperty({ example: '11:00', description: 'Start time of appointment (HH:MM)' })
   @IsNotEmpty()
   @IsString()
-  timeslot: string;
+  startTime: string;
+
+  @ApiProperty({ example: '11:30', description: 'End time of appointment (HH:MM)' })
+  @IsNotEmpty()
+  @IsString()
+  endTime: string;
+
+  @ApiProperty({ 
+    enum: AppointmentStatus, 
+    example: AppointmentStatus.PENDING, 
+    description: 'Status of the appointment',
+    required: false,
+    default: AppointmentStatus.PENDING 
+  })
+  @IsOptional()
+  @IsEnum(AppointmentStatus)
+  status?: AppointmentStatus;
 
   @ApiProperty({ enum: PurposeOfVisit, example: PurposeOfVisit.CONSULTATION, description: 'Reason for the visit' })
   @IsNotEmpty()
   @IsEnum(PurposeOfVisit)
   purposeOfVisit: PurposeOfVisit;
 
-  @ApiProperty({ enum: Department, example: Department.PHYSIOTHERAPY, description: 'Relevant department' })
+  @ApiProperty({ example: 1, description: 'ID of the department' })
   @IsNotEmpty()
-  @IsEnum(Department)
-  department: Department;
+  @IsNumber()
+  departmentId: number;
+
+  @ApiProperty({ required: false, example: 1, description: 'ID of the specialization (optional)' })
+  @IsOptional()
+  @IsNumber()
+  specializationId?: number;
 
   @ApiProperty({ required: false, example: 'Patient reports recurring back pain.', description: 'Optional details' })
   @IsOptional()
@@ -43,7 +64,7 @@ export class CreateAppointmentDto {
   @ApiProperty({ example: 4, description: 'ID of the appointed therapist' })
   @IsNotEmpty()
   @IsNumber()
-  therapistKey: number;
+  therapistId: number;
 
   @ApiProperty({ example:"db571dc0-1164-4528-bcd5-3d909aff3511",description: 'ID (UUID) of the team member creating the appointment (usually from auth token)' })
   @IsNotEmpty()

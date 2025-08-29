@@ -54,7 +54,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
           password: DBconfig.password,
           database: DBconfig.database,
           entities: [`${__dirname}../../**/**.entity{.ts,.js}`],
-          synchronize: false,
+          synchronize: true,
           logging: true,
           ssl: {rejectUnauthorized: false},
         }

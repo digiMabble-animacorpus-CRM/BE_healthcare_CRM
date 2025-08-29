@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, Query, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiQuery, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import HandleResponse from 'src/core/utils/handle_response';
 import { EC200, EC201, EC204, EC404, EC500, EM100, EM104, EM106, EM116, EM119, EM127 } from 'src/core/constants';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { UpdateAppointmentStatusDto } from './dto/update-appointment-status.dto';
 import { AppointmentsService } from './appointment.service';
 import { FindAllAppointmentsQueryDto } from './dto/find-all-appointments-query.dto';
 
@@ -26,6 +27,8 @@ export class AppointmentsController {
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create a new appointment' })
+  @ApiResponse({ status: 201, description: 'Appointment created successfully.' })
   async create(@Body() createAppointmentDto: CreateAppointmentDto) {
     try {
       const data = await this.appointmentsService.createAppointment(createAppointmentDto);
@@ -36,18 +39,39 @@ export class AppointmentsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all appointments with filtering and pagination' })
+  @ApiResponse({ status: 200, description: 'Appointments retrieved successfully.' })
   async findAll(@Query() query: FindAllAppointmentsQueryDto) {
     const page = query.pagNo ?? 1; 
     const limit = query.limit ?? 10; 
     const search = query.search;
+    const status = query.status;
+    const startDate = query.startDate;
+    const endDate = query.endDate;
+    const departmentId = query.departmentId;
+    const branchId = query.branchId;
+    const patientId = query.patientId;
+    const therapistId = query.therapistId;
 
     try {
-      const { data, total } = await this.appointmentsService.findAllWithPaginationAppointments(page, limit, search);
+      const { data, total } = await this.appointmentsService.findAllWithPaginationAppointments(
+        page, 
+        limit, 
+        search, 
+        status, 
+        startDate,
+        endDate,
+        departmentId,
+        branchId,
+        patientId,
+        therapistId
+      );
       return HandleResponse.buildSuccessObj(EC200, 'Appointments retrieved successfully.', {
         data,
         total,
         page,
         limit,
+        filters: { search, status, startDate, endDate, departmentId, branchId, patientId, therapistId }
       });
     } catch (error) {
       return this.handleError(error);
@@ -55,6 +79,8 @@ export class AppointmentsController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get appointment by ID' })
+  @ApiResponse({ status: 200, description: 'Appointment retrieved successfully.' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     try {
       const data = await this.appointmentsService.findOneAppointment(id);
@@ -65,6 +91,8 @@ export class AppointmentsController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update an appointment' })
+  @ApiResponse({ status: 200, description: 'Appointment updated successfully.' })
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateAppointmentDto: UpdateAppointmentDto) {
     try {
       await this.appointmentsService.updateAppointment(id, updateAppointmentDto);
@@ -75,7 +103,21 @@ export class AppointmentsController {
     }
   }
 
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Update appointment status' })
+  @ApiResponse({ status: 200, description: 'Appointment status updated successfully.' })
+  async updateStatus(@Param('id', ParseIntPipe) id: number, @Body() updateStatusDto: UpdateAppointmentStatusDto) {
+    try {
+      const data = await this.appointmentsService.updateAppointmentStatus(id, updateStatusDto);
+      return HandleResponse.buildSuccessObj(EC200, 'Appointment status updated successfully.', data);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete an appointment' })
+  @ApiResponse({ status: 200, description: 'Appointment deleted successfully.' })
   async remove(@Param('id', ParseIntPipe) id: number) {
     try {
       await this.appointmentsService.removeAppointment(id);
