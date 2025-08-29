@@ -7,8 +7,8 @@ import { logger } from 'src/core/utils/logger';
 import { EC404, EM119, EC500, EM100 } from 'src/core/constants';
 import Appointment, { AppointmentStatus } from './entities/appointment.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { FindAllAppointmentsQueryDto } from './dto/find-all-appointments-query.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
-import { UpdateAppointmentStatusDto } from './dto/update-appointment-status.dto';
 import { Therapist } from '../therapist/entities/therapist.entity';
 import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
@@ -309,17 +309,17 @@ export class AppointmentsService extends BaseService<Appointment> {
   }
 
   /**
-   * Updates an existing appointment.
+   * Updates an existing appointment including its status.
    * @param id - The ID of the appointment to update.
    * @param updateAppointmentDto - The data to update.
-   * @returns The result of the update operation.
+   * @returns The updated appointment.
    */
-  async updateAppointment(id: number, updateAppointmentDto: UpdateAppointmentDto): Promise<UpdateResult> {
+  async updateAppointment(id: number, updateAppointmentDto: UpdateAppointmentDto): Promise<Appointment> {
     try {
       logger.info(`Appointment_Update_Entry: id=${id}, data=${JSON.stringify(updateAppointmentDto)}`);
 
       const existingAppointment = await this.findOneAppointment(id);
-      const { modifiedById, branchId, patientId, therapistId, departmentId, specializationId, startTime, endTime, ...restDto } = updateAppointmentDto;
+      const { modifiedById, branchId, patientId, therapistId, departmentId, specializationId, startTime, endTime, status, reason, ...restDto } = updateAppointmentDto;
 
       // Validate time slot if both startTime and endTime are provided
       if (startTime && endTime) {
@@ -341,6 +341,23 @@ export class AppointmentsService extends BaseService<Appointment> {
       // Include time fields if provided
       if (startTime) updateData.startTime = startTime;
       if (endTime) updateData.endTime = endTime;
+
+      // Handle status update with validation
+      if (status !== undefined) {
+        // Check if status change is valid
+        if (existingAppointment.status === AppointmentStatus.CANCELLED && status !== AppointmentStatus.CANCELLED) {
+          throw new BadRequestException('Cannot change status of a cancelled appointment');
+        }
+        updateData.status = status;
+        
+        // If reason is provided for status change, add it to description
+        if (reason) {
+          updateData.description = `${existingAppointment.description || ''} [Status change: ${reason}]`.trim();
+        }
+      } else if (reason && !status) {
+        // If only reason is provided without status change, add it as a general note
+        updateData.description = `${existingAppointment.description || ''} [Update note: ${reason}]`.trim();
+      }
 
       if (branchId && branchId !== existingAppointment.branch.branch_id) {
         const branch = await this.branchRepository.findOne({ where: { branch_id: branchId } });
@@ -392,49 +409,12 @@ export class AppointmentsService extends BaseService<Appointment> {
         }
       }
 
-      const result = await this.repository.update(id, updateData);
-      logger.info(`Appointment_Update_Exit: ${JSON.stringify(result)}`);
-      return result;
-    } catch (error) {
-      this.handleError('Update', error);
-    }
-  }
-
-  /**
-   * Updates the status of an appointment.
-   * @param id - The ID of the appointment to update.
-   * @param updateStatusDto - The status update data.
-   * @returns The updated appointment.
-   */
-  async updateAppointmentStatus(id: number, updateStatusDto: UpdateAppointmentStatusDto): Promise<Appointment> {
-    try {
-      logger.info(`Appointment_UpdateStatus_Entry: id=${id}, data=${JSON.stringify(updateStatusDto)}`);
-
-      const existingAppointment = await this.findOneAppointment(id);
-      
-      // Validate the team member making the modification
-      const modifiedBy = await this.teamMemberRepository.findOne({ where: { team_id: updateStatusDto.modifiedById } });
-      if (!modifiedBy) {
-        throw new BadRequestException(`Team member with ID ${updateStatusDto.modifiedById} not found`);
-      }
-
-      // Check if status change is valid
-      if (existingAppointment.status === AppointmentStatus.CANCELLED && updateStatusDto.status !== AppointmentStatus.CANCELLED) {
-        throw new BadRequestException('Cannot change status of a cancelled appointment');
-      }
-
-      await this.repository.update(id, {
-        status: updateStatusDto.status,
-        modifiedBy: modifiedBy,
-        // If reason is provided, you might want to add it to description or create a separate field
-        ...(updateStatusDto.reason && { description: `${existingAppointment.description || ''} [Status change: ${updateStatusDto.reason}]`.trim() })
-      });
-
+      await this.repository.update(id, updateData);
       const updatedAppointment = await this.findOneAppointment(id);
-      logger.info(`Appointment_UpdateStatus_Exit: ${JSON.stringify(updatedAppointment)}`);
+      logger.info(`Appointment_Update_Exit: ${JSON.stringify(updatedAppointment)}`);
       return updatedAppointment;
     } catch (error) {
-      this.handleError('UpdateStatus', error);
+      this.handleError('Update', error);
     }
   }
 
