@@ -5,12 +5,15 @@ import { BaseService } from 'src/base.service';
 import { Patient } from 'src/modules/customers/entities/patient.entity';
 import { logger } from 'src/core/utils/logger';
 import { EC404, EM119, EC500, EM100 } from 'src/core/constants';
-import Appointment from './entities/appointment.entity';
+import Appointment, { AppointmentStatus } from './entities/appointment.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { FindAllAppointmentsQueryDto } from './dto/find-all-appointments-query.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Therapist } from '../therapist/entities/therapist.entity';
 import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
+import { Department } from '../Department/entities/department.entity';
+import { Specialization } from '../specialization/entities/specialization.entity';
 
 @Injectable()
 export class AppointmentsService extends BaseService<Appointment> {
@@ -22,6 +25,8 @@ export class AppointmentsService extends BaseService<Appointment> {
     @InjectRepository(Therapist) private readonly therapistRepository: Repository<Therapist>,
     @InjectRepository(TeamMember) private readonly teamMemberRepository: Repository<TeamMember>,
     @InjectRepository(Branch) private readonly branchRepository: Repository<Branch>,
+    @InjectRepository(Department) private readonly departmentRepository: Repository<Department>,
+    @InjectRepository(Specialization) private readonly specializationRepository: Repository<Specialization>,
   ) {
     super(appointmentRepository.manager);
     this.repository = appointmentRepository;
@@ -31,11 +36,19 @@ export class AppointmentsService extends BaseService<Appointment> {
    * Creates a base query with all necessary relations for appointments.
    */
   private getBaseQuery() {
-    return this.repository.createQueryBuilder('a')
-      .leftJoinAndSelect('a.patient', 'patient')
-      .leftJoinAndSelect('a.therapist', 'therapist')
-      .leftJoinAndSelect('a.createdBy', 'creator')
-      .leftJoinAndSelect('a.modifiedBy', 'modifier');
+    try {
+      return this.repository.createQueryBuilder('a')
+        .leftJoinAndSelect('a.branch', 'branch')
+        .leftJoinAndSelect('a.patient', 'patient')
+        .leftJoinAndSelect('a.therapist', 'therapist')
+        .leftJoinAndSelect('a.department', 'department')
+        .leftJoinAndSelect('a.specialization', 'specialization')
+        .leftJoinAndSelect('a.createdBy', 'creator')
+        .leftJoinAndSelect('a.modifiedBy', 'modifier');
+    } catch (error) {
+      logger.error(`Error creating base query: ${error?.message}`);
+      throw error;
+    }
   }
 
   /**
@@ -48,27 +61,78 @@ export class AppointmentsService extends BaseService<Appointment> {
   }
 
   /**
-   * Validates the existence of related entities (Patient, Therapist, TeamMember).
+   * Validates time slot format and ensures end time is after start time.
+   */
+  private validateTimeSlot(startTime: string, endTime: string): void {
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    
+    if (!timeRegex.test(startTime)) {
+      throw new BadRequestException('Start time must be in HH:MM format');
+    }
+    
+    if (!timeRegex.test(endTime)) {
+      throw new BadRequestException('End time must be in HH:MM format');
+    }
+
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+    const startMinutes = startHour * 60 + startMinute;
+    const endMinutes = endHour * 60 + endMinute;
+    
+    if (endMinutes <= startMinutes) {
+      throw new BadRequestException('End time must be after start time');
+    }
+  }
+
+  /**
+   * Validates the existence of related entities (Patient, Therapist, TeamMember, Department, Specialization).
    */
   private async validateRelations(
     branchId: number,
     patientId: string, // UUID for Patient
-    therapistKey: number, // _key field for Therapist
-    teamMemberId: string // team_id UUID for TeamMember
-  ): Promise<{ branch: Branch; patient: Patient; therapist: Therapist; teamMember: TeamMember }> {
-    const [branch, patient, therapist, teamMember] = await Promise.all([
+    therapistId: number, // ID field for Therapist
+    teamMemberId: string, // team_id UUID for TeamMember
+    departmentId: number, // ID for Department
+    specializationId?: number // Optional ID for Specialization
+  ): Promise<{ 
+    branch: Branch; 
+    patient: Patient; 
+    therapist: Therapist; 
+    teamMember: TeamMember; 
+    department: Department; 
+    specialization?: Specialization 
+  }> {
+    const [branch, patient, therapist, teamMember, department] = await Promise.all([
       this.branchRepository.findOne({ where: { branch_id: branchId } }),
       this.patientRepository.findOne({ where: { id: patientId } }),
-      this.therapistRepository.findOne({ where: { therapistId: therapistKey } }),
-      this.teamMemberRepository.findOne({ where: { team_id: teamMemberId } }) // Using team_id instead of id
+      this.therapistRepository.findOne({ where: { therapistId: therapistId } }),
+      this.teamMemberRepository.findOne({ where: { team_id: teamMemberId } }), // Using team_id instead of id
+      this.departmentRepository.findOne({ where: { id: departmentId } })
     ]);
 
     if (!branch) throw new BadRequestException(`Branch with ID ${branchId} not found`);
     if (!patient) throw new BadRequestException(`Patient with ID ${patientId} not found`);
-    if (!therapist) throw new BadRequestException(`Therapist with key ${therapistKey} not found`);
+    if (!therapist) throw new BadRequestException(`Therapist with ID ${therapistId} not found`);
     if (!teamMember) throw new BadRequestException(`Team member with ID ${teamMemberId} not found`);
+    if (!department) throw new BadRequestException(`Department with ID ${departmentId} not found`);
 
-    return { branch, patient, therapist, teamMember };
+    let specialization: Specialization | undefined;
+    if (specializationId) {
+      specialization = await this.specializationRepository.findOne({ 
+        where: { specialization_id: specializationId },
+        relations: ['department']
+      });
+      if (!specialization) {
+        throw new BadRequestException(`Specialization with ID ${specializationId} not found`);
+      }
+      // Validate that the specialization belongs to the specified department
+      if (specialization.department.id !== departmentId) {
+        throw new BadRequestException(`Specialization ${specializationId} does not belong to department ${departmentId}`);
+      }
+    }
+
+    return { branch, patient, therapist, teamMember, department, specialization };
   }
 
   /**
@@ -80,19 +144,27 @@ export class AppointmentsService extends BaseService<Appointment> {
     try {
       logger.info(`Appointment_Create_Entry: ${JSON.stringify(createAppointmentDto)}`);
 
-      const { branch, patient, therapist, teamMember: createdBy } = await this.validateRelations(
+      // Validate time slot
+      this.validateTimeSlot(createAppointmentDto.startTime, createAppointmentDto.endTime);
+
+      const { branch, patient, therapist, teamMember: createdBy, department, specialization } = await this.validateRelations(
         createAppointmentDto.branchId,
         createAppointmentDto.patientId, // string (UUID)
-        createAppointmentDto.therapistKey, // number
-        createAppointmentDto.createdById // string (UUID)
+        createAppointmentDto.therapistId, // number
+        createAppointmentDto.createdById, // string (UUID)
+        createAppointmentDto.departmentId, // number
+        createAppointmentDto.specializationId // optional number
       );
 
       const appointment = this.repository.create({
         ...createAppointmentDto,
+        status: createAppointmentDto.status || AppointmentStatus.PENDING,
         branch,
         patient,
         therapist,
         createdBy,
+        department,
+        specialization,
       });
 
       const savedAppointment = await this.repository.save(appointment);
@@ -108,13 +180,47 @@ export class AppointmentsService extends BaseService<Appointment> {
    * @param page - Page number.
    * @param limit - Number of items per page.
    * @param search - Optional search term.
+   * @param status - Optional status filter.
+   * @param startDate - Optional start date for date range filter.
+   * @param endDate - Optional end date for date range filter.
+   * @param departmentId - Optional department filter.
+   * @param branchId - Optional branch filter.
+   * @param patientId - Optional patient filter.
+   * @param therapistId - Optional therapist filter.
    * @returns A list of appointments and the total count.
    */
-  async findAllWithPaginationAppointments(page: number, limit: number, search?: string): Promise<{ data: Appointment[], total: number }> {
+  async findAllWithPaginationAppointments(
+    page: number, 
+    limit: number, 
+    search?: string, 
+    status?: AppointmentStatus,
+    startDate?: string,
+    endDate?: string,
+    departmentId?: number,
+    branchId?: number,
+    patientId?: string,
+    therapistId?: number
+  ): Promise<{ data: Appointment[], total: number }> {
     try {
-      logger.info(`Appointment_FindAllPaginated_Entry: page=${page}, limit=${limit}, search=${search}`);
+      logger.info(`Appointment_FindAllPaginated_Entry: page=${page}, limit=${limit}, search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, departmentId=${departmentId}, branchId=${branchId}, patientId=${patientId}, therapistId=${therapistId}`);
 
-      const query = this.getBaseQuery();
+      // Start with a simple query and add joins step by step
+      let query = this.repository.createQueryBuilder('a');
+      
+      // Add essential joins
+      query = query
+        .leftJoinAndSelect('a.branch', 'branch')
+        .leftJoinAndSelect('a.patient', 'patient')
+        .leftJoinAndSelect('a.therapist', 'therapist')
+        .leftJoinAndSelect('a.department', 'department');
+      
+      // Add optional joins
+      query = query
+        .leftJoinAndSelect('a.specialization', 'specialization')
+        .leftJoinAndSelect('a.createdBy', 'creator')
+        .leftJoinAndSelect('a.modifiedBy', 'modifier');
+      
+      logger.info('Base query with joins created successfully');
 
       if (search?.trim()) {
         const searchTerm = `%${search.trim()}%`;
@@ -127,14 +233,45 @@ export class AppointmentsService extends BaseService<Appointment> {
               .orWhere('therapist.lastName ILIKE :search')
               .orWhere('creator.first_name ILIKE :search')
               .orWhere('creator.last_name ILIKE :search')
-              .orWhere('a.department::text ILIKE :search');
+              .orWhere('department.name ILIKE :search')
+              .orWhere('specialization.specialization_type::text ILIKE :search');
           })
         );
         query.setParameter('search', searchTerm);
       }
 
+      if (status) {
+        query.andWhere('a.status = :status', { status });
+      }
+
+      if (startDate) {
+        query.andWhere('a.date >= :startDate', { startDate });
+      }
+
+      if (endDate) {
+        query.andWhere('a.date <= :endDate', { endDate });
+      }
+
+      if (departmentId) {
+        query.andWhere('department.id = :departmentId', { departmentId });
+      }
+
+      if (branchId) {
+        query.andWhere('branch.branch_id = :branchId', { branchId });
+      }
+
+      if (patientId) {
+        query.andWhere('patient.id = :patientId', { patientId });
+      }
+
+      if (therapistId) {
+        query.andWhere('therapist.therapistId = :therapistId', { therapistId });
+      }
+
+      logger.info('About to execute query with filters applied');
+      
       const [data, total] = await query
-        .orderBy('a.createdAt', 'DESC')
+        .orderBy('a.created_at', 'DESC')
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();
@@ -142,6 +279,7 @@ export class AppointmentsService extends BaseService<Appointment> {
       logger.info(`Appointment_FindAllPaginated_Exit: Found ${data.length} appointments, total: ${total}`);
       return { data, total };
     } catch (error) {
+      logger.error(`Detailed error in findAllWithPaginationAppointments: ${error?.message}, Stack: ${error?.stack}`);
       this.handleError('FindAllPaginated', error);
     }
   }
@@ -171,17 +309,26 @@ export class AppointmentsService extends BaseService<Appointment> {
   }
 
   /**
-   * Updates an existing appointment.
+   * Updates an existing appointment including its status.
    * @param id - The ID of the appointment to update.
    * @param updateAppointmentDto - The data to update.
-   * @returns The result of the update operation.
+   * @returns The updated appointment.
    */
-  async updateAppointment(id: number, updateAppointmentDto: UpdateAppointmentDto): Promise<UpdateResult> {
+  async updateAppointment(id: number, updateAppointmentDto: UpdateAppointmentDto): Promise<Appointment> {
     try {
       logger.info(`Appointment_Update_Entry: id=${id}, data=${JSON.stringify(updateAppointmentDto)}`);
 
       const existingAppointment = await this.findOneAppointment(id);
-      const { modifiedById, branchId, patientId, therapistKey, ...restDto } = updateAppointmentDto;
+      const { modifiedById, branchId, patientId, therapistId, departmentId, specializationId, startTime, endTime, status, reason, ...restDto } = updateAppointmentDto;
+
+      // Validate time slot if both startTime and endTime are provided
+      if (startTime && endTime) {
+        this.validateTimeSlot(startTime, endTime);
+      } else if (startTime && !endTime) {
+        this.validateTimeSlot(startTime, existingAppointment.endTime);
+      } else if (!startTime && endTime) {
+        this.validateTimeSlot(existingAppointment.startTime, endTime);
+      }
 
       // Validate the team member making the modification
       const modifiedBy = await this.teamMemberRepository.findOne({ where: { team_id: modifiedById } }); // Using team_id
@@ -190,6 +337,27 @@ export class AppointmentsService extends BaseService<Appointment> {
       }
 
       const updateData: any = { ...restDto, modifiedBy };
+
+      // Include time fields if provided
+      if (startTime) updateData.startTime = startTime;
+      if (endTime) updateData.endTime = endTime;
+
+      // Handle status update with validation
+      if (status !== undefined) {
+        // Check if status change is valid
+        if (existingAppointment.status === AppointmentStatus.CANCELLED && status !== AppointmentStatus.CANCELLED) {
+          throw new BadRequestException('Cannot change status of a cancelled appointment');
+        }
+        updateData.status = status;
+        
+        // If reason is provided for status change, add it to description
+        if (reason) {
+          updateData.description = `${existingAppointment.description || ''} [Status change: ${reason}]`.trim();
+        }
+      } else if (reason && !status) {
+        // If only reason is provided without status change, add it as a general note
+        updateData.description = `${existingAppointment.description || ''} [Update note: ${reason}]`.trim();
+      }
 
       if (branchId && branchId !== existingAppointment.branch.branch_id) {
         const branch = await this.branchRepository.findOne({ where: { branch_id: branchId } });
@@ -204,16 +372,47 @@ export class AppointmentsService extends BaseService<Appointment> {
         updateData.patient = patient;
       }
 
-      // If therapistKey is provided, validate and update the relation
-      if (therapistKey && therapistKey !== existingAppointment.therapist.therapistId) {
-        const therapist = await this.therapistRepository.findOne({ where: { therapistId: therapistKey } });
-        if (!therapist) throw new BadRequestException(`Therapist with key ${therapistKey} not found`);
+      // If therapistId is provided, validate and update the relation
+      if (therapistId && therapistId !== existingAppointment.therapist.therapistId) {
+        const therapist = await this.therapistRepository.findOne({ where: { therapistId: therapistId } });
+        if (!therapist) throw new BadRequestException(`Therapist with ID ${therapistId} not found`);
         updateData.therapist = therapist;
       }
 
-      const result = await this.repository.update(id, updateData);
-      logger.info(`Appointment_Update_Exit: ${JSON.stringify(result)}`);
-      return result;
+      // If departmentId is provided, validate and update the relation
+      if (departmentId && departmentId !== existingAppointment.department?.id) {
+        const department = await this.departmentRepository.findOne({ where: { id: departmentId } });
+        if (!department) throw new BadRequestException(`Department with ID ${departmentId} not found`);
+        updateData.department = department;
+      }
+
+      // If specializationId is provided, validate and update the relation
+      if (specializationId !== undefined) {
+        if (specializationId === null || specializationId === 0) {
+          // Clear the specialization
+          updateData.specialization = null;
+        } else {
+          const specialization = await this.specializationRepository.findOne({ 
+            where: { specialization_id: specializationId },
+            relations: ['department']
+          });
+          if (!specialization) {
+            throw new BadRequestException(`Specialization with ID ${specializationId} not found`);
+          }
+          
+          // If departmentId is also being updated, use the new department, otherwise use existing
+          const targetDepartmentId = departmentId || existingAppointment.department?.id;
+          if (specialization.department.id !== targetDepartmentId) {
+            throw new BadRequestException(`Specialization ${specializationId} does not belong to department ${targetDepartmentId}`);
+          }
+          updateData.specialization = specialization;
+        }
+      }
+
+      await this.repository.update(id, updateData);
+      const updatedAppointment = await this.findOneAppointment(id);
+      logger.info(`Appointment_Update_Exit: ${JSON.stringify(updatedAppointment)}`);
+      return updatedAppointment;
     } catch (error) {
       this.handleError('Update', error);
     }

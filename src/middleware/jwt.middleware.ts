@@ -26,8 +26,8 @@ export class JwtMiddleware implements NestMiddleware {
       return next();
     }
     if (!req.headers['authorization']) {
-            return next();
-      // return res.status(401).json({ code: 401, message: 'Unauthorized' });
+            // return next();
+      return res.status(401).json({ code: 401, message: 'Unauthorized' });
     }
     const authTokenHeader = req.headers['authorization'].split(' ')[1];
 
