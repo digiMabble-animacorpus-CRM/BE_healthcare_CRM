@@ -1,8 +1,7 @@
 // src/modules/appointments/dto/create-appointment.dto.ts
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, IsEnum } from 'class-validator';
-import { PurposeOfVisit, AppointmentStatus } from '../entities/appointment.entity';
+import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
 
 export class CreateAppointmentDto {
   @ApiProperty({ example: 1, description: 'ID of the existing branch' })
@@ -31,20 +30,19 @@ export class CreateAppointmentDto {
   endTime: string;
 
   @ApiProperty({ 
-    enum: AppointmentStatus, 
-    example: AppointmentStatus.PENDING, 
+    example: 'pending', 
     description: 'Status of the appointment',
     required: false,
-    default: AppointmentStatus.PENDING 
+    default: 'pending' 
   })
   @IsOptional()
-  @IsEnum(AppointmentStatus)
-  status?: AppointmentStatus;
+  @IsString()
+  status?: string;
 
-  @ApiProperty({ enum: PurposeOfVisit, example: PurposeOfVisit.CONSULTATION, description: 'Reason for the visit' })
+  @ApiProperty({ example: 'consultation', description: 'Reason for the visit' })
   @IsNotEmpty()
-  @IsEnum(PurposeOfVisit)
-  purposeOfVisit: PurposeOfVisit;
+  @IsString()
+  purposeOfVisit: string;
 
   @ApiProperty({ example: 1, description: 'ID of the department' })
   @IsNotEmpty()

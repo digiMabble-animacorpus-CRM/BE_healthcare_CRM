@@ -5,7 +5,7 @@ import { BaseService } from 'src/base.service';
 import { Patient } from 'src/modules/customers/entities/patient.entity';
 import { logger } from 'src/core/utils/logger';
 import { EC404, EM119, EC500, EM100 } from 'src/core/constants';
-import Appointment, { AppointmentStatus } from './entities/appointment.entity';
+import Appointment from './entities/appointment.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { FindAllAppointmentsQueryDto } from './dto/find-all-appointments-query.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
@@ -158,7 +158,7 @@ export class AppointmentsService extends BaseService<Appointment> {
 
       const appointment = this.repository.create({
         ...createAppointmentDto,
-        status: createAppointmentDto.status || AppointmentStatus.PENDING,
+        status: createAppointmentDto.status || 'pending',
         branch,
         patient,
         therapist,
@@ -193,7 +193,7 @@ export class AppointmentsService extends BaseService<Appointment> {
     page: number, 
     limit: number, 
     search?: string, 
-    status?: AppointmentStatus,
+    status?: string,
     startDate?: string,
     endDate?: string,
     departmentId?: number,
@@ -345,7 +345,7 @@ export class AppointmentsService extends BaseService<Appointment> {
       // Handle status update with validation
       if (status !== undefined) {
         // Check if status change is valid
-        if (existingAppointment.status === AppointmentStatus.CANCELLED && status !== AppointmentStatus.CANCELLED) {
+        if (existingAppointment.status === 'cancelled' && status !== 'cancelled') {
           throw new BadRequestException('Cannot change status of a cancelled appointment');
         }
         updateData.status = status;

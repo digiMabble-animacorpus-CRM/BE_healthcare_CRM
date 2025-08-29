@@ -14,6 +14,9 @@ import { Menu } from 'src/modules/menus/entities/menu.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { Token } from 'src/modules/users/entities/token.entity';
 import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
+import { Department } from 'src/modules/Department/entities/department.entity';
+import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
+import Appointment from 'src/modules/appointment/entities/appointment.entity';
 // import any other entities
 
 export const AppDataSource = new DataSource({
@@ -36,6 +39,9 @@ export const AppDataSource = new DataSource({
     Branch,
     Token,
     TeamMember,
+    Department,
+    Specialization,
+    Appointment,
    // `${__dirname}/src/modules/**/entities/*.entity{.ts,.js}`
   ],
   migrations: ['src/migrations/*{.ts,.js}'],
