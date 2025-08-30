@@ -72,7 +72,6 @@ export class Patient {
 @JoinColumn({ name: 'therapist_id' })
 therapist?: Therapist;
 
-
   // Soft delete columns
   @Column({ default: false })
   is_delete: boolean;
