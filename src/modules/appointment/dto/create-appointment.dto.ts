@@ -14,19 +14,14 @@ export class CreateAppointmentDto {
   @IsString()
   patientId: string;
 
-  @ApiProperty({ example: '2025-11-15', description: 'Date of appointment (YYYY-MM-DD)' })
+  @ApiProperty({ example: '2025-11-15T09:00:00.000Z', description: 'Start date and time of appointment in ISO format' })
   @IsNotEmpty()
   @IsDateString()
-  date: string;
-
-  @ApiProperty({ example: '11:00', description: 'Start time of appointment (HH:MM)' })
-  @IsNotEmpty()
-  @IsString()
   startTime: string;
 
-  @ApiProperty({ example: '11:30', description: 'End time of appointment (HH:MM)' })
+  @ApiProperty({ example: '2025-11-15T09:30:00.000Z', description: 'End date and time of appointment in ISO format' })
   @IsNotEmpty()
-  @IsString()
+  @IsDateString()
   endTime: string;
 
   @ApiProperty({ 

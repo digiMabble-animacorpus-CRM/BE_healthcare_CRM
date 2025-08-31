@@ -31,16 +31,12 @@ export default class Appointment extends BaseModel {
   patient: Patient;
 
 
-  @Column({ type: 'date' })
-  date: Date;
+  @Column({ type: 'timestamptz' })
+  startTime: Date;
 
 
-  @Column({ type: 'time' })
-  startTime: string;
-
-
-  @Column({ type: 'time' })
-  endTime: string;
+  @Column({ type: 'timestamptz' })
+  endTime: Date;
 
 
   @Column({ type: 'text', default: 'pending' })
