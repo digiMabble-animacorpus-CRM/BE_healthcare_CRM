@@ -55,6 +55,7 @@ export class SpecializationService {
     page: number,
     limit: number,
     search?: string,
+    departmentId?: string,
   ): Promise<{ data: Specialization[]; total: number }> {
     const skip = (page - 1) * limit;
     const query = this.specializationRepository.createQueryBuilder('specialization')
@@ -66,6 +67,10 @@ export class SpecializationService {
           .orWhere('specialization.description ILIKE :search', { search: `%${search}%` })
           .orWhere('department.name ILIKE :search', { search: `%${search}%` });
       }));
+    }
+
+    if (departmentId) {
+      query.andWhere('department.id = :departmentId', { departmentId });
     }
 
     const [data, total] = await query
