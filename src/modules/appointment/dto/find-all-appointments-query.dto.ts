@@ -30,7 +30,7 @@ export class FindAllAppointmentsQueryDto {
 
   @ApiProperty({ 
     required: false, 
-    description: 'Filter by start date (YYYY-MM-DD) - beginning of date range' 
+    description: 'Filter by start date and time (ISO format) - beginning of date range' 
   })
   @IsOptional()
   @IsString()
@@ -38,7 +38,7 @@ export class FindAllAppointmentsQueryDto {
 
   @ApiProperty({ 
     required: false, 
-    description: 'Filter by end date (YYYY-MM-DD) - end of date range' 
+    description: 'Filter by end date and time (ISO format) - end of date range' 
   })
   @IsOptional()
   @IsString()
