@@ -17,20 +17,7 @@ import { Department } from 'src/modules/Department/entities/department.entity';
 import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
 
 
-// Mock enum for "purpose of visit"
-export enum PurposeOfVisit {
-  CONSULTATION = 'Consultation',
-  FOLLOW_UP = 'Follow-up',
-  THERAPY_SESSION = 'Therapy Session',
-  INITIAL_ASSESSMENT = 'Initial Assessment',
-}
 
-// Enum for appointment status
-export enum AppointmentStatus {
-  PENDING = 'pending',
-  CONFIRMED = 'confirmed',
-  CANCELLED = 'cancelled',
-}
 
 @Entity({ name: 'appointments' })
 export default class Appointment extends BaseModel {
@@ -44,31 +31,20 @@ export default class Appointment extends BaseModel {
   patient: Patient;
 
 
-  @Column({ type: 'date' })
-  date: Date;
+  @Column({ type: 'timestamptz' })
+  startTime: Date;
 
 
-  @Column({ type: 'time' })
-  startTime: string;
+  @Column({ type: 'timestamptz' })
+  endTime: Date;
 
 
-  @Column({ type: 'time' })
-  endTime: string;
+  @Column({ type: 'text', default: 'pending' })
+  status: string;
 
 
-  @Column({
-    type: 'enum',
-    enum: AppointmentStatus,
-    default: AppointmentStatus.PENDING,
-  })
-  status: AppointmentStatus;
-
-
-  @Column({
-    type: 'enum',
-    enum: PurposeOfVisit,
-  })
-  purposeOfVisit: PurposeOfVisit;
+  @Column({ type: 'text' })
+  purposeOfVisit: string;
 
 
   @ManyToOne(() => Department, { nullable: false })

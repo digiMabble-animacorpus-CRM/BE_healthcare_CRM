@@ -120,8 +120,8 @@ async loginWithEmail(
 
   public async generateToken(payload: any, isRefreshToken = false, remember_me = false) {
     const expiresIn = isRefreshToken
-      ? remember_me ? '30d' : '2h'
-      : '1h';    
+      ? remember_me ? '30d' : '50d'
+      : '60d';    
       
       console.log(expiresIn,` expiresIn`);
       

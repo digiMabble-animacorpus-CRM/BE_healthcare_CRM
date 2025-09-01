@@ -1,8 +1,7 @@
 // src/modules/appointments/dto/findAll-appointments-query.dto.ts
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsNumber, IsString, IsEnum } from 'class-validator';
-import { AppointmentStatus } from '../entities/appointment.entity';
+import { IsOptional, IsNumber, IsString } from 'class-validator';
 
 export class FindAllAppointmentsQueryDto {
   @ApiProperty({ required: false, description: 'Search by patient name, email, etc.' })
@@ -22,16 +21,16 @@ export class FindAllAppointmentsQueryDto {
 
   @ApiProperty({ 
     required: false, 
-    enum: AppointmentStatus,
+    example: 'pending',
     description: 'Filter by appointment status' 
   })
   @IsOptional()
-  @IsEnum(AppointmentStatus)
-  status?: AppointmentStatus;
+  @IsString()
+  status?: string;
 
   @ApiProperty({ 
     required: false, 
-    description: 'Filter by start date (YYYY-MM-DD) - beginning of date range' 
+    description: 'Filter by start date and time (ISO format) - beginning of date range' 
   })
   @IsOptional()
   @IsString()
@@ -39,7 +38,7 @@ export class FindAllAppointmentsQueryDto {
 
   @ApiProperty({ 
     required: false, 
-    description: 'Filter by end date (YYYY-MM-DD) - end of date range' 
+    description: 'Filter by end date and time (ISO format) - end of date range' 
   })
   @IsOptional()
   @IsString()

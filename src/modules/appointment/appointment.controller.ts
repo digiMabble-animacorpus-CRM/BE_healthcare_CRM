@@ -38,11 +38,11 @@ export class AppointmentsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all appointments with filtering and pagination' })
+  @ApiOperation({ summary: 'Get all appointments with optional filtering and pagination' })
   @ApiResponse({ status: 200, description: 'Appointments retrieved successfully.' })
   async findAll(@Query() query: FindAllAppointmentsQueryDto) {
-    const page = query.pagNo ?? 1; 
-    const limit = query.limit ?? 10; 
+    const page = query.pagNo; 
+    const limit = query.limit; 
     const search = query.search;
     const status = query.status;
     const startDate = query.startDate;
@@ -65,13 +65,21 @@ export class AppointmentsController {
         patientId,
         therapistId
       );
-      return HandleResponse.buildSuccessObj(EC200, 'Appointments retrieved successfully.', {
+      
+      const response: any = {
         data,
         total,
-        page,
-        limit,
         filters: { search, status, startDate, endDate, departmentId, branchId, patientId, therapistId }
-      });
+      };
+      
+      // Only include pagination info if pagination was used
+      if (page && limit) {
+        response.page = page;
+        response.limit = limit;
+        response.totalPages = Math.ceil(total / limit);
+      }
+      
+      return HandleResponse.buildSuccessObj(EC200, 'Appointments retrieved successfully.', response);
     } catch (error) {
       return this.handleError(error);
     }

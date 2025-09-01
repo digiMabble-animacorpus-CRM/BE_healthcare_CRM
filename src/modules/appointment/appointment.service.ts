@@ -5,7 +5,7 @@ import { BaseService } from 'src/base.service';
 import { Patient } from 'src/modules/customers/entities/patient.entity';
 import { logger } from 'src/core/utils/logger';
 import { EC404, EM119, EC500, EM100 } from 'src/core/constants';
-import Appointment, { AppointmentStatus } from './entities/appointment.entity';
+import Appointment from './entities/appointment.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { FindAllAppointmentsQueryDto } from './dto/find-all-appointments-query.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
@@ -61,26 +61,21 @@ export class AppointmentsService extends BaseService<Appointment> {
   }
 
   /**
-   * Validates time slot format and ensures end time is after start time.
+   * Validates datetime format and ensures end time is after start time.
    */
-  private validateTimeSlot(startTime: string, endTime: string): void {
-    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+  private validateDateTimeSlot(startTime: string, endTime: string): void {
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
     
-    if (!timeRegex.test(startTime)) {
-      throw new BadRequestException('Start time must be in HH:MM format');
+    if (isNaN(startDate.getTime())) {
+      throw new BadRequestException('Start time must be a valid ISO datetime string');
     }
     
-    if (!timeRegex.test(endTime)) {
-      throw new BadRequestException('End time must be in HH:MM format');
+    if (isNaN(endDate.getTime())) {
+      throw new BadRequestException('End time must be a valid ISO datetime string');
     }
-
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const [endHour, endMinute] = endTime.split(':').map(Number);
     
-    const startMinutes = startHour * 60 + startMinute;
-    const endMinutes = endHour * 60 + endMinute;
-    
-    if (endMinutes <= startMinutes) {
+    if (endDate <= startDate) {
       throw new BadRequestException('End time must be after start time');
     }
   }
@@ -144,8 +139,8 @@ export class AppointmentsService extends BaseService<Appointment> {
     try {
       logger.info(`Appointment_Create_Entry: ${JSON.stringify(createAppointmentDto)}`);
 
-      // Validate time slot
-      this.validateTimeSlot(createAppointmentDto.startTime, createAppointmentDto.endTime);
+      // Validate datetime slot
+      this.validateDateTimeSlot(createAppointmentDto.startTime, createAppointmentDto.endTime);
 
       const { branch, patient, therapist, teamMember: createdBy, department, specialization } = await this.validateRelations(
         createAppointmentDto.branchId,
@@ -158,7 +153,9 @@ export class AppointmentsService extends BaseService<Appointment> {
 
       const appointment = this.repository.create({
         ...createAppointmentDto,
-        status: createAppointmentDto.status || AppointmentStatus.PENDING,
+        startTime: new Date(createAppointmentDto.startTime),
+        endTime: new Date(createAppointmentDto.endTime),
+        status: createAppointmentDto.status || 'pending',
         branch,
         patient,
         therapist,
@@ -176,9 +173,9 @@ export class AppointmentsService extends BaseService<Appointment> {
   }
 
   /**
-   * Finds all appointments with pagination and search functionality.
-   * @param page - Page number.
-   * @param limit - Number of items per page.
+   * Finds all appointments with optional pagination and search functionality.
+   * @param page - Page number (optional, if not provided returns all data).
+   * @param limit - Number of items per page (optional, if not provided returns all data).
    * @param search - Optional search term.
    * @param status - Optional status filter.
    * @param startDate - Optional start date for date range filter.
@@ -190,10 +187,10 @@ export class AppointmentsService extends BaseService<Appointment> {
    * @returns A list of appointments and the total count.
    */
   async findAllWithPaginationAppointments(
-    page: number, 
-    limit: number, 
+    page?: number, 
+    limit?: number, 
     search?: string, 
-    status?: AppointmentStatus,
+    status?: string,
     startDate?: string,
     endDate?: string,
     departmentId?: number,
@@ -245,11 +242,11 @@ export class AppointmentsService extends BaseService<Appointment> {
       }
 
       if (startDate) {
-        query.andWhere('a.date >= :startDate', { startDate });
+        query.andWhere('a.startTime >= :startDate', { startDate: new Date(startDate) });
       }
 
       if (endDate) {
-        query.andWhere('a.date <= :endDate', { endDate });
+        query.andWhere('a.endTime <= :endDate', { endDate: new Date(endDate) });
       }
 
       if (departmentId) {
@@ -270,11 +267,15 @@ export class AppointmentsService extends BaseService<Appointment> {
 
       logger.info('About to execute query with filters applied');
       
-      const [data, total] = await query
-        .orderBy('a.created_at', 'DESC')
-        .skip((page - 1) * limit)
-        .take(limit)
-        .getManyAndCount();
+      // Apply ordering
+      query = query.orderBy('a.created_at', 'DESC');
+      
+      // Apply pagination only if both page and limit are provided
+      if (page && limit) {
+        query = query.skip((page - 1) * limit).take(limit);
+      }
+      
+      const [data, total] = await query.getManyAndCount();
 
       logger.info(`Appointment_FindAllPaginated_Exit: Found ${data.length} appointments, total: ${total}`);
       return { data, total };
@@ -321,13 +322,13 @@ export class AppointmentsService extends BaseService<Appointment> {
       const existingAppointment = await this.findOneAppointment(id);
       const { modifiedById, branchId, patientId, therapistId, departmentId, specializationId, startTime, endTime, status, reason, ...restDto } = updateAppointmentDto;
 
-      // Validate time slot if both startTime and endTime are provided
+      // Validate datetime slot if both startTime and endTime are provided
       if (startTime && endTime) {
-        this.validateTimeSlot(startTime, endTime);
+        this.validateDateTimeSlot(startTime, endTime);
       } else if (startTime && !endTime) {
-        this.validateTimeSlot(startTime, existingAppointment.endTime);
+        this.validateDateTimeSlot(startTime, existingAppointment.endTime.toISOString());
       } else if (!startTime && endTime) {
-        this.validateTimeSlot(existingAppointment.startTime, endTime);
+        this.validateDateTimeSlot(existingAppointment.startTime.toISOString(), endTime);
       }
 
       // Validate the team member making the modification
@@ -338,14 +339,14 @@ export class AppointmentsService extends BaseService<Appointment> {
 
       const updateData: any = { ...restDto, modifiedBy };
 
-      // Include time fields if provided
-      if (startTime) updateData.startTime = startTime;
-      if (endTime) updateData.endTime = endTime;
+      // Include datetime fields if provided (convert from ISO string to Date)
+      if (startTime) updateData.startTime = new Date(startTime);
+      if (endTime) updateData.endTime = new Date(endTime);
 
       // Handle status update with validation
       if (status !== undefined) {
         // Check if status change is valid
-        if (existingAppointment.status === AppointmentStatus.CANCELLED && status !== AppointmentStatus.CANCELLED) {
+        if (existingAppointment.status === 'cancelled' && status !== 'cancelled') {
           throw new BadRequestException('Cannot change status of a cancelled appointment');
         }
         updateData.status = status;

@@ -1,8 +1,7 @@
 // src/modules/appointments/dto/create-appointment.dto.ts
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, IsEnum } from 'class-validator';
-import { PurposeOfVisit, AppointmentStatus } from '../entities/appointment.entity';
+import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
 
 export class CreateAppointmentDto {
   @ApiProperty({ example: 1, description: 'ID of the existing branch' })
@@ -15,36 +14,30 @@ export class CreateAppointmentDto {
   @IsString()
   patientId: string;
 
-  @ApiProperty({ example: '2025-11-15', description: 'Date of appointment (YYYY-MM-DD)' })
+  @ApiProperty({ example: '2025-11-15T09:00:00.000Z', description: 'Start date and time of appointment in ISO format' })
   @IsNotEmpty()
   @IsDateString()
-  date: string;
-
-  @ApiProperty({ example: '11:00', description: 'Start time of appointment (HH:MM)' })
-  @IsNotEmpty()
-  @IsString()
   startTime: string;
 
-  @ApiProperty({ example: '11:30', description: 'End time of appointment (HH:MM)' })
+  @ApiProperty({ example: '2025-11-15T09:30:00.000Z', description: 'End date and time of appointment in ISO format' })
   @IsNotEmpty()
-  @IsString()
+  @IsDateString()
   endTime: string;
 
   @ApiProperty({ 
-    enum: AppointmentStatus, 
-    example: AppointmentStatus.PENDING, 
+    example: 'pending', 
     description: 'Status of the appointment',
     required: false,
-    default: AppointmentStatus.PENDING 
+    default: 'pending' 
   })
   @IsOptional()
-  @IsEnum(AppointmentStatus)
-  status?: AppointmentStatus;
+  @IsString()
+  status?: string;
 
-  @ApiProperty({ enum: PurposeOfVisit, example: PurposeOfVisit.CONSULTATION, description: 'Reason for the visit' })
+  @ApiProperty({ example: 'consultation', description: 'Reason for the visit' })
   @IsNotEmpty()
-  @IsEnum(PurposeOfVisit)
-  purposeOfVisit: PurposeOfVisit;
+  @IsString()
+  purposeOfVisit: string;
 
   @ApiProperty({ example: 1, description: 'ID of the department' })
   @IsNotEmpty()

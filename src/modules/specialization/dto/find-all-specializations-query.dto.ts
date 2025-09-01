@@ -28,11 +28,18 @@ export class FindAllSpecializationsQueryDto {
   @IsNumber()
   limit?: number;
 
+  // @ApiProperty({
+  //   required: false,
+  //   description: 'Filter specializations by consultation ID',
+  // })
+  // @IsOptional()
+  // @IsUUID()
+  // consultationId?: string;
+
   @ApiProperty({
     required: false,
-    description: 'Filter specializations by consultation ID',
+    description: 'Filter specializations by department ID',
   })
   @IsOptional()
-  @IsUUID()
-  consultationId?: string;
+  departmentId?: string;
 }
