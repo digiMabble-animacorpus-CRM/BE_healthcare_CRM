@@ -13,6 +13,7 @@ import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { UsersService } from 'src/modules/users/users.service';
 // import { Public } from 'src/common/decorators/public.decorator';
 import { Logger } from '@nestjs/common';
+import { Public } from 'src/common/decorators/public.decorator';
 
 const logger = new Logger('AuthController');
 
@@ -24,7 +25,7 @@ export class AuthController {
   constructor(private authService: AuthService,
     private readonly usersService: UsersService,
   ) {}
-
+@Public()
 @Post('login')
 @ApiOperation({ summary: 'Login with email and password (AES encrypted or plain JSON)' })
 @ApiBody({ type: LoginDto })
@@ -90,7 +91,7 @@ async login(@Body() reqBody: any) {
 //     throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
 //   }
 // }
-
+// @Public()
 // @Post('signup-staff')
 // // @ApiOperation({ summary: 'Signup as staff (plain JSON or encrypted)' })
 // // @ApiBody({ type: SignupAdminDto })
@@ -102,7 +103,7 @@ async login(@Body() reqBody: any) {
 
 
 // signup for branch-admin
-
+// @Public()
 // @Post('signup-branch-admin')
 // // @ApiOperation({ summary: 'Signup as branch admin (plain JSON or encrypted)' })
 // // @ApiBody({ type: SignupAdminDto })
@@ -112,7 +113,7 @@ async login(@Body() reqBody: any) {
 // }
 
 // signup for super-admin
-
+// @Public()
 // @Post('signup-super-admin')
 // @ApiOperation({ summary: 'Signup as super admin (plain JSON or encrypted)' })
 // @ApiBody({ type: SignupAdminDto })
@@ -122,7 +123,7 @@ async login(@Body() reqBody: any) {
 //   return this.signupByRole(reqBody, 'super-admin');
 // }
 
-
+@Public()
   @Post('signup-admin')
 @ApiOperation({ summary: 'Signup as admin (plain JSON only)' })
 @ApiBody({ type: SignupAdminDto })
@@ -166,7 +167,7 @@ async signupAdmin(@Body() reqBody: any) {
 
 
 
-
+@Public()
   @Post('forgot-password')
     @ApiOperation({ summary: 'Send password reset link to email' })
   @ApiBody({ type: ForgotPasswordDto })
@@ -179,7 +180,7 @@ async signupAdmin(@Body() reqBody: any) {
       return HandleResponse.buildErrObj(error?.status || EC500, error?.message || EM100, error);
     }
   }
-
+@Public()
   @Post('reset-password')
   @ApiOperation({ summary: 'Reset password using token' })
   @ApiBody({ type: ResetPasswordDto })
@@ -192,7 +193,7 @@ async signupAdmin(@Body() reqBody: any) {
       return HandleResponse.buildErrObj(error?.status || EC500, error?.message || EM100, error);
     }
   }
-
+@Public()
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh JWT token' })
   @ApiBody({ schema: { example: { token: 'jwt-refresh-token-here' } } })
@@ -204,7 +205,7 @@ async signupAdmin(@Body() reqBody: any) {
       return HandleResponse.buildErrObj(error?.status || EC500, error?.message || EM100, error);
     }
   }
-
+@Public()
   @Post('destroy')
   async deleteUser(@Body() deleteDto: DeleteDto) {
     try {
@@ -215,7 +216,7 @@ async signupAdmin(@Body() reqBody: any) {
       return HandleResponse.buildErrObj(EC500 || error.status, error?.message || EM100, error);
     }
   }
-
+@Public()
   @Post('logout')
   async logout(@Body() logoutDto: userlogoutDto) {
     try {

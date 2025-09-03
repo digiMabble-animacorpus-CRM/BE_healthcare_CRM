@@ -1,65 +1,51 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
+import { TeamMemberRole } from 'src/modules/team-member/entities/team-member.entity';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
+  private readonly logger = new Logger(RolesGuard.name);
+
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-  //   const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
-  //     context.getHandler(),
-  //     context.getClass(),
-  //   ]);
+    const requiredRoles = this.reflector.getAllAndOverride<TeamMemberRole[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-  //   console.log(' RolesGuard checking roles...');
-  //   console.log(' Required Roles:', requiredRoles);
+    if (!requiredRoles || requiredRoles.length === 0) {
+      this.logger.debug('No roles required → Access granted by default.');
+      return true;
+    }
 
-  //   if (!requiredRoles || requiredRoles.length === 0) {
-  //     return true;
-  //   }
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
 
-  //   const { user } = context.switchToHttp().getRequest();
-  //   console.log(' request.user:', user);
+    this.logger.debug(`Checking access for user: ${JSON.stringify(user)}`);
+    this.logger.debug(`Required Roles: ${requiredRoles.join(', ')}`);
+    this.logger.debug(`User Role: ${user?.role ?? 'NONE'}`);
 
-  //   if (!user) {
-  //     console.log(' No user found in request');
-  //     return false;
-  //   }
+    if (!user) {
+      this.logger.warn('No user found in request → Access denied.');
+      return false;
+    }
 
-  //   //  Check roles array
-  //   if (Array.isArray(user.roles)) {
-  //     const matched = user.roles.some(
-  //       (role) =>
-  //         requiredRoles.includes(role.role_type) ||
-  //         requiredRoles.includes(role.name),
-  //     );
-  //     console.log(' Matched from roles array:', matched);
-  //     if (matched) return true;
-  //   } else {
-  //     console.log(' user.roles is missing or not an array:', user.roles);
-  //   }
+    // ✅ Super Admin bypass
+    if (user.role === TeamMemberRole.SUPER_ADMIN) {
+      this.logger.log('Super Admin bypass → Access granted.');
+      return true;
+    }
 
-  //   //  Check user_type
-  //   if (user.user_type) {
-  //     const matched = requiredRoles.includes(user.user_type);
-  //     console.log(' Matched from user_type:', matched);
-  //     if (matched) return true;
-  //   }
+    // ✅ Normal role check
+    const hasRole = requiredRoles.includes(user.role);
+    if (!hasRole) {
+      this.logger.warn(`Access denied → User role "${user.role}" not in required roles.`);
+    } else {
+      this.logger.log(`Access granted → User role "${user.role}" matches required roles.`);
+    }
 
-  //   //  Check single flat role_type (optional support)
-  //   if (user.role_type) {
-  //     const matched = requiredRoles.includes(user.role_type);
-  //     console.log(' Matched from role_type:', matched);
-  //     if (matched) return true;
-  //   }
-
-  //   console.log('Access denied. No role matched.');
-  //   return false;
-  return true; 
-   }
+    return hasRole;
+  }
 }

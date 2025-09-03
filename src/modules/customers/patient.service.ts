@@ -46,75 +46,144 @@ export class PatientsService extends BaseService<Patient> {
     }
   }
 
-  async findAll(options?: FindManyOptions<Patient>): Promise<Patient[]> {
-    try {
-      logger.info('Patient_FindAll_Entry');
-      const patients = await this.patientRepository.find({
-        where: { is_delete: false }, // exclude soft-deleted
-        ...(options || {}),
-      });
-      logger.info(`Patient_FindAll_Exit: Found ${patients.length} patients`);
-      return patients;
-    } catch (error) {
-      logger.error(`Patient_FindAll_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+
+
+// Overloads
+async findAll(options?: FindManyOptions<Patient>): Promise<Patient[]>;
+async findAll(
+  userCtx: { role: string; branches?: { branch_id: number }[] },
+  options?: FindManyOptions<Patient>
+): Promise<Patient[]>;
+
+// Implementation
+async findAll(
+  userCtxOrOptions?: { role: string; branches?: { branch_id: number }[] } | FindManyOptions<Patient>,
+  options?: FindManyOptions<Patient>
+): Promise<Patient[]> {
+  try {
+    logger.info('Patient_FindAll_Entry');
+
+    const query = this.patientRepository.createQueryBuilder('patient')
+      .where('patient.is_delete = false');   // soft delete filter
+
+    let userCtx: { role: string; branches?: { branch_id: number }[] } | undefined;
+
+    // Distinguish overload call safely
+    if (userCtxOrOptions && 'role' in userCtxOrOptions) {
+      // called as (userCtx, options)
+      userCtx = userCtxOrOptions;
+    } else {
+      // called as (options)
+      options = userCtxOrOptions as FindManyOptions<Patient>;
     }
+
+    // RBAC branch filter
+    if (userCtx?.role !== 'super_admin' && userCtx?.branches?.length) {
+      const branchIds = userCtx.branches.map(b => b.branch_id);
+      query.andWhere('patient.branch_id IN (:...branchIds)', { branchIds });
+    }
+
+    if (options?.where) {
+      query.andWhere(options.where as any);
+    }
+
+    const patients = await query.getMany();
+    logger.info(`Patient_FindAll_Exit: Found ${patients.length} patients`);
+    return patients;
+  } catch (error) {
+    logger.error(`Patient_FindAll_Error: ${error?.message}`);
+    throw new HttpException(EM100, EC500);
   }
-
-  async findAllWithPagination(
-    page: number,
-    limit: number,
-    options?: FindManyOptions<Patient> & {
-      searchText?: string;
-      branch?: string;
-      fromDate?: string;
-      toDate?: string;
-    },
-  ): Promise<{ data: Patient[]; total: number }> {
-    try {
-      const query = this.patientRepository.createQueryBuilder('patient');
-
-      // Always exclude deleted
-      query.where('patient.is_delete = false');
-
-   if (options?.searchText) {
-  const search = `%${options.searchText}%`;
-
-  query.andWhere(
-    `(patient.firstname ILIKE :search 
-      OR patient.lastname ILIKE :search 
-      OR patient.emails ILIKE :search 
-      OR EXISTS (
-        SELECT 1
-        FROM unnest(patient.phones) AS phone
-        WHERE phone ILIKE :search
-      ))`,
-    { search },
-  );
 }
 
-      if (options?.branch) {
-        query.andWhere('patient.source = :branch', { branch: options.branch });
-      }
 
-      if (options?.fromDate && options?.toDate) {
-        query.andWhere('DATE(patient.created_at) BETWEEN :fromDate AND :toDate', {
-          fromDate: options.fromDate,
-          toDate: options.toDate,
-        });
-      }
 
-      const [data, total] = await query
-        .orderBy('patient.created_at', 'DESC')
-        .skip((page - 1) * limit)
-        .take(limit)
-        .getManyAndCount();
 
-      return { data, total };
-    } catch (error) {
-      throw new HttpException(EM100, EC500);
+// Overload 1 - without userCtx
+async findAllWithPagination(
+  page: number,
+  limit: number,
+  options?: FindManyOptions<Patient> & {
+    searchText?: string;
+    branch?: string;
+    fromDate?: string;
+    toDate?: string;
+  },
+): Promise<{ data: Patient[]; total: number }>;
+
+// Overload 2 - with userCtx
+async findAllWithPagination(
+  page: number,
+  limit: number,
+  options: (FindManyOptions<Patient> & {
+    searchText?: string;
+    branch?: string;
+    fromDate?: string;
+    toDate?: string;
+  }) | undefined,
+  userCtx: { role: string; branches?: { branch_id: number }[] },
+): Promise<{ data: Patient[]; total: number }>;
+
+// Implementation
+async findAllWithPagination(
+  page: number,
+  limit: number,
+  options?: FindManyOptions<Patient> & {
+    searchText?: string;
+    branch?: string;
+    fromDate?: string;
+    toDate?: string;
+  },
+  userCtx?: { role: string; branches?: { branch_id: number }[] },
+): Promise<{ data: Patient[]; total: number }> {
+  try {
+    const query = this.patientRepository.createQueryBuilder('patient');
+    query.where('patient.is_delete = false');
+
+    if (options?.searchText) {
+      const search = `%${options.searchText}%`;
+      query.andWhere(
+        `(patient.firstname ILIKE :search 
+          OR patient.lastname ILIKE :search 
+          OR patient.emails ILIKE :search 
+          OR EXISTS (
+            SELECT 1 FROM unnest(patient.phones) AS phone WHERE phone ILIKE :search
+          ))`,
+        { search },
+      );
     }
+
+    if (options?.branch) {
+      query.andWhere('patient.source = :branch', { branch: options.branch });
+    }
+
+    if (options?.fromDate && options?.toDate) {
+      query.andWhere(
+        'DATE(patient.created_at) BETWEEN :fromDate AND :toDate',
+        { fromDate: options.fromDate, toDate: options.toDate },
+      );
+    }
+
+    // RBAC branch filter
+    if (userCtx?.role !== 'super_admin' && userCtx?.branches?.length) {
+      query.andWhere('patient.branch_id IN (:...branchIds)', {
+        branchIds: userCtx.branches.map((b) => b.branch_id),
+      });
+    }
+
+    const [data, total] = await query
+      .orderBy('patient.created_at', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return { data, total };
+  } catch (error) {
+    throw new HttpException(EM100, EC500);
   }
+}
+
+  
 
   async findOne(id: string): Promise<Patient> {
     try {

@@ -8,15 +8,16 @@ import { Therapist } from './src/modules/therapist/entities/therapist.entity';
 // import { Staff } from './src/modules/StaffType/entities/staff.entity';
 import { Role } from 'src/modules/roles/entities/role.entity';
 import { Permission } from 'src/modules/permissions/entities/permission.entity';
-// import User from '../BE_healthcare_CRM/src/modules/users/entities/user.entity';
+import User from 'src/modules/users/entities/user.entity';
 // import { SocialLinks } from '../BE_healthcare_CRM/src/modules/social-links/entities/social-links.entity';
 import { Menu } from 'src/modules/menus/entities/menu.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { Token } from 'src/modules/users/entities/token.entity';
 import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
+import { Consultation } from 'src/modules/consultations/entities/consultation.entity';
 import { Department } from 'src/modules/Department/entities/department.entity';
 import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
-import Appointment from 'src/modules/appointment/entities/appointment.entity';
+import { Language } from 'src/modules/language/entities/language.entity';
 // import any other entities
 
 export const AppDataSource = new DataSource({
@@ -33,15 +34,16 @@ export const AppDataSource = new DataSource({
     // Staff,
     Role,
     Permission,
-    // User,
+    User,
     // SocialLinks,
     Menu,
     Branch,
     Token,
     TeamMember,
+    Consultation,
     Department,
     Specialization,
-    Appointment,
+    Language,
    // `${__dirname}/src/modules/**/entities/*.entity{.ts,.js}`
   ],
   migrations: ['src/migrations/*{.ts,.js}'],
