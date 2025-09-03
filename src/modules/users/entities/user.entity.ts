@@ -113,6 +113,8 @@ export default class User  {
   team: TeamMember;
 
 
+
+
   // @Column({ type: 'boolean', default: false })
   // email_verified: boolean;
 

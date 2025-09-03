@@ -11,6 +11,8 @@ import {
   HttpException,
   BadRequestException,
   HttpStatus,
+  Req,
+  UseGuards,
  
 } from '@nestjs/common';
 import {
@@ -41,13 +43,22 @@ import { PaginationDto } from 'src/core/interfaces/shared.dto';
 import { validateOrReject } from 'class-validator';
 import { plainToClass,  plainToInstance } from 'class-transformer';
 import { logger } from 'src/core/utils/logger';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { PermissionGuard } from 'src/common/guards/permission.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { BranchGuard } from 'src/common/guards/branch.guard';
 
 @ApiTags('Patients')
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionGuard, BranchGuard)
 @Controller('patients')
 export class PatientsController {
   constructor(private readonly patientsService: PatientsService) {}
 
   // CREATE
+  @Roles('super_admin', 'admin')
+ @Permissions({ module: 'patients', action: 'create' })
   @Post()
   @ApiOperation({ summary: 'Create a new customer (plain JSON only)' })
   @ApiBody({ type: CreatePatientDto })
@@ -87,7 +98,8 @@ export class PatientsController {
 @ApiQuery({ name: 'branch', required: false, type: String })
 @ApiQuery({ name: 'fromDate', required: false, type: String })
 @ApiQuery({ name: 'toDate', required: false, type: String })
-async findAll(@Query() queryParams: PaginationDto) {
+@ApiOperation({ summary: 'Get all patients (with branch RBAC)' })
+async findAll(@Req() req, @Query() queryParams: PaginationDto) {
   try {
     const paginationDto = plainToClass(PaginationDto, queryParams);
     await validateOrReject(paginationDto);
@@ -103,24 +115,23 @@ async findAll(@Query() queryParams: PaginationDto) {
             fromDate: paginationDto.fromDate,
             toDate: paginationDto.toDate,
           },
+          req.user, // 👈 pass user context here
         );
       return HandleResponse.buildSuccessObj(EC200, EM106, { data, total });
     } else {
-      const data = await this.patientsService.findAll();
+      const data = await this.patientsService.findAll(req.user); // 👈 RBAC applied
       return HandleResponse.buildSuccessObj(EC200, EM106, data);
     }
   } catch (error) {
-    console.error('FindAll error:', error);
-    if (error instanceof HttpException) {
-      return HandleResponse.buildErrObj(
-        error.getStatus(),
-        error.message,
-        error,
-      );
-    }
-    return HandleResponse.buildErrObj(EC500, EM100, error);
+    logger.error(`FindAll error: ${error?.message}`);
+    return HandleResponse.buildErrObj(
+      error instanceof HttpException ? error.getStatus() : EC500,
+      error.message || EM100,
+      error,
+    );
   }
 }
+
 
 
   // GET ONE
@@ -193,7 +204,8 @@ async findOne(@Param('id') id: string) {
   }
 
 
-
+  @Roles('super_admin', 'admin')
+@Permissions({ module: 'patients', action: 'edit' })
 @Patch(':id')
 @ApiOperation({ summary: 'Update a patient by ID' })
 @ApiParam({
@@ -245,6 +257,8 @@ async update(
 
 
 // DELETE (Soft Delete)
+  @Roles('super_admin', 'admin')
+@Permissions({ module: 'patients', action: 'delete' })
 @Delete(':id')
 @ApiOperation({ summary: 'Soft delete a patient by ID' })
 @ApiParam({

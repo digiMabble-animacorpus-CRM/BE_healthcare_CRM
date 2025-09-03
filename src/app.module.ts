@@ -37,6 +37,8 @@ import { BranchesModule } from './modules/branches/branches.module';
 import { ConsultationsModule } from './modules/consultations/consultations.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { DepartmentsModule } from './modules/Department/departments.module';
+import { RolesGuard } from './common/guards/roles.guard';
+
 
 config();
 
@@ -93,10 +95,14 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
   ],
   controllers: [AppController],
   providers: [AppService,
-    //   {
-    //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard, 
-    // },
+      {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard, 
+    },
+      {
+      provide: APP_GUARD,
+      useClass: RolesGuard, 
+    },
   ],
 
 })

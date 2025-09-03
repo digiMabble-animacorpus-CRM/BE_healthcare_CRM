@@ -22,13 +22,18 @@ import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 // import { Staff } from 'src/modules/StaffType/entities/staff.entity';
 import { Token } from 'src/modules/users/entities/token.entity';
+import { TeamMemberModule } from '../team-member/team-member.module';
+import { TeamMember } from '../team-member/entities/team-member.entity';
+
+
 @Module({
   imports: [
     PassportModule,
     AddressesModule,
     UsersModule,
+    TeamMemberModule,
     // StaffModule,
-    TypeOrmModule.forFeature([Role, Token]),
+    TypeOrmModule.forFeature([Role, Token,TeamMember]),
     // forwardRef(() => AgentsModule),
     // JwtModule.register({
     //   secret: process.env.JWTKEY,
