@@ -12,19 +12,29 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { BranchesService } from './branches.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
 import { Branch } from './entities/branch.entity';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { PermissionGuard } from 'src/common/guards/permission.guard';
+import { BranchGuard } from 'src/common/guards/branch.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
 @ApiTags('Branches')
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionGuard, BranchGuard)
 @Controller('branches')
 export class BranchesController {
   constructor(private readonly branchesService: BranchesService) {}
 
   @Post()
+  @Roles('super_admin', 'admin')
+  @Permissions({ module: 'branches', action: 'create' })
   @ApiOperation({ summary: 'Create a new branch' })
   @ApiResponse({
     status: 201,
@@ -41,6 +51,8 @@ export class BranchesController {
   }
 
   @Get()
+  @Roles('super_admin', 'admin')
+  @Permissions({ module: 'branches', action: 'view' })
   @ApiOperation({ summary: 'Retrieve all branches with pagination and search' })
   @ApiResponse({
     status: 200,
@@ -59,6 +71,8 @@ export class BranchesController {
   }
 
   @Get(':id')
+  @Roles('super_admin', 'admin')
+  @Permissions({ module: 'branches', action: 'view' })
   @ApiOperation({ summary: 'Retrieve a single branch by ID' })
   @ApiResponse({ status: 200, description: 'Branch details.', type: Branch })
   @ApiResponse({ status: 404, description: 'Branch not found.' })
@@ -67,6 +81,8 @@ export class BranchesController {
   }
 
   @Patch(':id')
+  @Roles('super_admin', 'admin')
+  @Permissions({ module: 'branches', action: 'edit' })
   @ApiOperation({ summary: 'Update a branch' })
   @ApiResponse({
     status: 200,
@@ -86,6 +102,8 @@ export class BranchesController {
   }
 
   @Delete(':id')
+  @Roles('super_admin')
+  @Permissions({ module: 'branches', action: 'delete' })
   @HttpCode(HttpStatus.NO_CONTENT) //
   @ApiOperation({ summary: 'Delete a branch' })
   @ApiResponse({

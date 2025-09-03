@@ -18,6 +18,8 @@ export class TeamMemberController {
   constructor(private readonly service: TeamMemberService) {}
 
   @Get()
+    @Roles('super_admin', 'admin', 'staff')
+  @Permissions({ module: 'team_member', action: 'view' })
   @ApiOperation({ summary: 'Get all active (non-deleted) team members' })
   @ApiResponse({ status: 200, description: 'List of team members', type: [TeamMember] })
   findAll(@Req() req): Promise<TeamMember[]> {
@@ -26,6 +28,8 @@ export class TeamMemberController {
   }
 
   @Get(':id')
+    @Roles('super_admin', 'admin', 'staff')
+  @Permissions({ module: 'team_member', action: 'view' })
   @ApiOperation({ summary: 'Get team member by ID (only if not deleted)' })
   @ApiResponse({ status: 200, description: 'Team member found', type: TeamMember })
   @ApiResponse({ status: 404, description: 'Team member not found' })
@@ -53,6 +57,8 @@ export class TeamMemberController {
   }
 
   @Get('search')
+    @Roles('super_admin', 'admin', 'staff')
+  @Permissions({ module: 'team_member', action: 'view' })
   @ApiOperation({ summary: 'Search team members by name, job, specialization, etc.' })
   @ApiResponse({ status: 200, description: 'List of matching team members', type: [TeamMember] })
   search(@Query('q') q: string, @Req() req): Promise<TeamMember[]> {
@@ -60,7 +66,7 @@ export class TeamMemberController {
   }
 
   @Delete(':id')
-  @Roles('super_admin', 'admin')
+  @Roles('super_admin')
   @Permissions({ module: 'team_member', action: 'delete' })
   @ApiOperation({ summary: 'Soft delete a team member' })
   @ApiResponse({ status: 200, description: 'Team member soft deleted' })
@@ -70,7 +76,7 @@ export class TeamMemberController {
   }
 
   @Patch(':id/restore')
-@Roles('super_admin', 'admin')
+@Roles('super_admin')
   @Permissions({ module: 'team_member', action: 'edit' })
   @ApiOperation({ summary: 'Restore a soft-deleted team member' })
   restore(@Param('id') id: string, @Req() req): Promise<TeamMember> {
