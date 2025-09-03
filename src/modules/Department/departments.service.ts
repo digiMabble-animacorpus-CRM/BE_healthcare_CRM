@@ -25,7 +25,8 @@ async findAllFiltered(branchId?: number, search?: string): Promise<Department[]>
   const query = this.departmentRepository
     .createQueryBuilder('department')
     .leftJoin('department.therapists', 't')
-    .leftJoin('t.branches', 'b'); // join the branches relation
+    .leftJoin('t.branches', 'b')
+    .where('department.is_deleted = false'); // ✅ hide deleted ones
 
   if (branchId) {
     query.andWhere('b.branch_id = :branchId', { branchId });
@@ -38,15 +39,17 @@ async findAllFiltered(branchId?: number, search?: string): Promise<Department[]>
     );
   }
 
-  query.distinct(true); // avoid duplicates
+  query.distinct(true);
 
   return query.getMany();
 }
 
   
   async findAll(): Promise<Department[]> {
-    return await this.departmentRepository.find();
-  }
+  return await this.departmentRepository.find({
+    where: { is_deleted: false },
+  });
+}
 
   async findOne(id: number): Promise<Department> {
     const department = await this.departmentRepository.findOne({ where: { id } });
@@ -62,8 +65,16 @@ async findAllFiltered(branchId?: number, search?: string): Promise<Department[]>
     return await this.findOne(id);
   }
 
+
+
   async remove(id: number): Promise<void> {
-    const department = await this.findOne(id);
-    await this.departmentRepository.remove(department);
-  }
+  const department = await this.findOne(id);
+
+  // Instead of removing from DB, mark as deleted
+  department.is_deleted = true;
+  department.is_active = false; // optional, if you want to disable also
+
+  await this.departmentRepository.save(department);
+}
+
 }
