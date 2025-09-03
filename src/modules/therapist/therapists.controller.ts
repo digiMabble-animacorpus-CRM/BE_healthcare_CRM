@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,14 +23,24 @@ import { CreateTherapistDto } from './dto/create-therapist.dto';
 import { UpdateTherapistDto } from './dto/update-therapist.dto';
 import { TherapistFilterDto } from './dto/therapist-filter.dto';
 import { Therapist } from './entities/therapist.entity';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { PermissionGuard } from 'src/common/guards/permission.guard';
+import { BranchGuard } from 'src/common/guards/branch.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
+
 
 @ApiTags('Therapists')
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionGuard, BranchGuard)
 @Controller('therapists')
 export class TherapistController {
   constructor(private readonly therapistService: TherapistService) {}
 
   // CREATE
-  @Post()
+    @Post()
+    @Roles('super_admin', 'admin')
+  @Permissions({ module: 'therapists', action: 'create' })
   @ApiOperation({ summary: 'Create a new therapist' })
   @ApiBody({ type: CreateTherapistDto })
   @ApiResponse({ status: 201, description: 'Therapist created successfully', type: Therapist })
@@ -81,6 +92,8 @@ export class TherapistController {
 
   // UPDATE
   @Patch(':id')
+    @Roles('super_admin', 'admin')
+  @Permissions({ module: 'therapists', action: 'edit' })
   @ApiOperation({ summary: 'Update a therapist by ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateTherapistDto })
@@ -92,6 +105,8 @@ export class TherapistController {
 
   // DELETE BY ID
   @Delete(':id')
+   @Roles('super_admin', 'admin')
+  @Permissions({ module: 'therapists', action: 'edit' })
   @ApiOperation({ summary: 'Soft delete a therapist by ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Therapist deleted successfully' })
