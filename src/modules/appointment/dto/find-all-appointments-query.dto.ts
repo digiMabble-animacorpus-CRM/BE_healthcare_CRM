@@ -18,4 +18,61 @@ export class FindAllAppointmentsQueryDto {
   @IsOptional()
   @IsNumber()
   limit?: number;
+
+  @ApiProperty({ 
+    required: false, 
+    example: 'pending',
+    description: 'Filter by appointment status' 
+  })
+  @IsOptional()
+  @IsString()
+  status?: string;
+
+  @ApiProperty({ 
+    required: false, 
+    description: 'Filter by start date and time (ISO format) - beginning of date range' 
+  })
+  @IsOptional()
+  @IsString()
+  startDate?: string;
+
+  @ApiProperty({ 
+    required: false, 
+    description: 'Filter by end date and time (ISO format) - end of date range' 
+  })
+  @IsOptional()
+  @IsString()
+  endDate?: string;
+
+  @ApiProperty({ 
+    required: false, 
+    description: 'Filter by department ID' 
+  })
+  @IsOptional()
+  @IsNumber()
+  departmentId?: number;
+
+  @ApiProperty({ 
+    required: false, 
+    description: 'Filter by branch ID' 
+  })
+  @IsOptional()
+  @IsNumber()
+  branchId?: number;
+
+  @ApiProperty({ 
+    required: false, 
+    description: 'Filter by patient ID (UUID)' 
+  })
+  @IsOptional()
+  @IsString()
+  patientId?: string;
+
+  @ApiProperty({ 
+    required: false, 
+    description: 'Filter by therapist ID' 
+  })
+  @IsOptional()
+  @IsNumber()
+  therapistId?: number;
 }

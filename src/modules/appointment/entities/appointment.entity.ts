@@ -13,63 +13,55 @@ import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
 import { Patient } from 'src/modules/customers/entities/patient.entity';
 import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
+import { Department } from 'src/modules/Department/entities/department.entity';
+import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
 
 
-// Mock enum for "purpose of visit"
-export enum PurposeOfVisit {
-  CONSULTATION = 'Consultation',
-  FOLLOW_UP = 'Follow-up',
-  THERAPY_SESSION = 'Therapy Session',
-  INITIAL_ASSESSMENT = 'Initial Assessment',
-}
 
-// Mock enum for "department"
-export enum Department {
-  PSYCHOLOGY = 'Psychology',
-  PHYSIOTHERAPY = 'Physiotherapy',
-  NUTRITION = 'Nutrition',
-  GENERAL_MEDICINE = 'General Medicine',
-}
 
 @Entity({ name: 'appointments' })
 export default class Appointment extends BaseModel {
 
-  @ManyToOne(() => Branch, { nullable: false, eager: true })
+  @ManyToOne(() => Branch, { nullable: false })
   @JoinColumn({ name: 'branch_id' })
   branch: Branch;
 
-  @ManyToOne(() => Patient, { nullable: false, eager: true })
+  @ManyToOne(() => Patient, { nullable: false })
   @JoinColumn({ name: 'patient_id' })
   patient: Patient;
 
 
-  @Column({ type: 'date' })
-  date: Date;
+  @Column({ type: 'timestamptz' })
+  startTime: Date;
 
 
-  @Column({ type: 'varchar', length: 50 })
-  timeslot: string;
+  @Column({ type: 'timestamptz' })
+  endTime: Date;
 
 
-  @Column({
-    type: 'enum',
-    enum: PurposeOfVisit,
-  })
-  purposeOfVisit: PurposeOfVisit;
+  @Column({ type: 'text', default: 'pending' })
+  status: string;
 
 
-  @Column({
-    type: 'enum',
-    enum: Department,
-  })
+  @Column({ type: 'text' })
+  purposeOfVisit: string;
+
+
+  @ManyToOne(() => Department, { nullable: false })
+  @JoinColumn({ name: 'department_id' })
   department: Department;
+
+
+  @ManyToOne(() => Specialization, { nullable: true })
+  @JoinColumn({ name: 'specialization_id' })
+  specialization: Specialization;
 
 
   @Column({ type: 'text', nullable: true })
   description: string;
 
 
-  @ManyToOne(() => Therapist, { nullable: false, eager: true })
+  @ManyToOne(() => Therapist, { nullable: false })
   @JoinColumn({ name: 'therapist_id' })
   therapist: Therapist;
 

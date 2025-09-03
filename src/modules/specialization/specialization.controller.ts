@@ -37,11 +37,12 @@ export class SpecializationController {
     summary: 'Retrieve all specializations',
   })
   findAll(@Query() query: FindAllSpecializationsQueryDto) {
-    const { page = 1, limit = 10, search } = query;
+    const { page = 1, limit = 10, search, departmentId } = query;
     return this.specializationService.findAll(
       page,
       limit,
       search,
+      departmentId,
     );
   }
 
