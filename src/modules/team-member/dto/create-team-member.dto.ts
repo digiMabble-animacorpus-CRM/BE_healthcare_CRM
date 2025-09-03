@@ -1,5 +1,6 @@
-import { IsOptional, IsString, IsEmail, IsArray, IsObject } from 'class-validator';
+import { IsOptional, IsString, IsEmail, IsArray, IsObject, IsEnum, IsNumber } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { TeamMemberRole , TeamMemberStatus } from '../entities/team-member.entity';
 
 export class CreateTeamMemberDto {
   @ApiPropertyOptional({ example: 'Doe', description: 'Last name of the team member' })
@@ -157,4 +158,46 @@ export class CreateTeamMemberDto {
   @IsOptional()
   @IsString()
   photo?: string;
+
+
+
+  @ApiPropertyOptional({ example: 'staff', description: 'Role of the team member' })
+@IsOptional()
+@IsEnum(TeamMemberRole)
+role?: TeamMemberRole;
+
+
+@ApiPropertyOptional({ example: 'active', description: 'Status of the team member' })
+@IsOptional()
+@IsEnum(TeamMemberStatus)
+status?: TeamMemberStatus;
+
+
+@ApiPropertyOptional({ example: [1, 2], description: 'Assigned branch IDs' })
+@IsOptional()
+@IsArray()
+@IsNumber({}, { each: true })
+branches?: number[];
+
+
+@ApiPropertyOptional({ example: 1, description: 'Primary branch ID' })
+@IsOptional()
+@IsNumber()
+primary_branch_id?: number;
+
+
+
+@ApiPropertyOptional({ example: { appointments: { view: true } }, description: 'Permissions JSON' })
+@IsOptional()
+@IsObject()
+permissions?: object;
+
+
+
+@ApiPropertyOptional({ example: 'admin', description: 'Role of the user who created this team member' })
+@IsOptional()
+@IsEnum(TeamMemberRole)
+created_by_role?: TeamMemberRole;
+
+
 }

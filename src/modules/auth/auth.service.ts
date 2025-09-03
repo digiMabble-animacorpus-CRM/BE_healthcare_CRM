@@ -1,6 +1,8 @@
 import { ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Role } from '../roles/entities/role.entity';
 import { UsersService } from '../users/users.service';
 import User from 'src/modules/users/entities/user.entity';
 import { logger } from 'src/core/utils/logger';
@@ -10,13 +12,16 @@ import { MailUtils } from 'src/core/utils/mailUtils';
 import Encryption from 'src/core/utils/encryption';
 import { AddressesService } from '../addresses/addresses.service';
 import { SignupAdminDto } from './dto/signup.dto';
+import { TeamMember } from '../team-member/entities/team-member.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UsersService, 
     private readonly jwtService: JwtService,
-    private readonly addressesService: AddressesService
+    private readonly addressesService: AddressesService,
+    @InjectRepository(TeamMember)
+  private readonly teamMemberRepo: Repository<TeamMember>, 
   ) { }
 
   async signup(signupData: SignupAdminDto, user_type: 'admin'): Promise<any> {
@@ -88,20 +93,28 @@ async loginWithEmail(
     throw new UnauthorizedException(Errors.INCORRECT_USER_PASSWORD);
   }
 
-  // ✅ No last_login, no device_token
-  // (just proceed with token generation)
+  // 🔹 Fetch team member entry
+const teamMember = await this.teamMemberRepo.findOne({
+  where: { team_id: user.team_id },
+});
 
-  const { access_token, refresh_token } = await this.generateTokens(
-    { user_id: user.id },
-    remember_me,
-  );
+
+  if (!teamMember) {
+    throw new UnauthorizedException('User does not belong to any team');
+  }
+
+  // ✅ Only put user_id in JWT payload
+  const payload = { user_id: user.id };
+
+  const { access_token, refresh_token } = await this.generateTokens(payload, remember_me);
 
   const { password: _, ...userResponse } = user;
 
-  logger.info(`Login_Success: ${email_id}`);
+  logger.debug(`Generated JWT payload: ${JSON.stringify(payload)}`);
+  logger.info(`Login_Success: ${email_id} | Role=${teamMember.role}`);
 
   return {
-    user: userResponse,
+    user: { ...userResponse, role: teamMember.role } as Partial<User> & { role: string },
     accessToken: access_token,
     refreshToken: refresh_token,
   };

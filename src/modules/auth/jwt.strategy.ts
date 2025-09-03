@@ -1,17 +1,22 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-// import { StaffService } from '../StaffType/staff.service';
-import User from '../users/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
+import { TeamMemberService } from '../team-member/team-member.service';
+import User from '../users/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TeamMember } from '../team-member/entities/team-member.entity';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private readonly logger = new Logger(JwtStrategy.name);
+
   constructor(
     private configService: ConfigService,
     private userService: UsersService,
-    // private staffService: StaffService,
+    private teamMemberService: TeamMemberService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -21,65 +26,54 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    console.log('JWT payload:', payload);
+    try {
+      this.logger.debug(`🔹 [JwtStrategy] JWT payload received: ${JSON.stringify(payload)}`);
 
-    const userId = payload.user_id;
-    if (!userId) {
-      throw new UnauthorizedException('Invalid JWT payload: user_id missing');
+      if (!payload?.user_id) {
+        this.logger.error('❌ [JwtStrategy] Invalid JWT payload: user_id missing');
+        throw new UnauthorizedException('Invalid JWT payload: user_id missing');
+      }
+
+      // 1️⃣ Fetch user
+      const user: User = await this.userService.findOneById(payload.user_id);
+      if (!user) {
+        this.logger.error(`❌ [JwtStrategy] User not found for id=${payload.user_id}`);
+        throw new UnauthorizedException('User not found');
+      }
+      this.logger.debug(`✅ [JwtStrategy] User fetched: id=${user.id}, team_id=${user.team_id}`);
+
+      // 2️⃣ Fetch team member (role lives here)
+      const teamMember = await this.teamMemberService.findByUserIdAndTeamId(
+        user.id,
+        user.team_id,
+      );
+      if (!teamMember) {
+        this.logger.error(
+          `❌ [JwtStrategy] No team member found for user_id=${user.id}, team_id=${user.team_id}`,
+        );
+        throw new UnauthorizedException('Team member not linked to user');
+      }
+
+      this.logger.debug(
+        `✅ [JwtStrategy] TeamMember fetched: team_id=${teamMember.team_id}, role=${teamMember.role}`,
+      );
+
+      // 3️⃣ Final user object (goes into req.user)
+      const jwtUser = {
+        user_id: user.id,
+        email: user.email_id,
+        team_id: teamMember.team_id,
+        role: teamMember.role,
+        permissions: teamMember.permissions || {},
+        branches: teamMember.branches || [],
+        primary_branch: teamMember.primary_branch || null,
+      };
+
+      this.logger.debug(`✅ [JwtStrategy] Returning validated user: ${JSON.stringify(jwtUser)}`);
+      return jwtUser;
+    } catch (err) {
+      this.logger.error(`❌ [JwtStrategy] Validation failed: ${err.message}`, err.stack);
+      throw err; // rethrow so it still triggers Unauthorized
     }
-
-    const user: User = await this.userService.findOneById(userId, {
-      // relations: ['roles', 'roles.permissions'],
-    });
-
-    if (!user) {
-      console.error(' User not found');
-      throw new UnauthorizedException('User not found');
-    }
-
-    // const userPermissions =
-    //   user.roles?.flatMap((role) => role.permissions)?.map(
-    //     (p) => `${p.action}:${p.resource}`,
-    //   ) || [];
-
-    // const roleMeta = user.roles?.map((r) => ({
-    //   name: r.name,
-    //   role_type: r.role_type,
-    // })) || [];
-
-    console.log(' User validated:', {
-      user_id: user.id,
-      email: user.email_id,
-      // user_type: user.user_type,
-    });
-    // console.log(' Roles:', roleMeta);
-    // console.log(' Permissions:', userPermissions);
-
-    // Staff enrichment
-    // if (user.user_type === 'staff') {
-    //   const staff = await this.staffService.findOneByEmail(user.email_id);
-    //   if (!staff) {
-    //     throw new UnauthorizedException('Staff not found for user');
-    //   }
-
-    //   return {
-    //     user_id: user.id,
-    //     email: user.email_id,
-    //     user_type: user.user_type,
-    //     roles: user.roles || [],
-    //     permissions: userPermissions,
-    //     // staff_id: staff.id,
-    //     // selected_branch: staff.selectedBranch?.id || null,
-    //   };
-    // }
-
-    // Non-staff users
-    return {
-      user_id: user.id,
-      email: user.email_id,
-      // user_type: user.user_type,
-      // roles: user.roles || [],
-      // permissions: userPermissions,
-    };
   }
 }
