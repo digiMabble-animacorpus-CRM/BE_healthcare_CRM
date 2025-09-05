@@ -96,6 +96,7 @@ async loginWithEmail(
   // 🔹 Fetch team member entry
 const teamMember = await this.teamMemberRepo.findOne({
   where: { team_id: user.team_id },
+  relations: ['branches', 'primary_branch'],
 });
 
 
@@ -114,7 +115,13 @@ const teamMember = await this.teamMemberRepo.findOne({
   logger.info(`Login_Success: ${email_id} | Role=${teamMember.role}`);
 
   return {
-    user: { ...userResponse, role: teamMember.role } as Partial<User> & { role: string },
+    user: { ...userResponse, role: teamMember.role,
+      photo: teamMember.photo,
+     branches: teamMember.branches || [],
+    primary_branch: teamMember.primary_branch || null,
+    permissions: teamMember.permissions || {},
+      status: teamMember.status,
+     } as Partial<User> & { role: string },
     accessToken: access_token,
     refreshToken: refresh_token,
   };
