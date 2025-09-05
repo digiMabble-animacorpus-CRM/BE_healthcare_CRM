@@ -29,6 +29,9 @@ export class Therapist {
   @Column({ name: 'photo', type: 'text', default: '' })
   photo: string;
 
+  @Column({ name: 'image_url', type: 'text', nullable: true })
+  imageUrl: string;
+
   @Column({ name: 'contact_email', type: 'varchar', length: 255, nullable: false })
   contactEmail: string;
 
