@@ -1,10 +1,15 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable, HttpException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { logger } from 'src/core/utils/logger';
 import { EC500, EM100 } from 'src/core/constants';
 import Appointment from '../appointment/entities/appointment.entity';
+import { Branch } from 'src/modules/branches/entities/branch.entity';
+import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
+import { Patient } from 'src/modules/customers/entities/patient.entity';
+import { TeamMemberService } from 'src/modules/team-member/team-member.service';
 import { DashboardQueryDto, DistributionQueryDto } from './dto/dashboard-query.dto';
+import { BranchSummaryDto } from './dto/branch-summary.dto';
 import { 
   AppointmentStats, 
   AppointmentDistribution, 
@@ -15,6 +20,10 @@ import {
 export class DashboardService {
   constructor(
     @InjectRepository(Appointment) private readonly appointmentRepository: Repository<Appointment>,
+    @InjectRepository(Branch) private readonly branchRepo: Repository<Branch>,
+    @InjectRepository(Therapist) private readonly therapistRepo: Repository<Therapist>,
+    @InjectRepository(Patient) private readonly patientRepo: Repository<Patient>,
+    private readonly teamMemberService: TeamMemberService,
   ) {}
 
   /**
@@ -24,6 +33,13 @@ export class DashboardService {
     logger.error(`Dashboard_${operation}_Error: ${JSON.stringify(error?.message || error)}`);
     if (error instanceof HttpException) throw error;
     throw new HttpException(EM100, EC500);
+  }
+
+  private getMonthWindow() {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    return { startOfMonth, nextMonthStart };
   }
 
   /**
@@ -283,5 +299,92 @@ export class DashboardService {
     } catch (error) {
       this.handleError('GetCalendarEvents', error);
     }
+  }
+
+  /** Main API for branch-wise summary restricted by the logged-in user */
+  async getBranchesSummaryForUser(user: {
+    user_id?: number;
+    id?: number;
+    role: string;              // 'super_admin' | 'admin' | 'staff'
+    team_id?: string;
+  }): Promise<BranchSummaryDto[]> {
+    const userId = (user.user_id ?? user.id) as number | undefined;
+    if (!userId) throw new ForbiddenException('Missing user id in token');
+
+    const teamMember = await this.teamMemberService.findByUserId(userId);
+    if (!teamMember) throw new ForbiddenException('No team member mapped to user');
+
+    // Resolve allowed branches
+    let branchRows: { branch_id: number; name: string }[];
+    if (user.role === 'super_admin') {
+      const all = await this.branchRepo.find({ select: ['branch_id', 'name'] as any });
+      branchRows = all.map(b => ({ branch_id: (b as any).branch_id, name: (b as any).name }));
+    } else {
+      const allowed = teamMember.branches || [];
+      if (!allowed.length) return []; // no branches assigned → nothing to show
+      branchRows = allowed.map(b => ({ branch_id: b.branch_id, name: b.name }));
+    }
+
+    const branchIds = branchRows.map(b => b.branch_id);
+    if (!branchIds.length) return [];
+
+
+    const therapistCountsRaw = await this.therapistRepo
+      .createQueryBuilder('t')
+      .innerJoin('t.branches', 'b') 
+      .where('t.isDelete = false')
+      .andWhere('b.branch_id IN (:...branchIds)', { branchIds })
+      .select('b.branch_id', 'branch_id')
+      .addSelect('COUNT(DISTINCT t.therapistId)', 'count')
+      .groupBy('b.branch_id')
+      .getRawMany<{ branch_id: number; count: string }>();
+
+
+    const patientCountsRaw = await this.appointmentRepository
+      .createQueryBuilder('a')
+      .innerJoin('a.branch', 'b')
+      .innerJoin('a.patient', 'p')
+      .where('b.branch_id IN (:...branchIds)', { branchIds })
+      .select('b.branch_id', 'branch_id')
+      .addSelect('COUNT(DISTINCT p.id)', 'count')
+      .groupBy('b.branch_id')
+      .getRawMany<{ branch_id: number; count: string }>();
+
+
+    const { startOfMonth, nextMonthStart } = this.getMonthWindow();
+    const apptMonthCountsRaw = await this.appointmentRepository
+      .createQueryBuilder('a')
+      .innerJoin('a.branch', 'b')
+      .where('b.branch_id IN (:...branchIds)', { branchIds })
+      .andWhere('a.startTime >= :startOfMonth AND a.startTime < :nextMonthStart', {
+        startOfMonth,
+        nextMonthStart,
+      })
+      .select('b.branch_id', 'branch_id')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('b.branch_id')
+      .getRawMany<{ branch_id: number; count: string }>();
+
+
+    const toMap = (rows: { branch_id: number; count: string }[]) =>
+      rows.reduce<Record<number, number>>((acc, r) => {
+        acc[r.branch_id] = Number(r.count) || 0;
+        return acc;
+      }, {});
+
+    const therapistByBranch = toMap(therapistCountsRaw);
+    const patientByBranch   = toMap(patientCountsRaw);
+    const apptByBranch      = toMap(apptMonthCountsRaw);
+
+
+    const response: BranchSummaryDto[] = branchRows.map(b => ({
+      branch_id: b.branch_id,
+      branch_name: b.name,
+      therapists_count: therapistByBranch[b.branch_id] ?? 0,
+      patients_count: patientByBranch[b.branch_id] ?? 0,
+      appointments_count: apptByBranch[b.branch_id] ?? 0,
+    }));
+
+    return response;
   }
 }
