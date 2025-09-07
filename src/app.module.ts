@@ -37,6 +37,7 @@ import { BranchesModule } from './modules/branches/branches.module';
 import { ConsultationsModule } from './modules/consultations/consultations.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { DepartmentsModule } from './modules/Department/departments.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { RolesGuard } from './common/guards/roles.guard';
 
 
@@ -92,6 +93,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     // ConsultationsModule,
     ProfileModule,
     DepartmentsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService,

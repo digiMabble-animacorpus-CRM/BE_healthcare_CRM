@@ -1,0 +1,287 @@
+import { Injectable, HttpException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { logger } from 'src/core/utils/logger';
+import { EC500, EM100 } from 'src/core/constants';
+import Appointment from '../appointment/entities/appointment.entity';
+import { DashboardQueryDto, DistributionQueryDto } from './dto/dashboard-query.dto';
+import { 
+  AppointmentStats, 
+  AppointmentDistribution, 
+  CalendarEvent
+} from './interfaces/dashboard.interface';
+
+@Injectable()
+export class DashboardService {
+  constructor(
+    @InjectRepository(Appointment) private readonly appointmentRepository: Repository<Appointment>,
+  ) {}
+
+  /**
+   * Handles errors, logs them, and throws a standardized HttpException.
+   */
+  private handleError(operation: string, error: any): never {
+    logger.error(`Dashboard_${operation}_Error: ${JSON.stringify(error?.message || error)}`);
+    if (error instanceof HttpException) throw error;
+    throw new HttpException(EM100, EC500);
+  }
+
+  /**
+   * Calculate date range based on time filter preset
+   */
+  private getDateRangeFromTimeFilter(timeFilter: string): { startDate: Date; endDate: Date } {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    switch (timeFilter) {
+      case 'thisWeek': {
+        const dayOfWeek = today.getDay();
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - dayOfWeek); // Start of week (Sunday)
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6); // End of week (Saturday)
+        endDate.setHours(23, 59, 59, 999);
+        return { startDate, endDate };
+      }
+      
+      case 'lastWeek': {
+        const dayOfWeek = today.getDay();
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - dayOfWeek - 7); // Start of last week
+        const endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6); // End of last week
+        endDate.setHours(23, 59, 59, 999);
+        return { startDate, endDate };
+      }
+      
+      case 'thisMonth': {
+        const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        endDate.setHours(23, 59, 59, 999);
+        return { startDate, endDate };
+      }
+      
+      case 'lastMonth': {
+        const startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+        endDate.setHours(23, 59, 59, 999);
+        return { startDate, endDate };
+      }
+      
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Apply date filters to query, prioritizing timeFilter over custom dates
+   */
+  private applyDateFilters(query: any, dashboardQuery: DashboardQueryDto): any {
+    if (dashboardQuery.timeFilter) {
+      const dateRange = this.getDateRangeFromTimeFilter(dashboardQuery.timeFilter);
+      if (dateRange) {
+        query.andWhere('a.startTime >= :startDate', { startDate: dateRange.startDate });
+        query.andWhere('a.endTime <= :endDate', { endDate: dateRange.endDate });
+      }
+    } else {
+      if (dashboardQuery.startDate) {
+        query.andWhere('a.startTime >= :startDate', { startDate: new Date(dashboardQuery.startDate) });
+      }
+      if (dashboardQuery.endDate) {
+        query.andWhere('a.endTime <= :endDate', { endDate: new Date(dashboardQuery.endDate) });
+      }
+    }
+    return query;
+  }
+
+  /**
+   * Get appointment statistics for dashboard summary cards
+   */
+  async getAppointmentStats(query: DashboardQueryDto): Promise<AppointmentStats> {
+    try {
+      logger.info(`Dashboard_GetAppointmentStats_Entry: ${JSON.stringify(query)}`);
+
+      let statsQuery = this.appointmentRepository.createQueryBuilder('a');
+
+      // Apply date filters (timeFilter takes priority over custom dates)
+      statsQuery = this.applyDateFilters(statsQuery, query);
+
+      if (query.doctorId) {
+        statsQuery
+          .leftJoin('a.therapist', 'therapist')
+          .andWhere('therapist.therapistId = :doctorId', { doctorId: query.doctorId });
+      }
+
+      if (query.branchId) {
+        statsQuery
+          .leftJoin('a.branch', 'branch')
+          .andWhere('branch.branch_id = :branchId', { branchId: query.branchId });
+      }
+
+      // Get total count
+      const total = await statsQuery.getCount();
+
+      // Build status counts query with same filters
+      let statusQuery = this.appointmentRepository
+        .createQueryBuilder('a')
+        .select('a.status', 'status')
+        .addSelect('COUNT(*)', 'count');
+
+      // Apply the same filters for status counts
+      statusQuery = this.applyDateFilters(statusQuery, query);
+
+      if (query.doctorId) {
+        statusQuery
+          .leftJoin('a.therapist', 'therapist')
+          .andWhere('therapist.therapistId = :doctorId', { doctorId: query.doctorId });
+      }
+
+      if (query.branchId) {
+        statusQuery
+          .leftJoin('a.branch', 'branch')
+          .andWhere('branch.branch_id = :branchId', { branchId: query.branchId });
+      }
+
+      const statusCounts = await statusQuery
+        .groupBy('a.status')
+        .getRawMany();
+
+      const completed = statusCounts.find(sc => sc.status === 'completed')?.count || 0;
+      const cancellations = statusCounts.find(sc => sc.status === 'cancelled')?.count || 0;
+      const pending = statusCounts.find(sc => sc.status === 'pending')?.count || 0;
+
+      const result: AppointmentStats = {
+        total: parseInt(total.toString()),
+        completed: parseInt(completed.toString()),
+        cancellations: parseInt(cancellations.toString()),
+        pending: parseInt(pending.toString())
+      };
+
+      logger.info(`Dashboard_GetAppointmentStats_Exit: ${JSON.stringify(result)}`);
+      return result;
+    } catch (error) {
+      this.handleError('GetAppointmentStats', error);
+    }
+  }
+
+  /**
+   * Get appointment distribution for charts and breakdown cards
+   */
+  async getAppointmentDistribution(query: DistributionQueryDto): Promise<AppointmentDistribution> {
+    try {
+      logger.info(`Dashboard_GetAppointmentDistribution_Entry: ${JSON.stringify(query)}`);
+
+      const groupBy = query.groupBy || 'doctor';
+      
+      let distributionQuery = this.appointmentRepository.createQueryBuilder('a');
+
+      if (groupBy === 'doctor') {
+        distributionQuery = distributionQuery
+          .leftJoin('a.therapist', 'therapist')
+          .select('therapist.therapistId', 'id')
+          .addSelect('therapist.fullName', 'name')
+          .addSelect('COUNT(*)', 'count');
+      } else {
+        distributionQuery = distributionQuery
+          .leftJoin('a.branch', 'branch')
+          .select('branch.branch_id', 'id')
+          .addSelect('branch.name', 'name')
+          .addSelect('COUNT(*)', 'count');
+      }
+
+      // Apply date filters (timeFilter takes priority over custom dates)
+      distributionQuery = this.applyDateFilters(distributionQuery, query);
+
+      if (query.doctorId && groupBy !== 'doctor') {
+        distributionQuery.andWhere('therapist.therapistId = :doctorId', { doctorId: query.doctorId });
+      }
+
+      if (query.branchId && groupBy !== 'branch') {
+        distributionQuery.andWhere('branch.branch_id = :branchId', { branchId: query.branchId });
+      }
+
+      if (groupBy === 'doctor') {
+        distributionQuery = distributionQuery.groupBy('therapist.therapistId, therapist.fullName');
+      } else {
+        distributionQuery = distributionQuery.groupBy('branch.branch_id, branch.name');
+      }
+
+      const distribution = await distributionQuery
+        .orderBy('count', 'DESC')
+        .getRawMany();
+
+      const totalAppointments = distribution.reduce((sum, item) => sum + parseInt(item.count), 0);
+
+      const distributionWithPercentage = distribution.map(item => ({
+        id: parseInt(item.id),
+        name: item.name,
+        count: parseInt(item.count),
+        percentage: totalAppointments > 0 ? Math.round((parseInt(item.count) / totalAppointments) * 100 * 10) / 10 : 0
+      }));
+
+      const result: AppointmentDistribution = {
+        totalAppointments,
+        distribution: distributionWithPercentage
+      };
+
+      logger.info(`Dashboard_GetAppointmentDistribution_Exit: ${JSON.stringify(result)}`);
+      return result;
+    } catch (error) {
+      this.handleError('GetAppointmentDistribution', error);
+    }
+  }
+
+  /**
+   * Get appointments for calendar view
+   */
+  async getCalendarEvents(query: DashboardQueryDto): Promise<CalendarEvent[]> {
+    try {
+      logger.info(`Dashboard_GetCalendarEvents_Entry: ${JSON.stringify(query)}`);
+
+      let calendarQuery = this.appointmentRepository.createQueryBuilder('a')
+        .leftJoinAndSelect('a.therapist', 'therapist')
+        .leftJoinAndSelect('a.branch', 'branch')
+        .leftJoinAndSelect('a.patient', 'patient');
+
+      // Apply date filters (timeFilter takes priority over custom dates)
+      calendarQuery = this.applyDateFilters(calendarQuery, query);
+
+      if (query.doctorId) {
+        calendarQuery.andWhere('therapist.therapistId = :doctorId', { doctorId: query.doctorId });
+      }
+
+      if (query.branchId) {
+        calendarQuery.andWhere('branch.branch_id = :branchId', { branchId: query.branchId });
+      }
+
+      const appointments = await calendarQuery
+        .orderBy('a.startTime', 'ASC')
+        .getMany();
+
+      const events: CalendarEvent[] = appointments.map(appointment => ({
+        id: appointment.id,
+        title: appointment.purposeOfVisit || 'Appointment', // Simple title or use purpose
+        start: appointment.startTime,
+        end: appointment.endTime,
+        status: appointment.status,
+        doctor: {
+          id: appointment.therapist.therapistId,
+          name: appointment.therapist.fullName || `${appointment.therapist.firstName} ${appointment.therapist.lastName}`
+        },
+        branch: {
+          id: appointment.branch.branch_id,
+          name: appointment.branch.name
+        },
+        patient: appointment.patient ? {
+          id: appointment.patient.id,
+          name: `${appointment.patient.firstname} ${appointment.patient.lastname}`
+        } : undefined
+      }));
+
+      logger.info(`Dashboard_GetCalendarEvents_Exit: Found ${events.length} events`);
+      return events;
+    } catch (error) {
+      this.handleError('GetCalendarEvents', error);
+    }
+  }
+}
