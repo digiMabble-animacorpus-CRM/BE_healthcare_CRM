@@ -14,6 +14,9 @@ export class ChatBotHistory {
   @Column('text')
   message_content: string;
 
+   @Column({ nullable: true })
+  email: string;
+
   @CreateDateColumn()
   created_at: Date;
 }
