@@ -39,6 +39,7 @@ import { ProfileModule } from './modules/profile/profile.module';
 import { DepartmentsModule } from './modules/Department/departments.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { RolesGuard } from './common/guards/roles.guard';
+import { ChatBotHistoryModule } from './modules/chat-bot-history/chat-bot-history.module';
 
 
 config();
@@ -94,6 +95,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     ProfileModule,
     DepartmentsModule,
     DashboardModule,
+    ChatBotHistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService,
