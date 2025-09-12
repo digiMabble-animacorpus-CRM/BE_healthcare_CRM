@@ -1,6 +1,6 @@
 import { Injectable, HttpException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In ,Between , Not} from 'typeorm';
 import { logger } from 'src/core/utils/logger';
 import { EC500, EM100 } from 'src/core/constants';
 import Appointment from '../appointment/entities/appointment.entity';
@@ -386,5 +386,75 @@ export class DashboardService {
     }));
 
     return response;
+  }
+
+
+
+    // ---------- Patients Insights ----------
+  async getPatientsInsights() {
+    try {
+      const now = new Date();
+
+      const weekAgo = new Date();
+      weekAgo.setDate(now.getDate() - 7);
+
+      const monthAgo = new Date();
+      monthAgo.setMonth(now.getMonth() - 1);
+
+      // New patients
+      const newPatientsWeek = await this.patientRepo.count({ where: { created_at: Between(weekAgo, now) } });
+      const newPatientsMonth = await this.patientRepo.count({ where: { created_at: Between(monthAgo, now) } });
+
+      // Gender distribution
+      const maleCount = await this.patientRepo.count({ where: { legalgender: 'M' } });
+      const femaleCount = await this.patientRepo.count({ where: { legalgender: 'F' } });
+      const otherCount = await this.patientRepo.count({ where: { legalgender: Not(In(['M', 'F'])) } });
+
+      // Branch distribution (patients → therapist → branch)
+      const branchDistribution = await this.patientRepo
+        .createQueryBuilder('p')
+        .leftJoin('p.therapist', 't')
+        .leftJoin('t.branches', 'b')
+        .select('b.branch_id', 'branch_id')
+        .addSelect('b.name', 'branch_name')
+        .addSelect('COUNT(p.id)', 'count')
+        .groupBy('b.branch_id')
+        .addGroupBy('b.name')
+        .getRawMany();
+
+      // Age distribution
+      const patients = await this.patientRepo.find({ select: ['birthdate'] });
+      const ageGroups = { '0-12': 0, '13-25': 0, '26-40': 0, '41-60': 0, '60+': 0 };
+      const currentYear = now.getFullYear();
+
+    patients.forEach((p) => {
+  if (!p.birthdate) return;
+
+  const birthDate = new Date(p.birthdate); // <-- convert to Date
+  const age = currentYear - birthDate.getFullYear();
+
+  if (age <= 12) ageGroups['0-12']++;
+  else if (age <= 25) ageGroups['13-25']++;
+  else if (age <= 40) ageGroups['26-40']++;
+  else if (age <= 60) ageGroups['41-60']++;
+  else ageGroups['60+']++;
+});
+
+      const totalPatients = patients.length;
+      const ageDistribution = Object.entries(ageGroups).map(([range, count]) => ({
+        range,
+        count,
+        percentage: totalPatients ? Math.round((count / totalPatients) * 100) : 0,
+      }));
+
+      return {
+        new_patients: { week: newPatientsWeek, month: newPatientsMonth },
+        gender_distribution: { male: maleCount, female: femaleCount, other: otherCount },
+        branch_distribution: branchDistribution.map(b => ({ branch_name: b.branch_name, count: Number(b.count) })),
+        age_distribution: ageDistribution,
+      };
+    } catch (error) {
+      this.handleError('GetPatientsInsights', error);
+    }
   }
 }
