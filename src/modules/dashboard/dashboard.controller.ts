@@ -113,7 +113,7 @@ export class DashboardController {
 
   @Get('branches/summary')
   @Roles('super_admin', 'admin', 'staff')
-  @Permissions({ module: 'dashboard', action: 'view' })
+  // @Permissions({ module: 'dashboard', action: 'view' })
   @ApiOperation({ summary: 'Get branch-wise dashboard stats (therapists, patients, appointments)' })
   @ApiResponse({ status: 200, description: 'Branch summary counts', type: [BranchSummaryDto] })
   async getBranchSummary(@Req() req): Promise<BranchSummaryDto[]> {
@@ -124,4 +124,19 @@ export class DashboardController {
     };
     return this.dashboardService.getBranchesSummaryForUser(user);
   }
+
+
+
+  @Get('patients')
+@Roles('super_admin', 'admin', 'staff')
+@ApiOperation({ summary: 'Get patients insights for dashboard' })
+async getPatientsInsights() {
+  try {
+    const data = await this.dashboardService.getPatientsInsights();
+    return HandleResponse.buildSuccessObj(EC200, 'Patients insights retrieved successfully.', data);
+  } catch (error) {
+    return this.handleError(error);
+  }
+}
+
 }
