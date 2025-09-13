@@ -68,6 +68,7 @@ async findAll(filter?: TherapistFilterDto): Promise<Therapist[]> {
     .leftJoinAndSelect('therapist.languages', 'language')
     .leftJoinAndSelect('therapist.branches', 'branch')
     .leftJoinAndSelect('therapist.specializations', 'specialization')
+    .leftJoinAndSelect('therapist.department', 'department') 
     .where('therapist.is_delete = false');
 
   // Search text
@@ -148,7 +149,7 @@ async findAll(filter?: TherapistFilterDto): Promise<Therapist[]> {
   async findOne(id: number): Promise<Therapist> {
     const therapist = await this.therapistRepository.findOne({
       where: { therapistId: id, isDelete: false },
-      relations: ['languages', 'branches', 'specializations'],
+      relations: ['languages', 'branches', 'specializations','department'],
     });
     if (!therapist) throw new NotFoundException(`Therapist with ID ${id} not found`);
     return therapist;
