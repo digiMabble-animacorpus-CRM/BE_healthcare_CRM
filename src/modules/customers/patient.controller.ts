@@ -257,7 +257,7 @@ async update(
 
 
 // DELETE (Soft Delete)
-  @Roles('super_admin', 'admin')
+  @Roles('super_admin')
 @Permissions({ module: 'patients', action: 'delete' })
 @Delete(':id')
 @ApiOperation({ summary: 'Soft delete a patient by ID' })

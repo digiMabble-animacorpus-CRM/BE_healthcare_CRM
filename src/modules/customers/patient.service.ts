@@ -64,6 +64,7 @@ async findAll(
     logger.info('Patient_FindAll_Entry');
 
     const query = this.patientRepository.createQueryBuilder('patient')
+      .leftJoinAndSelect('patient.therapist', 'therapist') 
       .where('patient.is_delete = false');   // soft delete filter
 
     let userCtx: { role: string; branches?: { branch_id: number }[] } | undefined;
@@ -172,6 +173,7 @@ async findAllWithPagination(
     }
 
     const [data, total] = await query
+      .leftJoinAndSelect('patient.therapist', 'therapist')
       .orderBy('patient.created_at', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
@@ -189,7 +191,9 @@ async findAllWithPagination(
     try {
       logger.info(`Patient_FindOne_Entry: id=${id}`);
       const patient = await this.patientRepository.findOne({
-        where: { id, is_delete: false }, // only fetch non-deleted
+        where: { id, is_delete: false },
+        relations: ['therapist'],
+         // only fetch non-deleted
       });
 
       if (!patient) {

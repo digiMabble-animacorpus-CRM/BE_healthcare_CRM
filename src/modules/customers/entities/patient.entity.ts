@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn ,ManyToOne, JoinColumn} from 'typeorm';
-import { Therapist } from 'src/modules/therapist/entities/therapist.entity'; // adjust the path
+import { Entity, Column, PrimaryGeneratedColumn ,ManyToOne, JoinColumn ,CreateDateColumn ,RelationId} from 'typeorm';
+import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
 
 @Entity({ name: 'patients' })
 export class Patient {
@@ -71,6 +71,16 @@ export class Patient {
 @ManyToOne(() => Therapist, { nullable: true })
 @JoinColumn({ name: 'therapist_id' })
 therapist?: Therapist;
+
+@Column({ name:'therapist_id', type: 'int', nullable: true })
+therapistId?: number;
+
+// @RelationId((patient: Patient) => patient.therapist)
+// therapistId?: number;
+
+@CreateDateColumn({ type: 'timestamp' })
+created_at: Date;
+
 
   // Soft delete columns
   @Column({ default: false })

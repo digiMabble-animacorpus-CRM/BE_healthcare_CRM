@@ -16,6 +16,10 @@ export class Department {
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 
+  @Column({ default: false })
+is_deleted: boolean;
+
+
   @ApiProperty({ example: 'Handles heart-related treatments', required: false })
   @Column({ type: 'text', nullable: true })
   description: string | null;

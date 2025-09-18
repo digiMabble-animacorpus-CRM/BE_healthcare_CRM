@@ -30,6 +30,11 @@ export class CreateTherapistDto {
   @IsString()
   photo?: string;
 
+  @ApiProperty({ required: false, example: 'https://example.com/images/john.jpg' })
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
+
   @ApiProperty({ example: 'john.doe@example.com' })
   @IsString()
   contactEmail: string;
