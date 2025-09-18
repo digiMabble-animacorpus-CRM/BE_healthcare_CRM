@@ -1,22 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity('chat_bot_history')
-export class ChatBotHistory {
+@Entity('new_chat_bot_history')
+export class NewChatBotHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   session_id: string;
 
-  @Column()
-  message_type: string;
+  // DB column is `message`, but entity property is `message_content`
+  @Column({ name: 'message', type: 'jsonb' })
+  message_content: any;
 
-  @Column('text')
-  message_content: string;
-
-   @Column({ nullable: true })
-  email: string;
-
-  @CreateDateColumn()
-  created_at: Date;
+  @Column({ type: 'text', nullable: true })
+  email: string | null;
 }
