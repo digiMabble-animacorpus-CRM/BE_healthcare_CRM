@@ -8,7 +8,7 @@ import { Specialization } from 'src/modules/specialization/entities/specializati
 import { CreateTherapistDto } from './dto/create-therapist.dto';
 import { UpdateTherapistDto } from './dto/update-therapist.dto';
 import { TherapistFilterDto } from './dto/therapist-filter.dto';
-
+import { Department } from 'src/modules/Department/entities/department.entity';
 @Injectable()
 export class TherapistService {
   constructor(
@@ -23,6 +23,9 @@ export class TherapistService {
 
     @InjectRepository(Specialization)
     private specializationRepository: Repository<Specialization>,
+
+    @InjectRepository(Department)
+    private departmentRepository: Repository<Department>,
   ) {}
 
   // CREATE
@@ -156,47 +159,60 @@ async findAll(filter?: TherapistFilterDto): Promise<Therapist[]> {
   }
 
   // UPDATE
-  async update(id: number, dto: UpdateTherapistDto): Promise<Therapist> {
-    const therapist = await this.findOne(id);
+async update(id: number, dto: UpdateTherapistDto): Promise<Therapist> {
+  const therapist = await this.findOne(id);
 
-    // Handle languages
-    let languages = therapist.languages;
-    if (dto.languages?.length) {
-      languages = await Promise.all(
-        dto.languages.map(async (name) => {
-          let lang = await this.languageRepository.findOne({ where: { name } });
-          if (!lang) {
-            lang = this.languageRepository.create({ name });
-            lang = await this.languageRepository.save(lang);
-          }
-          return lang;
-        }),
-      );
-    }
-
-    // Handle branches
-    let branches = therapist.branches;
-    if (dto.branches?.length) {
-      branches = await this.branchRepository.findBy({ branch_id: In(dto.branches) });
-    }
-
-    // Handle specializations
-    let specializations = therapist.specializations;
-    if (dto.specializations?.length) {
-      specializations = await this.specializationRepository.findBy({
-        specialization_id: In(dto.specializations),
-      });
-    }
-
-    Object.assign(therapist, {
-      ...dto,
-      languages,
-      branches,
-      specializations,
-    });
-
-    return this.therapistRepository.save(therapist);
+  // Handle languages
+  let languages = therapist.languages;
+  if (dto.languages?.length) {
+    languages = await Promise.all(
+      dto.languages.map(async (name) => {
+        let lang = await this.languageRepository.findOne({ where: { name } });
+        if (!lang) {
+          lang = this.languageRepository.create({ name });
+          lang = await this.languageRepository.save(lang);
+        }
+        return lang;
+      }),
+    );
   }
+
+  // Handle branches
+  let branches = therapist.branches;
+  if (dto.branches?.length) {
+    branches = await this.branchRepository.findBy({ branch_id: In(dto.branches) });
+  }
+
+  // Handle specializations
+  let specializations = therapist.specializations;
+  if (dto.specializations?.length) {
+    specializations = await this.specializationRepository.findBy({
+      specialization_id: In(dto.specializations),
+    });
+  }
+
+  // Handle department
+  let department = therapist.department;
+  if (dto.departmentId) {
+    department = await this.departmentRepository.findOne({
+      where: { id: dto.departmentId },
+    });
+    if (!department) {
+      throw new Error(`Department with ID ${dto.departmentId} not found`);
+    }
+  }
+
+  Object.assign(therapist, {
+    ...dto,
+    languages,
+    branches,
+    specializations,
+    department, // important
+    departmentId: dto.departmentId, // also assign column
+  });
+
+  return this.therapistRepository.save(therapist);
+}
 
   // SOFT DELETE
   async remove(id: number): Promise<{ deleted: boolean }> {
