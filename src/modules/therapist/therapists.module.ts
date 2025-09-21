@@ -7,9 +7,9 @@ import { Address } from '../addresses/entities/address.entity';
 import { Language } from 'src/modules/language/entities/language.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
-
+import { Department } from 'src/modules/Department/entities/department.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Therapist, Address, Language,Branch,Specialization])],
+  imports: [TypeOrmModule.forFeature([Therapist, Address, Language,Branch,Specialization,Department])],
   controllers: [TherapistController],
   providers: [TherapistService],
   exports: [TherapistService],
