@@ -38,7 +38,7 @@ export class CreatePatientDto {
   @IsString()
   legalgender?: string;
 
-  @ApiProperty({ example: 'en' })
+  @ApiProperty({ example: 'English' })
   @IsOptional()
   @IsString()
   language?: string;

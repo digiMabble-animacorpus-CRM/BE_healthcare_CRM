@@ -14,7 +14,7 @@ export class ProfileService {
   async getProfile(userId: number) {
     return this.userRepository.findOne({
       where: { id: userId },
-      relations: ['team'], // join with team_member_list
+      relations: ['therapistTeamMembers'], // join with therapist_team_members
     });
   }
 }

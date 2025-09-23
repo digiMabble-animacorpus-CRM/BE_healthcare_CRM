@@ -41,6 +41,8 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { RolesGuard } from './common/guards/roles.guard';
 import { ChatBotHistoryModule } from './modules/chat-bot-history/chat-bot-history.module';
 import { NewRequestsModule } from './modules/new_requests/new-requests.module';
+import { TherapistTeamModule } from './modules/therapists-team/therapist-team.module';
+import { AppLanguagesModule } from './modules/languages/app-languages.module';
 
 
 config();
@@ -98,6 +100,8 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     DashboardModule,
     ChatBotHistoryModule,
     NewRequestsModule,
+    TherapistTeamModule,
+    AppLanguagesModule,
   ],
   controllers: [AppController],
   providers: [AppService,
