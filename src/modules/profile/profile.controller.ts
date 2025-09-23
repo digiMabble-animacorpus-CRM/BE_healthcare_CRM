@@ -19,7 +19,7 @@ export class ProfileController {
 async getProfile(@Req() req): Promise<ProfileDto> {
   const userId = req.user.user_id;
   const user = await this.profileService.getProfile(userId);
-  return new ProfileDto(user, user?.team);
+  return new ProfileDto(user, user?.therapistTeamMembers);
 }
 
 }

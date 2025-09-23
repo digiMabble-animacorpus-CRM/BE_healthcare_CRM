@@ -71,11 +71,12 @@
 
 // src/modules/users/entities/user.entity.ts
 
-import { Entity, Column, BeforeInsert, JoinColumn,ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import { Entity, Column, BeforeInsert, JoinColumn,ManyToOne, PrimaryGeneratedColumn,OneToMany} from 'typeorm';
 import Encryption from 'src/core/utils/encryption';
 import { BaseModel } from 'src/core/database/BaseModel';
 import { Exclude } from 'class-transformer';
 import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
+import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-team.entity';
 
 import { Role } from 'src/modules/roles/entities/role.entity';
 import { Address } from 'src/modules/addresses/entities/address.entity';
@@ -112,6 +113,14 @@ export default class User  {
   @JoinColumn({ name: 'team_id' })
   team: TeamMember;
 
+
+@Column({ type: 'int', nullable: false })
+therapist_id: number;
+
+
+    @ManyToOne(() => TherapistMember, (therapistMember) => therapistMember.users, { nullable: false })
+  @JoinColumn({ name: 'therapist_id' })
+  therapistTeamMembers: TherapistMember;
 
 
 

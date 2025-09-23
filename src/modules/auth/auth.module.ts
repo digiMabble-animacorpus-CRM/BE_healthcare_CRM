@@ -24,6 +24,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Token } from 'src/modules/users/entities/token.entity';
 import { TeamMemberModule } from '../team-member/team-member.module';
 import { TeamMember } from '../team-member/entities/team-member.entity';
+import { TherapistTeamModule } from '../therapists-team/therapist-team.module';
+import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-team.entity';
 
 
 @Module({
@@ -32,8 +34,9 @@ import { TeamMember } from '../team-member/entities/team-member.entity';
     AddressesModule,
     UsersModule,
     TeamMemberModule,
+    TherapistTeamModule,
     // StaffModule,
-    TypeOrmModule.forFeature([Role, Token,TeamMember]),
+    TypeOrmModule.forFeature([Role, Token,TeamMember, TherapistMember]),
     // forwardRef(() => AgentsModule),
     // JwtModule.register({
     //   secret: process.env.JWTKEY,
