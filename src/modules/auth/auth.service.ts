@@ -173,6 +173,9 @@ async loginWithEmail(
   const { password: _, ...userResponse } = user;
 
   const therapistData = {
+    therapist_id: therapistMember.therapistId,
+    name: therapistMember.contactEmail,
+    email: therapistMember.firstName,
     role: therapistMember.role,
     photo: therapistMember.imageUrl,
     branches: therapistMember.branches || [],

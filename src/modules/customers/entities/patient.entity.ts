@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn ,ManyToOne, JoinColumn ,CreateDateColumn ,RelationId} from 'typeorm';
 import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
+import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-team.entity';
 
 @Entity({ name: 'patients' })
 export class Patient {
@@ -67,16 +68,20 @@ export class Patient {
   @Column({ type: 'varchar', length: 20, nullable: false, default: '' })
   number: string;
 
- // Optional relation to Therapist
-@ManyToOne(() => Therapist, { nullable: true })
-@JoinColumn({ name: 'therapist_id' })
-therapist?: Therapist;
+//  // Optional relation to Therapist
+// @ManyToOne(() => Therapist, { nullable: true })
+// @JoinColumn({ name: 'therapist_id' })
+// therapist?: Therapist;
 
-@Column({ name:'therapist_id', type: 'int', nullable: true })
-therapistId?: number;
-
-// @RelationId((patient: Patient) => patient.therapist)
+// @Column({ name:'therapist_id', type: 'int', nullable: true })
 // therapistId?: number;
+
+ @ManyToOne(() => TherapistMember, { nullable: true })
+  @JoinColumn({ name: 'therapist_id' })
+  therapist?: TherapistMember;
+
+   @Column({ name: 'therapist_id', type: 'int', nullable: true })
+  therapistId?: number;
 
 @CreateDateColumn({ type: 'timestamp' })
 created_at: Date;

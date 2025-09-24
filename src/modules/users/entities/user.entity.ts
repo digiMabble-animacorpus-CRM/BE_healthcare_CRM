@@ -108,7 +108,7 @@ export default class User  {
   }
 
 
-    // team_id foreign key
+
   @ManyToOne(() => TeamMember, (teamMember) => teamMember.users, { nullable: false })
   @JoinColumn({ name: 'team_id' })
   team: TeamMember;
