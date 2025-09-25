@@ -122,6 +122,7 @@ specializations: Specialization[];
   primaryBranch?: Branch;
 
 
-  @OneToMany(() => User, (user) => user.team)
-  users: User[];
+@OneToMany(() => User, (user) => user.therapistTeamMembers)
+users: User[];
+
 }
