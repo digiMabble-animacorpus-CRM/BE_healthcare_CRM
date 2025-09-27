@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete,Query } from '@nestjs/common';
 import { AppLanguagesService } from './app-languages.service';
 import { CreateAppLanguageDto } from './dto/create-app-language.dto';
 import { UpdateAppLanguageDto } from './dto/update-app-language.dto';
@@ -15,8 +15,8 @@ export class AppLanguagesController {
   }
 
   @Get()
-  findAll() {
-    return this.service.findAll();
+  findAll(@Query('search') search?: string) {
+    return this.service.findAll(search);
   }
 
   @Get(':id')
