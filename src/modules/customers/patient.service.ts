@@ -21,31 +21,38 @@ export class PatientsService extends BaseService<Patient> {
     this.repository = patientRepository;
   }
 
-  async create(createPatientDto: CreatePatientDto): Promise<Patient> {
-    try {
-      logger.info(`Patient_Create_Entry: ${JSON.stringify(createPatientDto)}`);
+async create(createPatientDto: CreatePatientDto): Promise<Patient> {
+  try {
+    logger.info(`Patient_Create_Entry: ${JSON.stringify(createPatientDto)}`);
 
-      const patient = this.patientRepository.create({
-        ...createPatientDto,
-        status: createPatientDto.status ?? 'ACTIVE',
-        is_delete: false, // ensure new patients are not marked deleted
-      });
+    // Destructure language separately to handle relation
+    const { languageId, ...rest } = createPatientDto;
 
-      const savedPatient: Patient = await this.patientRepository.save(patient);
+    // Create patient entity
+    const patient = this.patientRepository.create({
+      ...rest,
+      status: createPatientDto.status ?? 'ACTIVE',
+      is_delete: false,
+      language: languageId ? { id: languageId } as any : null, // map language ID to relation
+    });
 
-      const result = await this.patientRepository.findOne({
-        where: { id: savedPatient.id, is_delete: false },
-      });
+    // Save to DB
+    const savedPatient = await this.patientRepository.save(patient);
 
-      logger.info(`Patient_Create_Exit: ${JSON.stringify(result)}`);
-      return result;
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      logger.error(`Patient_Create_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
-    }
+    // Fetch saved patient with relations
+    const result = await this.patientRepository.findOne({
+      where: { id: savedPatient.id, is_delete: false },
+      relations: ['therapist', 'language'],
+    });
+
+    logger.info(`Patient_Create_Exit: ${JSON.stringify(result)}`);
+    return result;
+  } catch (error) {
+    if (error instanceof HttpException) throw error;
+    logger.error(`Patient_Create_Error: ${error?.message || error}`);
+    throw new HttpException(EM100, EC500);
   }
-
+}
 
 
 // Overloads
@@ -65,9 +72,15 @@ async findAll(
 
     const query = this.patientRepository.createQueryBuilder('patient')
       .leftJoinAndSelect('patient.therapist', 'therapist') 
+         .leftJoinAndMapOne(
+    'patient.language',
+    'app_languages',
+    'language',
+    'language.id = patient.language'
+  )
       .where('patient.is_delete = false');   // soft delete filter
 
-    let userCtx: { role: string; branches?: { branch_id: number }[] } | undefined;
+    let userCtx: { role: string; branches?: { branch_id: number }[] } | undefined;  
 
     // Distinguish overload call safely
     if (userCtxOrOptions && 'role' in userCtxOrOptions) {
@@ -174,6 +187,12 @@ async findAllWithPagination(
 
     const [data, total] = await query
       .leftJoinAndSelect('patient.therapist', 'therapist')
+      .leftJoinAndMapOne(
+  'patient.language', // property in Patient entity
+  'app_languages',    // table name
+  'language',         // alias
+  'language.id = patient.language' // join condition
+)
       .orderBy('patient.created_at', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
@@ -188,27 +207,36 @@ async findAllWithPagination(
   
 
   async findOne(id: string): Promise<Patient> {
-    try {
-      logger.info(`Patient_FindOne_Entry: id=${id}`);
-      const patient = await this.patientRepository.findOne({
-        where: { id, is_delete: false },
-        relations: ['therapist'],
-         // only fetch non-deleted
-      });
+  try {
+    logger.info(`Patient_FindOne_Entry: id=${id}`);
 
-      if (!patient) {
-        logger.error(`Patient_FindOne_Error: No record found for ID ${id}`);
-        throw new NotFoundException(Errors.NO_RECORD_FOUND);
-      }
+    const patient = await this.patientRepository
+      .createQueryBuilder('patient')
+      .leftJoinAndMapOne(
+        'patient.language',    // property in patient object
+        'app_languages',           // table to join
+        'language',            // alias
+        'language.id = patient.language' // join condition
+      )
+      .leftJoinAndSelect('patient.therapist', 'therapist') // keep therapist relation
+      .where('patient.id = :id', { id })
+      .andWhere('patient.is_delete = false')
+      .getOne();
 
-      logger.info(`Patient_FindOne_Exit: ${JSON.stringify(patient)}`);
-      return patient;
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      logger.error(`Patient_FindOne_Error: ${JSON.stringify(error?.message || error)}`);
-      throw new HttpException(EM100, EC500);
+    if (!patient) {
+      logger.error(`Patient_FindOne_Error: No record found for ID ${id}`);
+      throw new NotFoundException(Errors.NO_RECORD_FOUND);
     }
+
+    logger.info(`Patient_FindOne_Exit: ${JSON.stringify(patient)}`);
+    return patient;
+  } catch (error) {
+    if (error instanceof HttpException) throw error;
+    logger.error(`Patient_FindOne_Error: ${JSON.stringify(error?.message || error)}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
 
 
 async findOneByIdentifier(identifier: {
@@ -230,6 +258,12 @@ async findOneByIdentifier(identifier: {
     } else if (identifier.phone) {
       patient = await this.patientRepository
         .createQueryBuilder('patient')
+         .leftJoinAndMapOne(
+    'patient.language',
+    'app_languages',
+    'language',
+    'language.id = patient.language'
+  )
         .where('patient.is_delete = false')
         .andWhere(':phone = ANY(patient.phones)', { phone: identifier.phone })
         .getOne();
@@ -248,27 +282,49 @@ async findOneByIdentifier(identifier: {
 
 
 
-  async updatePatient(id: string, updatePatientDto: UpdatePatientDto): Promise<Patient> {
-    try {
-      logger.info(`Patient_Service_Update_Entry: id=${id}, data=${JSON.stringify(updatePatientDto)}`);
+async updatePatient(id: string, updatePatientDto: UpdatePatientDto): Promise<Patient> {
+  try {
+    logger.info(`Patient_Service_Update_Entry: id=${id}, data=${JSON.stringify(updatePatientDto)}`);
 
-      const patient = await this.findOne(id);
-      if (!patient) {
-        throw new HttpException(`Patient with ID ${id} not found`, HttpStatus.NOT_FOUND);
-      }
+    // Fetch existing patient with relations
+    const patient = await this.patientRepository.findOne({
+      where: { id, is_delete: false },
+      relations: ['therapist', 'language'], // include language relation
+    });
 
-      await this.patientRepository.update(id, updatePatientDto);
-
-      const updatedPatient = await this.findOne(id);
-      logger.info(`Patient_Service_Update_Exit: ${JSON.stringify(updatedPatient)}`);
-
-      return updatedPatient;
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      logger.error(`Patient_Service_Update_Error: ${error?.message || error}`);
-      throw new HttpException(EM100, EC500);
+    if (!patient) {
+      throw new HttpException(`Patient with ID ${id} not found`, HttpStatus.NOT_FOUND);
     }
+
+    // Destructure languageId to handle relation separately
+    const { languageId, ...rest } = updatePatientDto;
+
+    // Update other fields
+    Object.assign(patient, rest);
+
+    // Map language ID to relation if provided
+    if (languageId) {
+      patient.language = { id: languageId } as any;
+    }
+
+    // Save entity
+    await this.patientRepository.save(patient);
+
+    // Fetch again to ensure relations are populated
+    const updatedPatient = await this.patientRepository.findOne({
+      where: { id, is_delete: false },
+      relations: ['therapist', 'language'], // fetch full language object
+    });
+
+    logger.info(`Patient_Service_Update_Exit: ${JSON.stringify(updatedPatient)}`);
+    return updatedPatient!;
+  } catch (error) {
+    if (error instanceof HttpException) throw error;
+    logger.error(`Patient_Service_Update_Error: ${error?.message || error}`);
+    throw new HttpException(EM100, EC500);
   }
+}
+
 
   async removePatient(id: string): Promise<void> {
     try {
