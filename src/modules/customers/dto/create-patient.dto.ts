@@ -38,10 +38,11 @@ export class CreatePatientDto {
   @IsString()
   legalgender?: string;
 
-  @ApiProperty({ example: 'English' })
-  @IsOptional()
-  @IsString()
-  language?: string;
+@ApiProperty({ example: 2, description: 'Language ID from app_languages table' })
+@IsOptional()
+@IsNumber()
+languageId?: number;
+
 
   @ApiProperty({ example: 'primary_record_123' })
   @IsOptional()
@@ -112,7 +113,7 @@ export class CreatePatientDto {
   phones?: string[];
 
 
-@ApiProperty({ example: 1, description: 'Optional therapist ID' })
+@ApiProperty({ example: 2, description: 'Optional therapist ID' })
 @IsOptional()
 @IsNumber()
 therapistId?: number;
