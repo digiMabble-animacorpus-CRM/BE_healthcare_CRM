@@ -108,10 +108,54 @@ export class CreateTherapistMemberDto {
   @IsString()
   consultations?: string;
 
-  @ApiPropertyOptional({ example: { admin: true } })
+  @ApiPropertyOptional({
+    description: 'Permissions object for the therapist team member',
+    example: {
+      billing: {
+        edit: true,
+        view: true,
+        create: true,
+        delete: true,
+      },
+      branches: {
+        edit: true,
+        view: true,
+        create: true,
+        delete: true,
+      },
+      patients: {
+        edit: true,
+        view: true,
+        create: true,
+        delete: true,
+      },
+      dashboard: {
+        view: true,
+      },
+      departments: {
+        edit: true,
+        view: true,
+        create: true,
+        delete: true,
+      },
+      appointments: {
+        edit: true,
+        view: true,
+        create: true,
+        delete: true,
+      },
+       therapists: {
+    edit: true,
+    view: true,
+    create: true,
+    delete: true
+  },
+    },
+  })
   @IsOptional()
   @IsObject()
   permissions?: Record<string, any>;
+
 
   @ApiPropertyOptional({ enum: MemberRole, example: MemberRole.STAFF })
   @IsOptional()
