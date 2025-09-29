@@ -9,6 +9,7 @@ import { Department } from '../Department/entities/department.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
 import { In } from 'typeorm';
+import { AppLanguage } from 'src/modules/languages/entities/app-languages.entity';
 
 @Injectable()
 export class TherapistTeamService {
@@ -25,7 +26,25 @@ export class TherapistTeamService {
     @InjectRepository(Specialization)
     private specializationRepo: Repository<Specialization>,
 
+    @InjectRepository(AppLanguage)
+private readonly languageRepo: Repository<AppLanguage>
+
+
   ) {}
+
+
+
+  async getLanguagesDetails(names: string[]): Promise<any[]> {
+  if (!names?.length) return [];
+  
+  // Assuming you have a repository for AppLanguage
+  const languages = await this.languageRepo.find({
+    where: { language_name: In(names) },
+  });
+  
+  return languages;
+}
+
 
 async create(dto: CreateTherapistMemberDto): Promise<TherapistMember> {
   // 1️⃣ Fetch department if provided
@@ -66,12 +85,19 @@ async create(dto: CreateTherapistMemberDto): Promise<TherapistMember> {
 
   // 6️⃣ Save again to persist ManyToMany relations
   const finalTherapist = await this.therapistRepo.save(savedTherapist);
+const languagesSpokenDetails = await this.getLanguagesDetails(finalTherapist.languagesSpoken);
+
+
+const therapistWithRelations = await this.therapistRepo.findOne({
+  where: { therapistId: finalTherapist.therapistId },
+  relations: ['department', 'branches', 'specializations'],
+});
 
   // 7️⃣ Return the therapist with relations loaded
-  return this.therapistRepo.findOne({
-    where: { therapistId: finalTherapist.therapistId },
-    relations: ['department', 'branches', 'specializations'],
-  });
+ return {
+  ...therapistWithRelations,
+  languagesSpoken: languagesSpokenDetails,
+};
 }
 
 
@@ -97,10 +123,20 @@ async create(dto: CreateTherapistMemberDto): Promise<TherapistMember> {
     query.andWhere('branch.branch_id IN (:...branchIds)', { branchIds });
   }
 
-  const data = await query.getMany();
+  const  therapists = await query.getMany();
 
+ // Fetch languages details for each therapist
+  const therapistsWithLanguages = await Promise.all(
+    therapists.map(async (therapist) => {
+      const languagesSpokenDetails = await this.getLanguagesDetails(therapist.languagesSpoken);
+      return {
+        ...therapist,
+        languagesSpokenDetails,
+      };
+    })
+  );
 
-  return data; // just return array
+  return therapistsWithLanguages; // just return array
 }
 
 
@@ -110,7 +146,13 @@ async create(dto: CreateTherapistMemberDto): Promise<TherapistMember> {
       relations: ['department', 'branches'],
     });
     if (!therapist) throw new NotFoundException(`Therapist member #${id} not found`);
-    return therapist;
+
+    const languagesDetails = await this.getLanguagesDetails(therapist.languagesSpoken);
+
+    return {
+      ...therapist,
+       languagesSpoken: languagesDetails,
+    };
   }
 
 async update(id: number, dto: UpdateTherapistTeamDto): Promise<TherapistMember> {
@@ -142,13 +184,25 @@ async update(id: number, dto: UpdateTherapistTeamDto): Promise<TherapistMember> 
   // Merge other fields safely
   const { departmentId, branchIds, specializationIds, full_name, ...rest } = dto;
   Object.assign(therapist, rest);
+ // Handle languages (store only names)
+  if (dto.languagesSpoken?.length) {
+    const languageEntities = await this.getLanguagesDetails(dto.languagesSpoken);
+    therapist.languagesSpoken = languageEntities.map(l => l.language_name);
+  }
 
-  await this.therapistRepo.save(therapist);
+  // Save updates
+  const updatedTherapist = await this.therapistRepo.save(therapist);
 
-  return this.therapistRepo.findOne({
-    where: { therapistId: therapist.therapistId },
+  // Fetch related entities for return
+  const therapistWithRelations = await this.therapistRepo.findOne({
+    where: { therapistId: updatedTherapist.therapistId },
     relations: ['department', 'branches', 'specializations'],
   });
+
+  return {
+    ...therapistWithRelations,
+    languagesSpoken: therapist.languagesSpoken, // only names
+  };
 }
 
 

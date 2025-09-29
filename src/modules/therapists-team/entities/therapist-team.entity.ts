@@ -65,8 +65,9 @@ export class TherapistMember {
   @Column({ type: 'jsonb', nullable: true, default: () => "'[]'::jsonb" })
 payment_methods: string[];
 
-@Column({ name: 'faq', type: 'text', array: true, default: '{}' })
-faq: string[];
+@Column({ type: 'jsonb', nullable: true, default: () => "'[]'::jsonb" })
+faq: { question: string; answer: string }[];
+
 
   @Column({ name: 'website', type: 'varchar', length: 255, nullable: true })
   website?: string;
