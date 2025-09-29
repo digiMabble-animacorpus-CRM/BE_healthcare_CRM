@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository ,Like} from 'typeorm';
 import { AppLanguage } from './entities/app-languages.entity';
 import { CreateAppLanguageDto } from './dto/create-app-language.dto';
 import { UpdateAppLanguageDto } from './dto/update-app-language.dto';
+
 
 @Injectable()
 export class AppLanguagesService {
@@ -17,9 +18,18 @@ export class AppLanguagesService {
     return this.languageRepo.save(language);
   }
 
-  async findAll(): Promise<AppLanguage[]> {
-    return this.languageRepo.find();
+  async findAll(search?: string): Promise<AppLanguage[]> {
+  if (search && search.trim() !== '') {
+    return this.languageRepo.find({
+      where: [
+        { language_name: Like(`%${search}%`) },
+        { language_description: Like(`%${search}%`) },
+      ],
+    });
   }
+
+  return this.languageRepo.find();
+}
 
   async findOne(id: number): Promise<AppLanguage> {
     const language = await this.languageRepo.findOne({ where: { id } });

@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn ,ManyToOne, JoinColumn ,CreateDateColumn ,RelationId} from 'typeorm';
 import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
 import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-team.entity';
+import { AppLanguage } from 'src/modules/languages/entities/app-languages.entity';
 
 @Entity({ name: 'patients' })
 export class Patient {
@@ -22,8 +23,12 @@ export class Patient {
   @Column({ type: 'text', nullable: false, default: '' })
   legalgender: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  language: string;
+  @Column({ name: 'language', type: 'int', nullable: true })
+  languageId?: number;
+
+  @ManyToOne(() => AppLanguage, { nullable: true })
+  @JoinColumn({ name: 'language' })
+  language?: AppLanguage;
 
   //  date cannot have default: ''
   //  allow null if unknown

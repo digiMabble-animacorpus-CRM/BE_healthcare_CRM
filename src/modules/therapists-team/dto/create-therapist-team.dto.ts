@@ -27,6 +27,17 @@ export class AvailabilityDto {
   endTime: string;
 }
 
+
+export class FaqDto {
+  @ApiProperty({ example: 'Who' })
+  @IsString()
+  question: string;
+
+  @ApiProperty({ example: 'I am a therapist' })
+  @IsString()
+  answer: string;
+}
+
 export class CreateTherapistMemberDto {
   @ApiProperty({ example: 'Alice' })
   @IsString()
@@ -76,11 +87,15 @@ export class CreateTherapistMemberDto {
   @IsString({ each: true })
   payment_methods?: string[];
 
- @ApiPropertyOptional({ example: ["Answer 1", "Answer 2", "Answer 3"] })
-@IsOptional()
-@IsArray()
-@IsString({ each: true })
-faq?: string[];
+  @ApiPropertyOptional({
+    type: [FaqDto],
+    example: [{ question: 'Who', answer: 'I am a therapist' }],
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FaqDto)
+  faq?: FaqDto[];
 
 
   @ApiPropertyOptional({ example: 'https://therapist-website.com' })
