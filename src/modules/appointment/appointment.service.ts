@@ -9,8 +9,7 @@ import Appointment from './entities/appointment.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { FindAllAppointmentsQueryDto } from './dto/find-all-appointments-query.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
-import { Therapist } from '../therapist/entities/therapist.entity';
-import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
+import { TherapistMember } from '../therapists-team/entities/therapist-team.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { Department } from '../Department/entities/department.entity';
 import { Specialization } from '../specialization/entities/specialization.entity';
@@ -22,8 +21,7 @@ export class AppointmentsService extends BaseService<Appointment> {
   constructor(
     @InjectRepository(Appointment) private readonly appointmentRepository: Repository<Appointment>,
     @InjectRepository(Patient) private readonly patientRepository: Repository<Patient>,
-    @InjectRepository(Therapist) private readonly therapistRepository: Repository<Therapist>,
-    @InjectRepository(TeamMember) private readonly teamMemberRepository: Repository<TeamMember>,
+    @InjectRepository(TherapistMember) private readonly therapistMemberRepository: Repository<TherapistMember>,
     @InjectRepository(Branch) private readonly branchRepository: Repository<Branch>,
     @InjectRepository(Department) private readonly departmentRepository: Repository<Department>,
     @InjectRepository(Specialization) private readonly specializationRepository: Repository<Specialization>,
@@ -32,9 +30,6 @@ export class AppointmentsService extends BaseService<Appointment> {
     this.repository = appointmentRepository;
   }
 
-  /**
-   * Creates a base query with all necessary relations for appointments.
-   */
   private getBaseQuery() {
     try {
       return this.repository.createQueryBuilder('a')
@@ -44,25 +39,20 @@ export class AppointmentsService extends BaseService<Appointment> {
         .leftJoinAndSelect('a.department', 'department')
         .leftJoinAndSelect('a.specialization', 'specialization')
         .leftJoinAndSelect('a.createdBy', 'creator')
-        .leftJoinAndSelect('a.modifiedBy', 'modifier');
+        .leftJoinAndSelect('a.modifiedBy', 'modifier')
+        .where('a.deleted_at IS NULL');
     } catch (error) {
       logger.error(`Error creating base query: ${error?.message}`);
       throw error;
     }
   }
 
-  /**
-   * Handles errors, logs them, and throws a standardized HttpException.
-   */
   private handleError(operation: string, error: any): never {
     logger.error(`Appointment_${operation}_Error: ${JSON.stringify(error?.message || error)}`);
     if (error instanceof HttpException) throw error;
     throw new HttpException(EM100, EC500);
   }
 
-  /**
-   * Validates datetime format and ensures end time is after start time.
-   */
   private validateDateTimeSlot(startTime: string, endTime: string): void {
     const startDate = new Date(startTime);
     const endDate = new Date(endTime);
@@ -80,36 +70,33 @@ export class AppointmentsService extends BaseService<Appointment> {
     }
   }
 
-  /**
-   * Validates the existence of related entities (Patient, Therapist, TeamMember, Department, Specialization).
-   */
   private async validateRelations(
     branchId: number,
-    patientId: string, // UUID for Patient
-    therapistId: number, // ID field for Therapist
-    teamMemberId: string, // team_id UUID for TeamMember
-    departmentId: number, // ID for Department
-    specializationId?: number // Optional ID for Specialization
+    patientId: string,
+    therapistId: number,
+    createdById: number,
+    departmentId: number,
+    specializationId?: number
   ): Promise<{ 
     branch: Branch; 
     patient: Patient; 
-    therapist: Therapist; 
-    teamMember: TeamMember; 
+    therapist: TherapistMember; 
+    createdBy: TherapistMember; 
     department: Department; 
     specialization?: Specialization 
   }> {
-    const [branch, patient, therapist, teamMember, department] = await Promise.all([
+    const [branch, patient, therapist, createdBy, department] = await Promise.all([
       this.branchRepository.findOne({ where: { branch_id: branchId } }),
       this.patientRepository.findOne({ where: { id: patientId } }),
-      this.therapistRepository.findOne({ where: { therapistId: therapistId } }),
-      this.teamMemberRepository.findOne({ where: { team_id: teamMemberId } }), // Using team_id instead of id
+      this.therapistMemberRepository.findOne({ where: { therapistId: therapistId } }),
+      this.therapistMemberRepository.findOne({ where: { therapistId: createdById } }),
       this.departmentRepository.findOne({ where: { id: departmentId } })
     ]);
 
     if (!branch) throw new BadRequestException(`Branch with ID ${branchId} not found`);
     if (!patient) throw new BadRequestException(`Patient with ID ${patientId} not found`);
     if (!therapist) throw new BadRequestException(`Therapist with ID ${therapistId} not found`);
-    if (!teamMember) throw new BadRequestException(`Team member with ID ${teamMemberId} not found`);
+    if (!createdBy) throw new BadRequestException(`Team member with ID ${createdById} not found`);
     if (!department) throw new BadRequestException(`Department with ID ${departmentId} not found`);
 
     let specialization: Specialization | undefined;
@@ -121,34 +108,27 @@ export class AppointmentsService extends BaseService<Appointment> {
       if (!specialization) {
         throw new BadRequestException(`Specialization with ID ${specializationId} not found`);
       }
-      // Validate that the specialization belongs to the specified department
       if (specialization.department.id !== departmentId) {
         throw new BadRequestException(`Specialization ${specializationId} does not belong to department ${departmentId}`);
       }
     }
 
-    return { branch, patient, therapist, teamMember, department, specialization };
+    return { branch, patient, therapist, createdBy, department, specialization };
   }
 
-  /**
-   * Creates a new appointment.
-   * @param createAppointmentDto - Data for creating the appointment.
-   * @returns The newly created appointment.
-   */
   async createAppointment(createAppointmentDto: CreateAppointmentDto): Promise<Appointment> {
     try {
       logger.info(`Appointment_Create_Entry: ${JSON.stringify(createAppointmentDto)}`);
 
-      // Validate datetime slot
       this.validateDateTimeSlot(createAppointmentDto.startTime, createAppointmentDto.endTime);
 
-      const { branch, patient, therapist, teamMember: createdBy, department, specialization } = await this.validateRelations(
+      const { branch, patient, therapist, createdBy, department, specialization } = await this.validateRelations(
         createAppointmentDto.branchId,
-        createAppointmentDto.patientId, // string (UUID)
-        createAppointmentDto.therapistId, // number
-        createAppointmentDto.createdById, // string (UUID)
-        createAppointmentDto.departmentId, // number
-        createAppointmentDto.specializationId // optional number
+        createAppointmentDto.patientId,
+        createAppointmentDto.therapistId,
+        createAppointmentDto.createdById,
+        createAppointmentDto.departmentId,
+        createAppointmentDto.specializationId
       );
 
       const appointment = this.repository.create({
@@ -172,20 +152,6 @@ export class AppointmentsService extends BaseService<Appointment> {
     }
   }
 
-  /**
-   * Finds all appointments with optional pagination and search functionality.
-   * @param page - Page number (optional, if not provided returns all data).
-   * @param limit - Number of items per page (optional, if not provided returns all data).
-   * @param search - Optional search term.
-   * @param status - Optional status filter.
-   * @param startDate - Optional start date for date range filter.
-   * @param endDate - Optional end date for date range filter.
-   * @param departmentId - Optional department filter.
-   * @param branchId - Optional branch filter.
-   * @param patientId - Optional patient filter.
-   * @param therapistId - Optional therapist filter.
-   * @returns A list of appointments and the total count.
-   */
   async findAllWithPaginationAppointments(
     page?: number, 
     limit?: number, 
@@ -201,21 +167,19 @@ export class AppointmentsService extends BaseService<Appointment> {
     try {
       logger.info(`Appointment_FindAllPaginated_Entry: page=${page}, limit=${limit}, search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, departmentId=${departmentId}, branchId=${branchId}, patientId=${patientId}, therapistId=${therapistId}`);
 
-      // Start with a simple query and add joins step by step
       let query = this.repository.createQueryBuilder('a');
       
-      // Add essential joins
       query = query
         .leftJoinAndSelect('a.branch', 'branch')
         .leftJoinAndSelect('a.patient', 'patient')
         .leftJoinAndSelect('a.therapist', 'therapist')
         .leftJoinAndSelect('a.department', 'department');
       
-      // Add optional joins
       query = query
         .leftJoinAndSelect('a.specialization', 'specialization')
         .leftJoinAndSelect('a.createdBy', 'creator')
-        .leftJoinAndSelect('a.modifiedBy', 'modifier');
+        .leftJoinAndSelect('a.modifiedBy', 'modifier')
+        .where('a.deleted_at IS NULL');
       
       logger.info('Base query with joins created successfully');
 
@@ -228,8 +192,8 @@ export class AppointmentsService extends BaseService<Appointment> {
               .orWhere('patient.emails ILIKE :search')
               .orWhere('therapist.firstName ILIKE :search')
               .orWhere('therapist.lastName ILIKE :search')
-              .orWhere('creator.first_name ILIKE :search')
-              .orWhere('creator.last_name ILIKE :search')
+              .orWhere('creator.firstName ILIKE :search')
+              .orWhere('creator.lastName ILIKE :search')
               .orWhere('department.name ILIKE :search')
               .orWhere('specialization.specialization_type::text ILIKE :search');
           })
@@ -267,10 +231,8 @@ export class AppointmentsService extends BaseService<Appointment> {
 
       logger.info('About to execute query with filters applied');
       
-      // Apply ordering
       query = query.orderBy('a.created_at', 'DESC');
       
-      // Apply pagination only if both page and limit are provided
       if (page && limit) {
         query = query.skip((page - 1) * limit).take(limit);
       }
@@ -285,11 +247,6 @@ export class AppointmentsService extends BaseService<Appointment> {
     }
   }
 
-  /**
-   * Finds a single appointment by its ID.
-   * @param id - The ID of the appointment.
-   * @returns The found appointment.
-   */
   async findOneAppointment(id: number): Promise<Appointment> {
     try {
       logger.info(`Appointment_FindOne_Entry: id=${id}`);
@@ -309,12 +266,6 @@ export class AppointmentsService extends BaseService<Appointment> {
     }
   }
 
-  /**
-   * Updates an existing appointment including its status.
-   * @param id - The ID of the appointment to update.
-   * @param updateAppointmentDto - The data to update.
-   * @returns The updated appointment.
-   */
   async updateAppointment(id: number, updateAppointmentDto: UpdateAppointmentDto): Promise<Appointment> {
     try {
       logger.info(`Appointment_Update_Entry: id=${id}, data=${JSON.stringify(updateAppointmentDto)}`);
@@ -322,7 +273,6 @@ export class AppointmentsService extends BaseService<Appointment> {
       const existingAppointment = await this.findOneAppointment(id);
       const { modifiedById, branchId, patientId, therapistId, departmentId, specializationId, startTime, endTime, status, reason, ...restDto } = updateAppointmentDto;
 
-      // Validate datetime slot if both startTime and endTime are provided
       if (startTime && endTime) {
         this.validateDateTimeSlot(startTime, endTime);
       } else if (startTime && !endTime) {
@@ -331,32 +281,26 @@ export class AppointmentsService extends BaseService<Appointment> {
         this.validateDateTimeSlot(existingAppointment.startTime.toISOString(), endTime);
       }
 
-      // Validate the team member making the modification
-      const modifiedBy = await this.teamMemberRepository.findOne({ where: { team_id: modifiedById } }); // Using team_id
+      const modifiedBy = await this.therapistMemberRepository.findOne({ where: { therapistId: modifiedById } });
       if (!modifiedBy) {
         throw new BadRequestException(`Team member with ID ${modifiedById} not found`);
       }
 
       const updateData: any = { ...restDto, modifiedBy };
 
-      // Include datetime fields if provided (convert from ISO string to Date)
       if (startTime) updateData.startTime = new Date(startTime);
       if (endTime) updateData.endTime = new Date(endTime);
 
-      // Handle status update with validation
       if (status !== undefined) {
-        // Check if status change is valid
         if (existingAppointment.status === 'cancelled' && status !== 'cancelled') {
           throw new BadRequestException('Cannot change status of a cancelled appointment');
         }
         updateData.status = status;
         
-        // If reason is provided for status change, add it to description
         if (reason) {
           updateData.description = `${existingAppointment.description || ''} [Status change: ${reason}]`.trim();
         }
       } else if (reason && !status) {
-        // If only reason is provided without status change, add it as a general note
         updateData.description = `${existingAppointment.description || ''} [Update note: ${reason}]`.trim();
       }
 
@@ -366,31 +310,26 @@ export class AppointmentsService extends BaseService<Appointment> {
         updateData.branch = branch;
       }
 
-      // If patientId is provided, validate and update the relation
       if (patientId && patientId !== existingAppointment.patient.id) {
         const patient = await this.patientRepository.findOne({ where: { id: patientId } });
         if (!patient) throw new BadRequestException(`Patient with ID ${patientId} not found`);
         updateData.patient = patient;
       }
 
-      // If therapistId is provided, validate and update the relation
       if (therapistId && therapistId !== existingAppointment.therapist.therapistId) {
-        const therapist = await this.therapistRepository.findOne({ where: { therapistId: therapistId } });
+        const therapist = await this.therapistMemberRepository.findOne({ where: { therapistId: therapistId } });
         if (!therapist) throw new BadRequestException(`Therapist with ID ${therapistId} not found`);
         updateData.therapist = therapist;
       }
 
-      // If departmentId is provided, validate and update the relation
       if (departmentId && departmentId !== existingAppointment.department?.id) {
         const department = await this.departmentRepository.findOne({ where: { id: departmentId } });
         if (!department) throw new BadRequestException(`Department with ID ${departmentId} not found`);
         updateData.department = department;
       }
 
-      // If specializationId is provided, validate and update the relation
       if (specializationId !== undefined) {
         if (specializationId === null || specializationId === 0) {
-          // Clear the specialization
           updateData.specialization = null;
         } else {
           const specialization = await this.specializationRepository.findOne({ 
@@ -401,7 +340,6 @@ export class AppointmentsService extends BaseService<Appointment> {
             throw new BadRequestException(`Specialization with ID ${specializationId} not found`);
           }
           
-          // If departmentId is also being updated, use the new department, otherwise use existing
           const targetDepartmentId = departmentId || existingAppointment.department?.id;
           if (specialization.department.id !== targetDepartmentId) {
             throw new BadRequestException(`Specialization ${specializationId} does not belong to department ${targetDepartmentId}`);
@@ -419,22 +357,103 @@ export class AppointmentsService extends BaseService<Appointment> {
     }
   }
 
-  /**
-   * Deletes an appointment permanently.
-   * @param id - The ID of the appointment to delete.
-   * @returns The result of the delete operation.
-   */
-  async removeAppointment(id: number): Promise<DeleteResult> {
+  async removeAppointment(id: number): Promise<UpdateResult> {
     try {
-      logger.info(`Appointment_Remove_Entry: id=${id}`);
-      await this.findOneAppointment(id); // Verify existence before attempting deletion
+      logger.info(`Appointment_SoftDelete_Entry: id=${id}`);
+      await this.findOneAppointment(id);
+
+      const result = await this.repository.update(id, {
+        deleted_at: new Date(),
+        is_deleted: true
+      });
+
+      logger.info(`Appointment_SoftDelete_Exit: ${JSON.stringify(result)}`);
+      return result;
+    } catch (error) {
+      this.handleError('SoftDelete', error);
+    }
+  }
+
+  async permanentlyDeleteAppointment(id: number): Promise<DeleteResult> {
+    try {
+      logger.info(`Appointment_PermanentDelete_Entry: id=${id}`);
+      
+      const appointment = await this.repository.findOne({ 
+        where: { id }, 
+        withDeleted: true 
+      });
+      
+      if (!appointment) {
+        throw new NotFoundException(EM119);
+      }
 
       const result = await this.repository.delete(id);
 
-      logger.info(`Appointment_Remove_Exit: ${JSON.stringify(result)}`);
+      logger.info(`Appointment_PermanentDelete_Exit: ${JSON.stringify(result)}`);
       return result;
     } catch (error) {
-      this.handleError('Remove', error);
+      this.handleError('PermanentDelete', error);
+    }
+  }
+
+  async restoreAppointment(id: number): Promise<Appointment> {
+    try {
+      logger.info(`Appointment_Restore_Entry: id=${id}`);
+      
+      const appointment = await this.repository.findOne({ 
+        where: { id }, 
+        withDeleted: true 
+      });
+      
+      if (!appointment) {
+        throw new NotFoundException(EM119);
+      }
+
+      if (!appointment.deleted_at) {
+        throw new BadRequestException('Appointment is not deleted');
+      }
+
+      await this.repository.update(id, {
+        deleted_at: null,
+        is_deleted: false
+      });
+
+      const restoredAppointment = await this.findOneAppointment(id);
+      logger.info(`Appointment_Restore_Exit: ${JSON.stringify(restoredAppointment)}`);
+      return restoredAppointment;
+    } catch (error) {
+      this.handleError('Restore', error);
+    }
+  }
+
+  async findAllDeletedAppointments(
+    page?: number, 
+    limit?: number
+  ): Promise<{ data: Appointment[], total: number }> {
+    try {
+      logger.info(`Appointment_FindAllDeleted_Entry: page=${page}, limit=${limit}`);
+
+      let query = this.repository.createQueryBuilder('a')
+        .leftJoinAndSelect('a.branch', 'branch')
+        .leftJoinAndSelect('a.patient', 'patient')
+        .leftJoinAndSelect('a.therapist', 'therapist')
+        .leftJoinAndSelect('a.department', 'department')
+        .leftJoinAndSelect('a.specialization', 'specialization')
+        .leftJoinAndSelect('a.createdBy', 'creator')
+        .leftJoinAndSelect('a.modifiedBy', 'modifier')
+        .where('a.deleted_at IS NOT NULL')
+        .orderBy('a.deleted_at', 'DESC');
+
+      if (page && limit) {
+        query = query.skip((page - 1) * limit).take(limit);
+      }
+      
+      const [data, total] = await query.getManyAndCount();
+
+      logger.info(`Appointment_FindAllDeleted_Exit: Found ${data.length} deleted appointments, total: ${total}`);
+      return { data, total };
+    } catch (error) {
+      this.handleError('FindAllDeleted', error);
     }
   }
 }

@@ -126,14 +126,70 @@ export class AppointmentsController {
   }
 
   @Delete(':id')
-    @Roles('super_admin')
+  @Roles('super_admin', 'admin')
   @Permissions({ module: 'appointments', action: 'delete' })
-  @ApiOperation({ summary: 'Delete an appointment' })
-  @ApiResponse({ status: 200, description: 'Appointment deleted successfully.' })
+  @ApiOperation({ summary: 'Soft delete an appointment' })
+  @ApiResponse({ status: 200, description: 'Appointment soft deleted successfully.' })
   async remove(@Param('id', ParseIntPipe) id: number) {
     try {
       await this.appointmentsService.removeAppointment(id);
-      return HandleResponse.buildSuccessObj(EC200, 'Appointment deleted successfully.', null);
+      return HandleResponse.buildSuccessObj(EC200, 'Appointment soft deleted successfully.', null);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  @Delete(':id/permanent')
+  @Roles('super_admin')
+  @Permissions({ module: 'appointments', action: 'delete' })
+  @ApiOperation({ summary: 'Permanently delete an appointment' })
+  @ApiResponse({ status: 200, description: 'Appointment permanently deleted successfully.' })
+  async permanentDelete(@Param('id', ParseIntPipe) id: number) {
+    try {
+      await this.appointmentsService.permanentlyDeleteAppointment(id);
+      return HandleResponse.buildSuccessObj(EC200, 'Appointment permanently deleted successfully.', null);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  @Patch(':id/restore')
+  @Roles('super_admin', 'admin')
+  @Permissions({ module: 'appointments', action: 'edit' })
+  @ApiOperation({ summary: 'Restore a soft deleted appointment' })
+  @ApiResponse({ status: 200, description: 'Appointment restored successfully.' })
+  async restore(@Param('id', ParseIntPipe) id: number) {
+    try {
+      const data = await this.appointmentsService.restoreAppointment(id);
+      return HandleResponse.buildSuccessObj(EC200, 'Appointment restored successfully.', data);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  @Get('deleted/all')
+  @Roles('super_admin', 'admin')
+  @Permissions({ module: 'appointments', action: 'view' })
+  @ApiOperation({ summary: 'Get all soft deleted appointments' })
+  @ApiResponse({ status: 200, description: 'Deleted appointments retrieved successfully.' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async findAllDeleted(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number
+  ) {
+    try {
+      const { data, total } = await this.appointmentsService.findAllDeletedAppointments(page, limit);
+      
+      const response: any = { data, total };
+      
+      if (page && limit) {
+        response.page = page;
+        response.limit = limit;
+        response.totalPages = Math.ceil(total / limit);
+      }
+      
+      return HandleResponse.buildSuccessObj(EC200, 'Deleted appointments retrieved successfully.', response);
     } catch (error) {
       return this.handleError(error);
     }
