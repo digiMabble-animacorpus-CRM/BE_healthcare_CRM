@@ -48,7 +48,7 @@ export class AppointmentsController {
   }
 
   @Get()
-  @Roles('super_admin', 'admin', 'staff')
+  @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'appointments', action: 'view' })
   @ApiOperation({ summary: 'Get all appointments with optional filtering and pagination' })
   @ApiResponse({ status: 200, description: 'Appointments retrieved successfully.' })
@@ -98,7 +98,7 @@ export class AppointmentsController {
   }
 
   @Get(':id')
-  @Roles('super_admin', 'admin', 'staff')
+  @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'appointments', action: 'view' })
   @ApiOperation({ summary: 'Get appointment by ID' })
   @ApiResponse({ status: 200, description: 'Appointment retrieved successfully.' })

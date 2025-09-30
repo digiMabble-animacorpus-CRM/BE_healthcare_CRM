@@ -8,20 +8,20 @@ export class Patient {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: false, default: '' })
+  @Column({ type: 'varchar', length: 100, nullable: false })
   firstname: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: false, default: '' })
-  middlename: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  middlename?: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: false, default: '' })
-  lastname: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  lastname?: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  ssin: string;
+  @Column({ type: 'text', nullable: true, default: '' })
+  ssin?: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  legalgender: string;
+  @Column({ type: 'text', nullable: true, default: '' })
+  legalgender?: string;
 
   @Column({ name: 'language', type: 'int', nullable: true })
   languageId?: number;
@@ -33,45 +33,44 @@ export class Patient {
   //  date cannot have default: ''
   //  allow null if unknown
   @Column({ type: 'date', nullable: true })
-  birthdate: Date | null;
+  birthdate?: Date | null;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  primarypatientrecordid: string;
+  @Column({ type: 'text', nullable: true})
+  primarypatientrecordid?: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  note: string;
+  @Column({ type: 'text', nullable: true })
+  note?: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  status: string;
+  @Column({ type: 'text', nullable: true })
+  status?: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  mutualitynumber: string;
+  @Column({ type: 'text', nullable: true })
+  mutualitynumber?: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  mutualityregistrationnumber: string;
+  @Column({ type: 'text', nullable: false })
+  rpnumber: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  emails: string;
+  @Column({ type: 'text', nullable: true })
+  emails?: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  country: string;
+  @Column({ type: 'text', nullable: true })
+  country?: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  city: string;
+  @Column({ type: 'text', nullable: true})
+  city?: string;
 
-  @Column({ type: 'text', nullable: false, default: '' })
-  street: string;
+  @Column({ type: 'text', nullable: true })
+  street?: string;
 
-  // arrays don’t support default: ''
-  // keep nullable true
-  @Column('text', { array: true, nullable: true })
+ 
+  @Column('text', { array: true, nullable: false })
   phones: string[];
 
-  @Column({ type: 'varchar', length: 20, nullable: false, default: '' })
-  zipcode: string;
+  @Column({ type: 'varchar', length: 20, nullable: true})
+  zipcode?: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: false, default: '' })
-  number: string;
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  number?: string;
 
 //  // Optional relation to Therapist
 // @ManyToOne(() => Therapist, { nullable: true })

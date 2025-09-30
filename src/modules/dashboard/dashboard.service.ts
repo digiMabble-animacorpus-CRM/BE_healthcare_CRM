@@ -328,7 +328,7 @@ export class DashboardService {
   async getBranchesSummaryForUser(user: {
   user_id?: number;
   id?: number;
-  role: string; // 'super_admin' | 'admin' | 'staff'
+  role: string; // 'super_admin' | 'admin' | 'therapist'
 }): Promise<BranchSummaryDto[]> {
   const userId = user.user_id ?? user.id;
   if (!userId) throw new ForbiddenException('Missing user id');

@@ -11,7 +11,7 @@ import { Role } from '../modules/roles/entities/role.entity';
     await roleRepository.save([
       { name: 'super-admin', description: 'Super admin role', is_active: true },
       { name: 'branch-admin', description: 'Branch admin role', is_active: true },
-      { name: 'staff', description: 'Staff role', is_active: true },
+      { name: 'therapist', description: 'therapist role', is_active: true },
     ]);
 
     console.log('Roles seeded successfully.');

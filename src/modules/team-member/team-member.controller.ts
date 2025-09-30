@@ -18,17 +18,17 @@ export class TeamMemberController {
   constructor(private readonly service: TeamMemberService) {}
 
   @Get()
-    @Roles('super_admin', 'admin', 'staff')
+    @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'team_member', action: 'view' })
   @ApiOperation({ summary: 'Get all active (non-deleted) team members' })
   @ApiResponse({ status: 200, description: 'List of team members', type: [TeamMember] })
   findAll(@Req() req): Promise<TeamMember[]> {
-    // Could filter by branch if user is Admin/Staff
+    // Could filter by branch if user is Admin/therapist
     return this.service.findAll(req.user);
   }
 
   @Get(':id')
-    @Roles('super_admin', 'admin', 'staff')
+    @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'team_member', action: 'view' })
   @ApiOperation({ summary: 'Get team member by ID (only if not deleted)' })
   @ApiResponse({ status: 200, description: 'Team member found', type: TeamMember })
@@ -57,7 +57,7 @@ export class TeamMemberController {
   }
 
   @Get('search')
-    @Roles('super_admin', 'admin', 'staff')
+    @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'team_member', action: 'view' })
   @ApiOperation({ summary: 'Search team members by name, job, specialization, etc.' })
   @ApiResponse({ status: 200, description: 'List of matching team members', type: [TeamMember] })

@@ -29,7 +29,7 @@ export class TherapistTeamController {
   }
 
   @Get()
-  @Roles('super_admin', 'admin', 'staff')
+  @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'therapists', action: 'view' })
   @ApiOperation({ summary: 'Get all therapist team members with pagination and filters' })
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination' })
@@ -43,7 +43,7 @@ export class TherapistTeamController {
   }
 
   @Get(':id')
-  @Roles('super_admin', 'admin', 'staff')
+  @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'therapists', action: 'view' })
   @ApiOperation({ summary: 'Get a therapist team member by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Therapist member ID' })

@@ -50,7 +50,7 @@ export class TherapistController {
 
   // GET ALL WITH FILTERS
   @Get()
-    @Roles('super_admin', 'admin', 'staff')
+    @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'therapists', action: 'view' })
   @ApiOperation({ summary: 'Get all therapists with optional filters' })
   @ApiQuery({ name: 'page', required: false, example: '1' })
@@ -69,7 +69,7 @@ export class TherapistController {
 
   // SEARCH
   @Get('search')
-    @Roles('super_admin', 'admin', 'staff')
+    @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'therapists', action: 'view' })
   @ApiOperation({ summary: 'Search therapists by name, specialization, language, etc.' })
   @ApiQuery({
@@ -86,7 +86,7 @@ export class TherapistController {
 
   // GET BY ID
   @Get(':id')
-    @Roles('super_admin', 'admin', 'staff')
+    @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'therapists', action: 'view' })
   @ApiOperation({ summary: 'Get a therapist by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Therapist ID' })

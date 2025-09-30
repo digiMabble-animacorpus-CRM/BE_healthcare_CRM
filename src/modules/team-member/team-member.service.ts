@@ -64,7 +64,7 @@ async create(
   creator: { role: string; branches?: { branch_id: number }[] }
 ): Promise<TeamMember> {
 
-  if (creator.role === 'staff') throw new ForbiddenException('Staff cannot create team members');
+  if (creator.role === 'therapist') throw new ForbiddenException('therapist cannot create team members');
   if (creator.role === 'admin' && data.role === 'admin') throw new ForbiddenException('Admin cannot create another admin');
 
   // Load branches (ensure they exist)
@@ -96,8 +96,8 @@ async update(
 ): Promise<TeamMember> {
   const member = await this.findOne(id, updater);
 
-  if (updater.role === 'staff') {
-    throw new ForbiddenException('Staff cannot update team members');
+  if (updater.role === 'therapist') {
+    throw new ForbiddenException('therapist cannot update team members');
   }
   if (updater.role === 'admin' && member.role === 'admin') {
     throw new ForbiddenException('Admin cannot update another admin');
@@ -168,8 +168,8 @@ async remove(
   const member = await this.findOne(id, userCtx);
 
   // RBAC restrictions
-  if (userCtx.role === 'staff') {
-    throw new ForbiddenException('Staff cannot delete team members');
+  if (userCtx.role === 'therapist') {
+    throw new ForbiddenException('therapist cannot delete team members');
   }
   if (userCtx.role === 'admin' && member.role === 'admin') {
     throw new ForbiddenException('Admin cannot delete another admin');
@@ -206,8 +206,8 @@ async restore(
   }
 
   // RBAC restrictions
-  if (userCtx.role === 'staff') {
-    throw new ForbiddenException('Staff cannot restore team members');
+  if (userCtx.role === 'therapist') {
+    throw new ForbiddenException('therapist cannot restore team members');
   }
   if (userCtx.role === 'admin' && member.role === 'admin') {
     throw new ForbiddenException('Admin cannot restore another admin');
