@@ -9,9 +9,8 @@ import {
   CreateDateColumn, 
   UpdateDateColumn 
 } from 'typeorm';
-import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
+import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-team.entity';
 import { Patient } from 'src/modules/customers/entities/patient.entity';
-import { TeamMember } from 'src/modules/team-member/entities/team-member.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
 import { Department } from 'src/modules/Department/entities/department.entity';
 import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
@@ -61,18 +60,18 @@ export default class Appointment extends BaseModel {
   description: string;
 
 
-  @ManyToOne(() => Therapist, { nullable: false })
+  @ManyToOne(() => TherapistMember, { nullable: false })
   @JoinColumn({ name: 'therapist_id' })
-  therapist: Therapist;
+  therapist: TherapistMember;
 
 
-  @ManyToOne(() => TeamMember, { nullable: false })
+  @ManyToOne(() => TherapistMember, { nullable: false })
   @JoinColumn({ name: 'created_by_id' })
-  createdBy: TeamMember;
+  createdBy: TherapistMember;
 
 
-  @ManyToOne(() => TeamMember, { nullable: true })
+  @ManyToOne(() => TherapistMember, { nullable: true })
   @JoinColumn({ name: 'modified_by_id' })
-  modifiedBy: TeamMember;
+  modifiedBy: TherapistMember;
 
 }

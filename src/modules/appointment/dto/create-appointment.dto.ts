@@ -59,8 +59,8 @@ export class CreateAppointmentDto {
   @IsNumber()
   therapistId: number;
 
-  @ApiProperty({ example:"db571dc0-1164-4528-bcd5-3d909aff3511",description: 'ID (UUID) of the team member creating the appointment (usually from auth token)' })
+  @ApiProperty({ example: 4, description: 'ID of the team member creating the appointment (from therapists-team table)' })
   @IsNotEmpty()
-  @IsString()
-  createdById: string;
+  @IsNumber()
+  createdById: number;
 }

@@ -12,5 +12,6 @@ import { AppLanguage } from 'src/modules/languages/entities/app-languages.entity
   imports: [TypeOrmModule.forFeature([TherapistMember, Department, Branch, Specialization, AppLanguage])],
   controllers: [TherapistTeamController],
   providers: [TherapistTeamService],
+  exports: [TherapistTeamService, TypeOrmModule],
 })
 export class TherapistTeamModule {}

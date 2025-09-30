@@ -9,14 +9,14 @@ config();
 
 export const databaseConfig: IDatabaseConfig = Object.freeze({
   local: {
-    username: process.env.DB_USER_LOCAL,
-    password: process.env.DB_PASSWORD_LOCAL,
-    database: process.env.DB_NAME_LOCAL,
-    host: process.env.DB_HOST_LOCAL,
-    port: process.env.DB_PORT_LOCAL,
-    dialect: process.env.DB_DIALECT_LOCAL,
-    frontEndBaseUrl: process.env.FRONTEND_FORGET_URL_LOCAL,
-    ssl: false,
+     username: process.env.DB_USER_DEV,
+    password: process.env.DB_PASSWORD_DEV,
+    database: process.env.DB_NAME_DEV,
+    host: process.env.DB_HOST_DEV,
+    port: process.env.DB_PORT_DEV,
+    dialect: process.env.DB_DIALECT_DEV,
+    frontEndBaseUrl: process.env.FRONTEND_FORGET_URL_DEV,
+    ssl: false, 
   },
   development: {
     username: process.env.DB_USER_DEV,

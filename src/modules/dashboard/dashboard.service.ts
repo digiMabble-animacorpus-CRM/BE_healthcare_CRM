@@ -1,13 +1,11 @@
 import { Injectable, HttpException, ForbiddenException,NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In ,Between , Not} from 'typeorm';
+import { Repository, In ,Between , Not, IsNull} from 'typeorm';
 import { logger } from 'src/core/utils/logger';
 import { EC500, EM100 } from 'src/core/constants';
 import Appointment from '../appointment/entities/appointment.entity';
 import { Branch } from 'src/modules/branches/entities/branch.entity';
-import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
 import { Patient } from 'src/modules/customers/entities/patient.entity';
-import { TeamMemberService } from 'src/modules/team-member/team-member.service';
 import { DashboardQueryDto, DistributionQueryDto } from './dto/dashboard-query.dto';
 import { BranchSummaryDto } from './dto/branch-summary.dto';
 import { 
@@ -23,16 +21,11 @@ export class DashboardService {
   constructor(
     @InjectRepository(Appointment) private readonly appointmentRepository: Repository<Appointment>,
     @InjectRepository(Branch) private readonly branchRepo: Repository<Branch>,
-    @InjectRepository(Therapist) private readonly therapistRepo: Repository<Therapist>,
     @InjectRepository(Patient) private readonly patientRepo: Repository<Patient>,
-    private readonly teamMemberService: TeamMemberService,
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(TherapistMember) private readonly therapistMemberRepo: Repository<TherapistMember>,
   ) {}
 
-  /**
-   * Handles errors, logs them, and throws a standardized HttpException.
-   */
   private handleError(operation: string, error: any): never {
     logger.error(`Dashboard_${operation}_Error: ${JSON.stringify(error?.message || error)}`);
     if (error instanceof HttpException) throw error;
@@ -46,84 +39,94 @@ export class DashboardService {
     return { startOfMonth, nextMonthStart };
   }
 
-  /**
-   * Calculate date range based on time filter preset
-   */
   private getDateRangeFromTimeFilter(timeFilter: string): { startDate: Date; endDate: Date } {
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     
     switch (timeFilter) {
       case 'thisWeek': {
-        const dayOfWeek = today.getDay();
+        const dayOfWeek = today.getUTCDay();
+        const mondayDiff = dayOfWeek === 0 ? -6 : -(dayOfWeek - 1);
         const startDate = new Date(today);
-        startDate.setDate(today.getDate() - dayOfWeek); // Start of week (Sunday)
+        startDate.setUTCDate(today.getUTCDate() + mondayDiff);
+        startDate.setUTCHours(0, 0, 0, 0);
         const endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6); // End of week (Saturday)
-        endDate.setHours(23, 59, 59, 999);
+        endDate.setUTCDate(startDate.getUTCDate() + 6);
+        endDate.setUTCHours(23, 59, 59, 999);
+        
         return { startDate, endDate };
       }
       
       case 'lastWeek': {
-        const dayOfWeek = today.getDay();
+        const dayOfWeek = today.getUTCDay();
+        const mondayDiff = dayOfWeek === 0 ? -6 : -(dayOfWeek - 1);
         const startDate = new Date(today);
-        startDate.setDate(today.getDate() - dayOfWeek - 7); // Start of last week
+        startDate.setUTCDate(today.getUTCDate() + mondayDiff - 7);
+        startDate.setUTCHours(0, 0, 0, 0);
         const endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6); // End of last week
-        endDate.setHours(23, 59, 59, 999);
+        endDate.setUTCDate(startDate.getUTCDate() + 6);
+        endDate.setUTCHours(23, 59, 59, 999);
         return { startDate, endDate };
       }
       
       case 'thisMonth': {
-        const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        endDate.setHours(23, 59, 59, 999);
+        const startDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
+        startDate.setUTCHours(0, 0, 0, 0);
+        const endDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0));
+        endDate.setUTCHours(23, 59, 59, 999);
         return { startDate, endDate };
       }
       
       case 'lastMonth': {
-        const startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        const endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-        endDate.setHours(23, 59, 59, 999);
+        const startDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 1, 1));
+        startDate.setUTCHours(0, 0, 0, 0);
+        const endDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 0));
+        endDate.setUTCHours(23, 59, 59, 999);
         return { startDate, endDate };
       }
       
       default:
+        logger.warn(`Dashboard_DateRangeCalculation: Unknown timeFilter="${timeFilter}"`);
         return null;
     }
   }
 
-  /**
-   * Apply date filters to query, prioritizing timeFilter over custom dates
-   */
   private applyDateFilters(query: any, dashboardQuery: DashboardQueryDto): any {
     if (dashboardQuery.timeFilter) {
       const dateRange = this.getDateRangeFromTimeFilter(dashboardQuery.timeFilter);
       if (dateRange) {
-        query.andWhere('a.startTime >= :startDate', { startDate: dateRange.startDate });
-        query.andWhere('a.endTime <= :endDate', { endDate: dateRange.endDate });
+        logger.info(`Dashboard_DateFilter: timeFilter=${dashboardQuery.timeFilter}, range=${dateRange.startDate.toISOString()} to ${dateRange.endDate.toISOString()}`);
+        
+        query.andWhere('a.startTime <= :endDate', { endDate: dateRange.endDate });
+        query.andWhere('a.endTime >= :startDate', { startDate: dateRange.startDate });
+        
+        const sqlQuery = query.getSql();
+        const parameters = query.getParameters();
+        logger.info(`Dashboard_DateFilter_SQL: ${sqlQuery}`);
+        logger.info(`Dashboard_DateFilter_Params: ${JSON.stringify(parameters)}`);
+      } else {
+        logger.warn(`Dashboard_DateFilter: No date range returned for timeFilter=${dashboardQuery.timeFilter}`);
       }
     } else {
       if (dashboardQuery.startDate) {
-        query.andWhere('a.startTime >= :startDate', { startDate: new Date(dashboardQuery.startDate) });
+        query.andWhere('a.endTime >= :startDate', { startDate: new Date(dashboardQuery.startDate) });
       }
       if (dashboardQuery.endDate) {
-        query.andWhere('a.endTime <= :endDate', { endDate: new Date(dashboardQuery.endDate) });
+        query.andWhere('a.startTime <= :endDate', { endDate: new Date(dashboardQuery.endDate) });
       }
     }
     return query;
   }
 
-  /**
-   * Get appointment statistics for dashboard summary cards
-   */
   async getAppointmentStats(query: DashboardQueryDto): Promise<AppointmentStats> {
     try {
       logger.info(`Dashboard_GetAppointmentStats_Entry: ${JSON.stringify(query)}`);
 
-      let statsQuery = this.appointmentRepository.createQueryBuilder('a');
+      let statsQuery = this.appointmentRepository.createQueryBuilder('a')
+        .where('a.deleted_at IS NULL');
 
-      // Apply date filters (timeFilter takes priority over custom dates)
+        console.log(`Dashboard_GetAppointmentStats_Query: ${statsQuery.getQuery()}`);
+        
       statsQuery = this.applyDateFilters(statsQuery, query);
 
       if (query.doctorId) {
@@ -138,16 +141,37 @@ export class DashboardService {
           .andWhere('branch.branch_id = :branchId', { branchId: query.branchId });
       }
 
-      // Get total count
-      const total = await statsQuery.getCount();
+      const totalWithoutDateFilter = await this.appointmentRepository
+        .createQueryBuilder('a')
+        .where('a.deleted_at IS NULL')
+        .getCount();
+      
+      logger.info(`Dashboard_AppointmentStats_Debug: Total appointments in DB (non-deleted): ${totalWithoutDateFilter}`);
 
-      // Build status counts query with same filters
+      const total = await statsQuery.getCount();
+      
+      logger.info(`Dashboard_AppointmentStats_Debug: Total appointments after filters: ${total}`);
+
+      const sampleAppointments = await this.appointmentRepository
+        .createQueryBuilder('a')
+        .select(['a.id', 'a.startTime', 'a.endTime', 'a.deleted_at'])
+        .where('a.deleted_at IS NULL')
+        .limit(3)
+        .getMany();
+      
+      logger.info(`Dashboard_AppointmentStats_Debug: Sample appointments: ${JSON.stringify(sampleAppointments.map(a => ({
+        id: a.id,
+        startTime: a.startTime,
+        endTime: a.endTime,
+        deleted_at: a.deleted_at
+      })))}`);
+
       let statusQuery = this.appointmentRepository
         .createQueryBuilder('a')
         .select('a.status', 'status')
-        .addSelect('COUNT(*)', 'count');
+        .addSelect('COUNT(*)', 'count')
+        .where('a.deleted_at IS NULL');
 
-      // Apply the same filters for status counts
       statusQuery = this.applyDateFilters(statusQuery, query);
 
       if (query.doctorId) {
@@ -184,16 +208,14 @@ export class DashboardService {
     }
   }
 
-  /**
-   * Get appointment distribution for charts and breakdown cards
-   */
   async getAppointmentDistribution(query: DistributionQueryDto): Promise<AppointmentDistribution> {
     try {
       logger.info(`Dashboard_GetAppointmentDistribution_Entry: ${JSON.stringify(query)}`);
 
       const groupBy = query.groupBy || 'doctor';
       
-      let distributionQuery = this.appointmentRepository.createQueryBuilder('a');
+      let distributionQuery = this.appointmentRepository.createQueryBuilder('a')
+        .where('a.deleted_at IS NULL');
 
       if (groupBy === 'doctor') {
         distributionQuery = distributionQuery
@@ -209,11 +231,12 @@ export class DashboardService {
           .addSelect('COUNT(*)', 'count');
       }
 
-      // Apply date filters (timeFilter takes priority over custom dates)
       distributionQuery = this.applyDateFilters(distributionQuery, query);
 
       if (query.doctorId && groupBy !== 'doctor') {
-        distributionQuery.andWhere('therapist.therapistId = :doctorId', { doctorId: query.doctorId });
+        distributionQuery
+          .leftJoin('a.therapist', 'therapist')
+          .andWhere('therapist.therapistId = :doctorId', { doctorId: query.doctorId });
       }
 
       if (query.branchId && groupBy !== 'branch') {
@@ -251,9 +274,6 @@ export class DashboardService {
     }
   }
 
-  /**
-   * Get appointments for calendar view
-   */
   async getCalendarEvents(query: DashboardQueryDto): Promise<CalendarEvent[]> {
     try {
       logger.info(`Dashboard_GetCalendarEvents_Entry: ${JSON.stringify(query)}`);
@@ -261,9 +281,9 @@ export class DashboardService {
       let calendarQuery = this.appointmentRepository.createQueryBuilder('a')
         .leftJoinAndSelect('a.therapist', 'therapist')
         .leftJoinAndSelect('a.branch', 'branch')
-        .leftJoinAndSelect('a.patient', 'patient');
+        .leftJoinAndSelect('a.patient', 'patient')
+        .where('a.deleted_at IS NULL');
 
-      // Apply date filters (timeFilter takes priority over custom dates)
       calendarQuery = this.applyDateFilters(calendarQuery, query);
 
       if (query.doctorId) {
@@ -280,7 +300,7 @@ export class DashboardService {
 
       const events: CalendarEvent[] = appointments.map(appointment => ({
         id: appointment.id,
-        title: appointment.purposeOfVisit || 'Appointment', // Simple title or use purpose
+        title: appointment.purposeOfVisit || 'Appointment',
         start: appointment.startTime,
         end: appointment.endTime,
         status: appointment.status,
@@ -305,8 +325,7 @@ export class DashboardService {
     }
   }
 
-  /** Main API for branch-wise summary restricted by the logged-in user */
-async getBranchesSummaryForUser(user: {
+  async getBranchesSummaryForUser(user: {
   user_id?: number;
   id?: number;
   role: string; // 'super_admin' | 'admin' | 'staff'
@@ -314,7 +333,6 @@ async getBranchesSummaryForUser(user: {
   const userId = user.user_id ?? user.id;
   if (!userId) throw new ForbiddenException('Missing user id');
 
-  // Load user with TherapistTeamMember relations
   const userEntity = await this.userRepo.findOne({
     where: { id: userId },
     relations: ['therapistTeamMembers', 'therapistTeamMembers.branches'],
@@ -322,7 +340,6 @@ async getBranchesSummaryForUser(user: {
 
   if (!userEntity) throw new NotFoundException(`User not found`);
 
-  // If not super_admin and user has no team memberships, return empty
   if (
     user.role !== 'super_admin' &&
     (
@@ -333,13 +350,11 @@ async getBranchesSummaryForUser(user: {
     return [];
   }
 
-  // Resolve allowed branches
   let branchRows: { branch_id: number; branch_name: string }[] = [];
   if (user.role === 'super_admin') {
     const allBranches = await this.branchRepo.find();
     branchRows = allBranches.map(b => ({ branch_id: b.branch_id, branch_name: b.name }));
   } else {
-    // Aggregate branches from all team memberships
     const branchesSet = new Map<number, string>();
     (Array.isArray(userEntity.therapistTeamMembers) ? userEntity.therapistTeamMembers : [userEntity.therapistTeamMembers]).forEach(ttm => {
       (ttm.branches || []).forEach(b => branchesSet.set(b.branch_id, b.branch_name));
@@ -351,34 +366,33 @@ async getBranchesSummaryForUser(user: {
 
   const branchIds = branchRows.map(b => b.branch_id);
 
-  // Count therapists per branch via TherapistTeamMember
  const therapistCountsRaw = await this.therapistMemberRepo
   .createQueryBuilder('ttm')
   .innerJoin('ttm.branches', 'b')
   .where('b.branch_id IN (:...branchIds)', { branchIds })
+  .andWhere('ttm.deleted_at IS NULL')
   .select('b.branch_id', 'branch_id')
-  .addSelect('COUNT(DISTINCT ttm.therapist_id)', 'count') // use actual PK
+  .addSelect('COUNT(DISTINCT ttm.therapist_id)', 'count')
   .groupBy('b.branch_id')
   .getRawMany<{ branch_id: number; count: string }>();
 
-
-  // Count distinct patients per branch via appointments
   const patientCountsRaw = await this.appointmentRepository
     .createQueryBuilder('a')
     .innerJoin('a.branch', 'b')
     .innerJoin('a.patient', 'p')
     .where('b.branch_id IN (:...branchIds)', { branchIds })
+    .andWhere('a.deleted_at IS NULL')
     .select('b.branch_id', 'branch_id')
     .addSelect('COUNT(DISTINCT p.id)', 'count')
     .groupBy('b.branch_id')
     .getRawMany<{ branch_id: number; count: string }>();
 
-  // Appointments this month per branch
   const { startOfMonth, nextMonthStart } = this.getMonthWindow();
   const apptMonthCountsRaw = await this.appointmentRepository
     .createQueryBuilder('a')
     .innerJoin('a.branch', 'b')
     .where('b.branch_id IN (:...branchIds)', { branchIds })
+    .andWhere('a.deleted_at IS NULL')
     .andWhere('a.startTime >= :startOfMonth AND a.startTime < :nextMonthStart', {
       startOfMonth,
       nextMonthStart,
@@ -388,7 +402,6 @@ async getBranchesSummaryForUser(user: {
     .groupBy('b.branch_id')
     .getRawMany<{ branch_id: number; count: string }>();
 
-  // Helper to map raw counts
   const toMap = (rows: { branch_id: number; count: string }[]) =>
     rows.reduce<Record<number, number>>((acc, r) => {
       acc[r.branch_id] = Number(r.count) || 0;
@@ -411,7 +424,6 @@ async getBranchesSummaryForUser(user: {
 
 
 
-// ---------- Patients Insights ----------
 async getPatientsInsights() {
   try {
     const now = new Date();
@@ -422,7 +434,6 @@ async getPatientsInsights() {
     const monthAgo = new Date();
     monthAgo.setMonth(now.getMonth() - 1);
 
-    // New patients
     const newPatientsWeek = await this.patientRepo.count({
       where: { created_at: Between(weekAgo, now) },
     });
@@ -430,7 +441,6 @@ async getPatientsInsights() {
       where: { created_at: Between(monthAgo, now) },
     });
 
-    // Gender distribution (handle M, F, male, female, case-insensitive)
     const maleCount = await this.patientRepo
       .createQueryBuilder('p')
       .where('LOWER(p.legalgender) IN (:...maleValues)', {
@@ -452,7 +462,6 @@ async getPatientsInsights() {
       })
       .getCount();
 
-    // Branch distribution (patients → therapist → branch)
     const branchDistribution = await this.patientRepo
       .createQueryBuilder('p')
       .leftJoin('p.therapist', 't')
@@ -464,7 +473,6 @@ async getPatientsInsights() {
       .addGroupBy('b.name')
       .getRawMany();
 
-    // Age distribution
     const patients = await this.patientRepo.find({ select: ['birthdate'] });
     const ageGroups = { '0-12': 0, '13-25': 0, '26-40': 0, '41-60': 0, '60+': 0 };
     const currentYear = now.getFullYear();
