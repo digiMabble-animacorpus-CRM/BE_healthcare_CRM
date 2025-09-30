@@ -2,7 +2,7 @@
 
 import { PartialType, ApiProperty, OmitType } from '@nestjs/swagger';
 import { CreateAppointmentDto } from './create-appointment.dto';
-import { IsNotEmpty, IsString, IsOptional, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsDateString, IsNumber } from 'class-validator';
 
 // Omit 'createdById' as it should not be updated. All other fields become optional.
 export class UpdateAppointmentDto extends PartialType(
@@ -10,8 +10,8 @@ export class UpdateAppointmentDto extends PartialType(
 ) {
   @ApiProperty({ description: 'ID of the team member modifying the appointment' })
   @IsNotEmpty()
-  @IsString()
-  modifiedById: string;
+  @IsNumber()
+  modifiedById: number;
 
   @ApiProperty({ 
     example: '2025-11-15T09:00:00.000Z', 
