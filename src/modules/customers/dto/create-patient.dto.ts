@@ -64,7 +64,7 @@ languageId?: number;
   @IsString()
   mutualitynumber?: string;
 
-  @ApiProperty({ example: '67890' })
+  @ApiProperty({ example: 'AB67890' })
   @IsOptional()
   @IsString()
   rpnumber: string;
