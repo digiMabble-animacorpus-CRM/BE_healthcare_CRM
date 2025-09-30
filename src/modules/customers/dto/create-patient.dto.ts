@@ -16,7 +16,7 @@ export class CreatePatientDto {
   @ApiProperty({ example: 'John' })
   @IsOptional()
   @IsString()
-  firstname?: string;
+  firstname: string;
 
   @ApiProperty({ example: 'Middle' })
   @IsOptional()
@@ -67,7 +67,7 @@ languageId?: number;
   @ApiProperty({ example: '67890' })
   @IsOptional()
   @IsString()
-  mutualityregistrationnumber?: string;
+  rpnumber: string;
 
   @ApiProperty({ example: 'john.doe@example.com' })
   @IsOptional()
@@ -110,7 +110,7 @@ languageId?: number;
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  phones?: string[];
+  phones: string[];
 
 
 @ApiProperty({ example: 2, description: 'Optional therapist ID' })
