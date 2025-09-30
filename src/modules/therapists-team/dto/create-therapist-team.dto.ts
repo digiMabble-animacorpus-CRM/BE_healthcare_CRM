@@ -157,7 +157,7 @@ export class CreateTherapistMemberDto {
   permissions?: Record<string, any>;
 
 
-  @ApiPropertyOptional({ enum: MemberRole, example: MemberRole.STAFF })
+  @ApiPropertyOptional({ enum: MemberRole, example: MemberRole.THERAPIST })
   @IsOptional()
   @IsEnum(MemberRole)
   role?: MemberRole;

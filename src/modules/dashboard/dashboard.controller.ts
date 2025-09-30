@@ -29,7 +29,7 @@ export class DashboardController {
   }
 
   @Get('appointments/stats')
-  @Roles('super_admin', 'admin', 'staff')
+  @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'appointments', action: 'view' })
   @ApiOperation({ summary: 'Get appointment statistics for dashboard summary cards' })
   @ApiResponse({ 
@@ -54,7 +54,7 @@ export class DashboardController {
   }
 
   @Get('appointments/distribution')
-  @Roles('super_admin', 'admin', 'staff')
+  @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'appointments', action: 'view' })
   @ApiOperation({ summary: 'Get appointment distribution for charts and breakdown cards' })
   @ApiResponse({ 
@@ -81,7 +81,7 @@ export class DashboardController {
   }
 
   @Get('appointments/calendar')
-  @Roles('super_admin', 'admin', 'staff')
+  @Roles('super_admin', 'admin', 'therapist')
   @Permissions({ module: 'appointments', action: 'view' })
   @ApiOperation({ summary: 'Get appointments for calendar view' })
   @ApiResponse({ 
@@ -112,7 +112,7 @@ export class DashboardController {
   }
 
   @Get('branches/summary')
-  @Roles('super_admin', 'admin', 'staff')
+  @Roles('super_admin', 'admin', 'therapist')
   // @Permissions({ module: 'dashboard', action: 'view' })
   @ApiOperation({ summary: 'Get branch-wise dashboard stats (therapists, patients, appointments)' })
   @ApiResponse({ status: 200, description: 'Branch summary counts', type: [BranchSummaryDto] })
@@ -128,7 +128,7 @@ export class DashboardController {
 
 
   @Get('patients')
-@Roles('super_admin', 'admin', 'staff')
+@Roles('super_admin', 'admin', 'therapist')
 @ApiOperation({ summary: 'Get patients insights for dashboard' })
 async getPatientsInsights() {
   try {

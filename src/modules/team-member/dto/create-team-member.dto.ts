@@ -161,7 +161,7 @@ export class CreateTeamMemberDto {
 
 
 
-  @ApiPropertyOptional({ example: 'staff', description: 'Role of the team member' })
+  @ApiPropertyOptional({ example: 'therapist', description: 'Role of the team member' })
 @IsOptional()
 @IsEnum(TeamMemberRole)
 role?: TeamMemberRole;

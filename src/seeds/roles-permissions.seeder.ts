@@ -20,10 +20,10 @@ export class RolesPermissionsSeeder implements OnModuleInit {
 
   async seedPermissionsAndRoles() {
     const permissionsToSeed = [
-      { name: 'Create Staff', action: 'create', resource: 'staff', description: 'Create staff member' },
-      { name: 'View Staff', action: 'read', resource: 'staff', description: 'View staff' },
-      { name: 'Update Staff', action: 'update', resource: 'staff', description: 'Update staff info' },
-      { name: 'Delete Staff', action: 'delete', resource: 'staff', description: 'Delete staff' },
+      { name: 'Create therapist', action: 'create', resource: 'therapist', description: 'Create therapist member' },
+      { name: 'View therapist', action: 'read', resource: 'therapist', description: 'View therapist' },
+      { name: 'Update therapist', action: 'update', resource: 'therapist', description: 'Update therapist info' },
+      { name: 'Delete Statherapistff', action: 'delete', resource: 'therapist', description: 'Delete therapist' },
       { name: 'Create Patient', action: 'create', resource: 'patient', description: 'Create patient record' },
       { name: 'Read Patient', action: 'read', resource: 'patient', description: 'View patient record' },
       { name: 'Update Patient', action: 'update', resource: 'patient', description: 'Update patient record' },
@@ -32,7 +32,7 @@ export class RolesPermissionsSeeder implements OnModuleInit {
       { name: 'Update Appointment', action: 'update', resource: 'appointment', description: 'Update appointments' },
     ];
 
-    const rolesToSeed = ['super-admin', 'branch-admin', 'staff'];
+    const rolesToSeed = ['super-admin', 'branch-admin', 'therapist'];
 
     for (const perm of permissionsToSeed) {
       const exists = await this.permissionRepo.findOne({
@@ -51,9 +51,9 @@ export class RolesPermissionsSeeder implements OnModuleInit {
       'super-admin': allPermissions,
       'branch-admin': allPermissions.filter(p =>
         ['read', 'create', 'update'].includes(p.action) &&
-        ['staff', 'patient', 'appointment'].includes(p.resource)
+        ['therapist', 'patient', 'appointment'].includes(p.resource)
       ),
-      'staff': allPermissions.filter(p =>
+      'therapist': allPermissions.filter(p =>
         ['read'].includes(p.action) &&
         ['patient'].includes(p.resource)
       ),

@@ -16,8 +16,9 @@ import User from 'src/modules/users/entities/user.entity';
 export enum MemberRole {
   SUPER_ADMIN = 'super_admin',
   ADMIN = 'admin',
-  STAFF = 'staff',
+  THERAPIST = 'therapist',
 }
+
 
 export enum MemberStatus {
   ACTIVE = 'active',
@@ -78,7 +79,7 @@ faq: { question: string; answer: string }[];
   @Column({ type: 'jsonb', nullable: true, default: () => "'{}'::jsonb" })
 permissions: Record<string, any>;
 
-  @Column({ type: 'enum', enum: MemberRole, default: MemberRole.STAFF })
+  @Column({ type: 'enum', enum: MemberRole, default: MemberRole.THERAPIST })
   role: MemberRole;
 
   @Column({ type: 'enum', enum: MemberStatus, default: MemberStatus.ACTIVE })

@@ -9,7 +9,7 @@ import { Branch } from 'src/modules/branches/entities/branch.entity';
 export enum TeamMemberRole {
   SUPER_ADMIN = 'super_admin',
   ADMIN = 'admin',
-  STAFF = 'staff',
+  THERAPIST = 'therapist',
 }
 
 
@@ -102,7 +102,7 @@ export class TeamMember {
   @Column({ type: 'timestamp', nullable: true })
   deleted_at?: Date;
 
-  @Column({ type: 'enum', enum: TeamMemberRole, default: TeamMemberRole.STAFF })
+  @Column({ type: 'enum', enum: TeamMemberRole, default: TeamMemberRole.THERAPIST })
   role: TeamMemberRole;
 
   @Column({ type: 'jsonb', nullable: false })
