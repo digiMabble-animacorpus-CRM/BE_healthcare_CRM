@@ -6,7 +6,7 @@ import {
   IsEnum,
   IsInt,
 } from 'class-validator';
-import { SpecializationType } from '../entities/specialization.entity';
+
 
 export class CreateSpecializationDto {
   @ApiProperty({ description: 'Reference to Department' })
@@ -15,12 +15,13 @@ export class CreateSpecializationDto {
   department_id: number;
 
   @ApiProperty({
-    enum: SpecializationType,
-    description: 'Type of specialization',
+    type: String,
+    description: 'Type of specialization (e.g. Consultation, Therapy, X-Ray, etc.)',
+    example: 'Consultation',
   })
-  @IsEnum(SpecializationType)
+  @IsString()
   @IsNotEmpty()
-  specialization_type: SpecializationType;
+  specialization_type: string;
 
   @ApiProperty({
     description: 'Extra info about this specialization',

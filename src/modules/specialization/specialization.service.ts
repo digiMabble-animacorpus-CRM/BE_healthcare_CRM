@@ -63,7 +63,7 @@ export class SpecializationService {
 
     if (search) {
       query.andWhere(new Brackets(qb => {
-        qb.where('specialization.specialization_type::text ILIKE :search', { search: `%${search}%` })
+        qb.where('specialization.specialization_type ILIKE :search', { search: `%${search}%` })
           .orWhere('specialization.description ILIKE :search', { search: `%${search}%` })
           .orWhere('department.name ILIKE :search', { search: `%${search}%` });
       }));

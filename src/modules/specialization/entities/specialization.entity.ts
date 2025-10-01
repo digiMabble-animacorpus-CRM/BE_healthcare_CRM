@@ -10,11 +10,7 @@ import {
 } from 'typeorm';
 import { Department } from 'src/modules/Department/entities/department.entity';
 
-export enum SpecializationType {
-  CONSULTATION = 'Consultation',
-  OPERATION = 'Operation',
-  OTHER = 'Other',
-}
+
 
 @Entity({ name: 'specializations' })
 export class Specialization {
@@ -25,11 +21,9 @@ export class Specialization {
   @JoinColumn({ name: 'department_id' })
   department: Department;
 
-  @Column({
-    type: 'enum',
-    enum: SpecializationType,
-  })
-  specialization_type: SpecializationType;
+  @Column({ type: 'varchar', length: 100 }) 
+  specialization_type: string;
+
 
   @Column({ type: 'text', nullable: true })
   description: string;
