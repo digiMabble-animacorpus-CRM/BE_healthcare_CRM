@@ -24,7 +24,7 @@ export class DepartmentsService {
 async findAllFiltered(branchId?: number, search?: string): Promise<Department[]> {
   const query = this.departmentRepository
     .createQueryBuilder('department')
-    .leftJoin('department.therapists', 't')
+    .leftJoin('department.therapistMembers', 't')
     .leftJoin('t.branches', 'b')
     .where('department.is_deleted = false'); // ✅ hide deleted ones
 

@@ -501,6 +501,7 @@ async getPatientsInsights() {
       new_patients: { week: newPatientsWeek, month: newPatientsMonth },
       gender_distribution: { male: maleCount, female: femaleCount, other: otherCount },
       branch_distribution: branchDistribution.map((b) => ({
+        branch_id: b.branch_id,
         branch_name: b.branch_name,
         count: Number(b.count),
       })),
