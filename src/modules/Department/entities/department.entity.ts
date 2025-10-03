@@ -1,6 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column,OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Therapist } from 'src/modules/therapist/entities/therapist.entity'; // adjust the path
+import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-team.entity';
+import { Specialization } from 'src/modules/specialization/entities/specialization.entity';
+
 
 @Entity({ name: 'departments' })
 export class Department {
@@ -25,7 +27,11 @@ is_deleted: boolean;
   description: string | null;
 
 
-  @OneToMany(() => Therapist, (therapist) => therapist.department)
-therapists: Therapist[];
+  @OneToMany(() => TherapistMember, (therapist) => therapist.department)
+therapistMembers: TherapistMember[];
+
+
+  @OneToMany(() => Specialization, (specialization) => specialization.department)
+  specializations: Specialization[];
 
 }

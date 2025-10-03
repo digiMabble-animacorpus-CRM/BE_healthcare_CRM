@@ -325,11 +325,13 @@ export class DashboardService {
     }
   }
 
-  async getBranchesSummaryForUser(user: {
-  user_id?: number;
-  id?: number;
-  role: string; // 'super_admin' | 'admin' | 'therapist'
-}): Promise<BranchSummaryDto[]> {
+
+
+
+async getBranchesSummaryForUser(
+  user: { user_id?: number; id?: number; role: string },
+  query?: DashboardQueryDto
+): Promise<BranchSummaryDto[]> {
   const userId = user.user_id ?? user.id;
   if (!userId) throw new ForbiddenException('Missing user id');
 
@@ -340,42 +342,34 @@ export class DashboardService {
 
   if (!userEntity) throw new NotFoundException(`User not found`);
 
-  if (
-    user.role !== 'super_admin' &&
-    (
-      !userEntity.therapistTeamMembers ||
-      (Array.isArray(userEntity.therapistTeamMembers) && userEntity.therapistTeamMembers.length === 0)
-    )
-  ) {
-    return [];
-  }
-
+  // determine accessible branches
   let branchRows: { branch_id: number; branch_name: string }[] = [];
   if (user.role === 'super_admin') {
     const allBranches = await this.branchRepo.find();
     branchRows = allBranches.map(b => ({ branch_id: b.branch_id, branch_name: b.name }));
   } else {
     const branchesSet = new Map<number, string>();
-    (Array.isArray(userEntity.therapistTeamMembers) ? userEntity.therapistTeamMembers : [userEntity.therapistTeamMembers]).forEach(ttm => {
-      (ttm.branches || []).forEach(b => branchesSet.set(b.branch_id, b.branch_name));
+    (Array.isArray(userEntity.therapistTeamMembers) ? userEntity.therapistTeamMembers : []).forEach(ttm => {
+      (ttm?.branches || []).forEach(b => branchesSet.set(b.branch_id, b.branch_name));
     });
     branchRows = Array.from(branchesSet, ([branch_id, branch_name]) => ({ branch_id, branch_name }));
   }
 
   if (!branchRows.length) return [];
-
   const branchIds = branchRows.map(b => b.branch_id);
 
- const therapistCountsRaw = await this.therapistMemberRepo
-  .createQueryBuilder('ttm')
-  .innerJoin('ttm.branches', 'b')
-  .where('b.branch_id IN (:...branchIds)', { branchIds })
-  .andWhere('ttm.deleted_at IS NULL')
-  .select('b.branch_id', 'branch_id')
-  .addSelect('COUNT(DISTINCT ttm.therapist_id)', 'count')
-  .groupBy('b.branch_id')
-  .getRawMany<{ branch_id: number; count: string }>();
+  // therapist count
+  const therapistCountsRaw = await this.therapistMemberRepo
+    .createQueryBuilder('ttm')
+    .innerJoin('ttm.branches', 'b')
+    .where('b.branch_id IN (:...branchIds)', { branchIds })
+    .andWhere('ttm.deleted_at IS NULL')
+    .select('b.branch_id', 'branch_id')
+    .addSelect('COUNT(DISTINCT ttm.therapist_id)', 'count')
+    .groupBy('b.branch_id')
+    .getRawMany<{ branch_id: number; count: string }>();
 
+  // patients count
   const patientCountsRaw = await this.appointmentRepository
     .createQueryBuilder('a')
     .innerJoin('a.branch', 'b')
@@ -387,16 +381,24 @@ export class DashboardService {
     .groupBy('b.branch_id')
     .getRawMany<{ branch_id: number; count: string }>();
 
-  const { startOfMonth, nextMonthStart } = this.getMonthWindow();
-  const apptMonthCountsRaw = await this.appointmentRepository
+  // appointments count with dynamic date range
+  let apptQuery = this.appointmentRepository
     .createQueryBuilder('a')
     .innerJoin('a.branch', 'b')
     .where('b.branch_id IN (:...branchIds)', { branchIds })
-    .andWhere('a.deleted_at IS NULL')
-    .andWhere('a.startTime >= :startOfMonth AND a.startTime < :nextMonthStart', {
-      startOfMonth,
-      nextMonthStart,
-    })
+    .andWhere('a.deleted_at IS NULL');
+
+  if (query?.timeFilter) {
+    const { startDate, endDate } = this.getDateRangeFromTimeFilter(query.timeFilter);
+    apptQuery.andWhere('a.startTime >= :startDate AND a.startTime <= :endDate', { startDate, endDate });
+  } else if (query?.startDate && query?.endDate) {
+    apptQuery.andWhere('a.startTime >= :startDate AND a.startTime <= :endDate', {
+      startDate: new Date(query.startDate),
+      endDate: new Date(query.endDate),
+    });
+  }
+
+  const apptMonthCountsRaw = await apptQuery
     .select('b.branch_id', 'branch_id')
     .addSelect('COUNT(*)', 'count')
     .groupBy('b.branch_id')
@@ -501,6 +503,7 @@ async getPatientsInsights() {
       new_patients: { week: newPatientsWeek, month: newPatientsMonth },
       gender_distribution: { male: maleCount, female: femaleCount, other: otherCount },
       branch_distribution: branchDistribution.map((b) => ({
+        branch_id: b.branch_id,
         branch_name: b.branch_name,
         count: Number(b.count),
       })),

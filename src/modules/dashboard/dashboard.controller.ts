@@ -1,5 +1,5 @@
 import { Controller, Get, Query, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse,OmitType } from '@nestjs/swagger';
 import HandleResponse from 'src/core/utils/handle_response';
 import { EC200 } from 'src/core/constants';
 import { DashboardService } from './dashboard.service';
@@ -11,6 +11,13 @@ import { PermissionGuard } from 'src/common/guards/permission.guard';
 import { BranchGuard } from 'src/common/guards/branch.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Permissions } from 'src/common/decorators/permissions.decorator';
+
+
+
+
+// Create a local version without doctorId
+class BranchSummaryQueryDto extends OmitType(DashboardQueryDto, ['doctorId'] as const) {}
+
 
 @ApiTags('dashboard')
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionGuard, BranchGuard)
@@ -111,19 +118,25 @@ export class DashboardController {
     }
   }
 
-  @Get('branches/summary')
-  @Roles('super_admin', 'admin', 'therapist')
-  // @Permissions({ module: 'dashboard', action: 'view' })
-  @ApiOperation({ summary: 'Get branch-wise dashboard stats (therapists, patients, appointments)' })
-  @ApiResponse({ status: 200, description: 'Branch summary counts', type: [BranchSummaryDto] })
-  async getBranchSummary(@Req() req): Promise<BranchSummaryDto[]> {
-    const user = {
-      user_id: req.user?.user_id ?? req.user?.id,
-      role: req.user?.role,
-      team_id: req.user?.team_id,
-    };
-    return this.dashboardService.getBranchesSummaryForUser(user);
-  }
+
+
+@Get('branches/summary')
+@Roles('super_admin', 'admin', 'therapist')
+@ApiOperation({ summary: 'Get branch-wise dashboard stats (therapists, patients, appointments)' })
+@ApiResponse({ status: 200, description: 'Branch summary counts', type: [BranchSummaryDto] })
+async getBranchSummary(
+  @Req() req,
+  @Query() query: BranchSummaryQueryDto,  // auto-bind DTO
+): Promise<BranchSummaryDto[]> {
+  const user = {
+    user_id: req.user?.user_id ?? req.user?.id,
+    role: req.user?.role,
+  };
+
+  return this.dashboardService.getBranchesSummaryForUser(user, query);
+}
+
+
 
 
 
