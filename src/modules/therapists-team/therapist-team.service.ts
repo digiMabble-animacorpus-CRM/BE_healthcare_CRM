@@ -108,7 +108,7 @@ const therapistWithRelations = await this.therapistRepo.findOne({
     .leftJoinAndSelect('t.department', 'department')
     .leftJoinAndSelect('department.specializations', 'departmentSpecializations') 
     .leftJoinAndSelect('t.branches', 'branch')
-    // .leftJoinAndSelect('t.specializations', 'specializations')
+    .leftJoinAndSelect('t.specializations', 'specializations')
     .where('t.isDelete = false');
 
   if (searchText) {
@@ -131,9 +131,27 @@ const therapistWithRelations = await this.therapistRepo.findOne({
   const therapistsWithLanguages = await Promise.all(
     therapists.map(async (therapist) => {
       const languagesSpokenDetails = await this.getLanguagesDetails(therapist.languagesSpoken);
+
+
+        // Merge department + therapist-level specializations
+      const deptSpecs = therapist.department?.specializations ?? [];
+      const ownSpecs = therapist.specializations ?? [];
+      const mergedSpecs = [...deptSpecs, ...ownSpecs].reduce((acc, curr) => {
+        if (!acc.some((s) => s.specialization_id === curr.specialization_id)) {
+          acc.push(curr);
+        }
+        return acc;
+      }, []);
+
+
       return {
         ...therapist,
         languagesSpokenDetails,
+        specializations: mergedSpecs, //  unified for frontend
+        department: {
+          ...therapist.department,
+          specializations: undefined, //  remove nested to avoid confusion
+        },
       };
     })
   );
@@ -142,21 +160,45 @@ const therapistWithRelations = await this.therapistRepo.findOne({
 }
 
 
-  async findOne(id: number): Promise<TherapistMember> {
-    const therapist = await this.therapistRepo.findOne({
-      where: { therapistId: id, isDelete: false },
-      relations: ['department','department.specializations',
-         'branches' ],
-    });
-    if (!therapist) throw new NotFoundException(`Therapist member #${id} not found`);
+async findOne(id: number): Promise<TherapistMember> {
+  const therapist = await this.therapistRepo.findOne({
+    where: { therapistId: id, isDelete: false },
+    relations: [
+      'department',
+      'department.specializations', //  include this
+      'branches',
+      'specializations',
+    ],
+  });
 
-    const languagesDetails = await this.getLanguagesDetails(therapist.languagesSpoken);
-
-    return {
-      ...therapist,
-       languagesSpoken: languagesDetails,
-    };
+  if (!therapist) {
+    throw new NotFoundException(`Therapist member #${id} not found`);
   }
+
+  const languagesDetails = await this.getLanguagesDetails(therapist.languagesSpoken);
+
+  // 🔹 Merge department + therapist specializations
+  const deptSpecs = therapist.department?.specializations ?? [];
+  const ownSpecs = therapist.specializations ?? [];
+  const mergedSpecs = [...deptSpecs, ...ownSpecs].reduce((acc, curr) => {
+    if (!acc.some((s) => s.specialization_id === curr.specialization_id)) {
+      acc.push(curr);
+    }
+    return acc;
+  }, []);
+
+  return {
+    ...therapist,
+    languagesSpoken: languagesDetails,
+    specializations: mergedSpecs, // unified field for frontend
+    department: {
+      ...therapist.department,
+      specializations: undefined, //  remove nested specs to avoid confusion
+    },
+  };
+}
+
+
 
 async update(id: number, dto: UpdateTherapistTeamDto): Promise<TherapistMember> {
   const therapist = await this.findOne(id);
