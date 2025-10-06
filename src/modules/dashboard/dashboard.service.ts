@@ -425,93 +425,118 @@ async getBranchesSummaryForUser(
 
 
 
-
-async getPatientsInsights() {
+async getPatientsInsights(query?: DashboardQueryDto) {
   try {
     const now = new Date();
-
     const weekAgo = new Date();
     weekAgo.setDate(now.getDate() - 7);
-
     const monthAgo = new Date();
     monthAgo.setMonth(now.getMonth() - 1);
 
-    const newPatientsWeek = await this.patientRepo.count({
-      where: { created_at: Between(weekAgo, now) },
-    });
-    const newPatientsMonth = await this.patientRepo.count({
-      where: { created_at: Between(monthAgo, now) },
-    });
+    // Fetch all branches
+    const branches = await this.branchRepo.find({ select: ['branch_id', 'name'] });
+    if (!branches.length) return [];
 
-    const maleCount = await this.patientRepo
-      .createQueryBuilder('p')
-      .where('LOWER(p.legalgender) IN (:...maleValues)', {
-        maleValues: ['m', 'male'],
-      })
-      .getCount();
+    const branchInsights = [];
 
-    const femaleCount = await this.patientRepo
-      .createQueryBuilder('p')
-      .where('LOWER(p.legalgender) IN (:...femaleValues)', {
-        femaleValues: ['f', 'female'],
-      })
-      .getCount();
+    for (const branch of branches) {
+      // --- New Patients (This Week / This Month) ---
+      const newPatientsWeek = await this.patientRepo
+        .createQueryBuilder('p')
+        .leftJoin('p.therapist', 't')
+        .leftJoin('t.branches', 'b')
+        .where('b.branch_id = :branchId', { branchId: branch.branch_id })
+        .andWhere('p.created_at BETWEEN :weekAgo AND :now', { weekAgo, now })
+        .getCount();
 
-    const otherCount = await this.patientRepo
-      .createQueryBuilder('p')
-      .where('LOWER(p.legalgender) NOT IN (:...allValid)', {
-        allValid: ['m', 'male', 'f', 'female'],
-      })
-      .getCount();
+      const newPatientsMonth = await this.patientRepo
+        .createQueryBuilder('p')
+        .leftJoin('p.therapist', 't')
+        .leftJoin('t.branches', 'b')
+        .where('b.branch_id = :branchId', { branchId: branch.branch_id })
+        .andWhere('p.created_at BETWEEN :monthAgo AND :now', { monthAgo, now })
+        .getCount();
 
-    const branchDistribution = await this.patientRepo
-      .createQueryBuilder('p')
-      .leftJoin('p.therapist', 't')
-      .leftJoin('t.branches', 'b')
-      .select('b.branch_id', 'branch_id')
-      .addSelect('b.name', 'branch_name')
-      .addSelect('COUNT(p.id)', 'count')
-      .groupBy('b.branch_id')
-      .addGroupBy('b.name')
-      .getRawMany();
+      // --- Gender Distribution ---
+      const maleCount = await this.patientRepo
+        .createQueryBuilder('p')
+        .leftJoin('p.therapist', 't')
+        .leftJoin('t.branches', 'b')
+        .where('b.branch_id = :branchId', { branchId: branch.branch_id })
+        .andWhere('LOWER(p.legalgender) IN (:...maleValues)', { maleValues: ['m', 'male'] })
+        .getCount();
 
-    const patients = await this.patientRepo.find({ select: ['birthdate'] });
-    const ageGroups = { '0-12': 0, '13-25': 0, '26-40': 0, '41-60': 0, '60+': 0 };
-    const currentYear = now.getFullYear();
+      const femaleCount = await this.patientRepo
+        .createQueryBuilder('p')
+        .leftJoin('p.therapist', 't')
+        .leftJoin('t.branches', 'b')
+        .where('b.branch_id = :branchId', { branchId: branch.branch_id })
+        .andWhere('LOWER(p.legalgender) IN (:...femaleValues)', { femaleValues: ['f', 'female'] })
+        .getCount();
 
-    patients.forEach((p) => {
-      if (!p.birthdate) return;
+      const otherCount = await this.patientRepo
+        .createQueryBuilder('p')
+        .leftJoin('p.therapist', 't')
+        .leftJoin('t.branches', 'b')
+        .where('b.branch_id = :branchId', { branchId: branch.branch_id })
+        .andWhere('LOWER(p.legalgender) NOT IN (:...validValues)', { validValues: ['m', 'male', 'f', 'female'] })
+        .getCount();
 
-      const birthDate = new Date(p.birthdate);
-      const age = currentYear - birthDate.getFullYear();
+      // --- Age Distribution ---
+      const patients = await this.patientRepo
+        .createQueryBuilder('p')
+        .leftJoin('p.therapist', 't')
+        .leftJoin('t.branches', 'b')
+        .where('b.branch_id = :branchId', { branchId: branch.branch_id })
+        .select(['p.birthdate'])
+        .getMany();
 
-      if (age <= 12) ageGroups['0-12']++;
-      else if (age <= 25) ageGroups['13-25']++;
-      else if (age <= 40) ageGroups['26-40']++;
-      else if (age <= 60) ageGroups['41-60']++;
-      else ageGroups['60+']++;
-    });
+      const ageGroups = { '0-12': 0, '13-25': 0, '26-40': 0, '41-60': 0, '60+': 0 };
+      const currentYear = now.getFullYear();
 
-    const totalPatients = patients.length;
-    const ageDistribution = Object.entries(ageGroups).map(([range, count]) => ({
-      range,
-      count,
-      percentage: totalPatients ? Math.round((count / totalPatients) * 100) : 0,
-    }));
+      patients.forEach(p => {
+        if (!p.birthdate) return;
+        const birthDate = new Date(p.birthdate);
+        const age = currentYear - birthDate.getFullYear();
+        if (age <= 12) ageGroups['0-12']++;
+        else if (age <= 25) ageGroups['13-25']++;
+        else if (age <= 40) ageGroups['26-40']++;
+        else if (age <= 60) ageGroups['41-60']++;
+        else ageGroups['60+']++;
+      });
 
-    return {
-      new_patients: { week: newPatientsWeek, month: newPatientsMonth },
-      gender_distribution: { male: maleCount, female: femaleCount, other: otherCount },
-      branch_distribution: branchDistribution.map((b) => ({
-        branch_id: b.branch_id,
-        branch_name: b.branch_name,
-        count: Number(b.count),
-      })),
-      age_distribution: ageDistribution,
-    };
+      const totalPatients = patients.length;
+      const ageDistribution = Object.entries(ageGroups).map(([range, count]) => ({
+        range,
+        count,
+        percentage: totalPatients ? Math.round((count / totalPatients) * 100) : 0,
+      }));
+
+      // --- Appointment Count (Branchwise) ---
+      const appointmentCount = await this.appointmentRepository
+        .createQueryBuilder('a')
+        .leftJoin('a.branch', 'b')
+        .where('b.branch_id = :branchId', { branchId: branch.branch_id })
+        .andWhere('a.deleted_at IS NULL')
+        .getCount();
+
+      branchInsights.push({
+        branch_id: branch.branch_id,
+        branch_name: branch.name,
+        new_patients: { week: newPatientsWeek, month: newPatientsMonth },
+        gender_distribution: { male: maleCount, female: femaleCount, other: otherCount },
+        age_distribution: ageDistribution,
+        appointments_count: appointmentCount,
+      });
+    }
+
+    return branchInsights;
   } catch (error) {
     this.handleError('GetPatientsInsights', error);
   }
 }
+
+
+
 
 }
