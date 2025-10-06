@@ -106,7 +106,7 @@ const therapistWithRelations = await this.therapistRepo.findOne({
 
   const query = this.therapistRepo.createQueryBuilder('t')
     .leftJoinAndSelect('t.department', 'department')
-    .leftJoinAndSelect('department.specializations', 'departmentSpecializations') 
+    // .leftJoinAndSelect('department.specializations', 'departmentSpecializations') 
     .leftJoinAndSelect('t.branches', 'branch')
     .leftJoinAndSelect('t.specializations', 'specializations')
     .where('t.isDelete = false');
@@ -165,7 +165,7 @@ async findOne(id: number): Promise<TherapistMember> {
     where: { therapistId: id, isDelete: false },
     relations: [
       'department',
-      'department.specializations', //  include this
+      // 'department.specializations', //  include this
       'branches',
       'specializations',
     ],
