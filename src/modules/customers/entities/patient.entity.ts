@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryGeneratedColumn ,ManyToOne, JoinColumn ,CreateDateColumn ,RelationId} from 'typeorm';
-import { Therapist } from 'src/modules/therapist/entities/therapist.entity';
 import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-team.entity';
 import { AppLanguage } from 'src/modules/languages/entities/app-languages.entity';
 
@@ -71,14 +70,6 @@ export class Patient {
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   number?: string;
-
-//  // Optional relation to Therapist
-// @ManyToOne(() => Therapist, { nullable: true })
-// @JoinColumn({ name: 'therapist_id' })
-// therapist?: Therapist;
-
-// @Column({ name:'therapist_id', type: 'int', nullable: true })
-// therapistId?: number;
 
  @ManyToOne(() => TherapistMember, { nullable: true })
   @JoinColumn({ name: 'therapist_id' })
