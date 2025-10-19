@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
 @Entity('new_chat_bot_history')
 export class NewChatBotHistory {
@@ -14,4 +14,8 @@ export class NewChatBotHistory {
 
   @Column({ type: 'text', nullable: true })
   email: string | null;
+
+
+   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
 }
