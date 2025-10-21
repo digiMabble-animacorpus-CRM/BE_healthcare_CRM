@@ -12,7 +12,7 @@ export class ChatBotHistoryService {
   ) {}
 
   async findAll(filter?: ChatBotHistoryFilterDto) {
-    const { start_date, end_date } = filter || {};
+    const { start_date, end_date, email } = filter || {};
 
     const where: any = {};
 
@@ -32,6 +32,10 @@ export class ChatBotHistoryService {
         new Date(end_date),
         new Date(new Date(end_date).setHours(23, 59, 59, 999))
       );
+    }
+
+    if (email) {
+      where.email = email.toLowerCase();
     }
 
     return this.historyRepository.find({
