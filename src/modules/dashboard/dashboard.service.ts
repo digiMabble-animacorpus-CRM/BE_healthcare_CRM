@@ -537,11 +537,112 @@ async getPatientsInsights(query?: DashboardQueryDto) {
       });
     }
 
-    return branchInsights;
+
+// --- Overall Summary (All Patients) ---
+const totalPatientsAll = await this.patientRepo
+  .createQueryBuilder('p')
+  .where('p.is_delete = false')
+  .getMany();
+
+// --- New patients ---
+const newPatientsWeek = totalPatientsAll.filter(
+  p => p.created_at >= weekAgo && p.created_at <= now
+).length;
+
+const newPatientsMonth = totalPatientsAll.filter(
+  p => p.created_at >= monthAgo && p.created_at <= now
+).length;
+
+// --- Gender distribution ---
+const maleCount = totalPatientsAll.filter(p => ['m', 'male'].includes(p.legalgender?.toLowerCase())).length;
+const femaleCount = totalPatientsAll.filter(p => ['f', 'female'].includes(p.legalgender?.toLowerCase())).length;
+const otherCount = totalPatientsAll.length - maleCount - femaleCount;
+
+// --- Age distribution ---
+const ageGroups = { '0-12': 0, '13-25': 0, '26-40': 0, '41-60': 0, '60+': 0 };
+const currentYear = now.getFullYear();
+totalPatientsAll.forEach(p => {
+  if (!p.birthdate) return;
+  const age = currentYear - new Date(p.birthdate).getFullYear();
+  if (age <= 12) ageGroups['0-12']++;
+  else if (age <= 25) ageGroups['13-25']++;
+  else if (age <= 40) ageGroups['26-40']++;
+  else if (age <= 60) ageGroups['41-60']++;
+  else ageGroups['60+']++;
+});
+const ageDistribution = Object.entries(ageGroups).map(([range, count]) => ({
+  range,
+  count,
+  percentage: totalPatientsAll.length ? Math.round((count / totalPatientsAll.length) * 100) : 0,
+}));
+
+// --- Overall appointments count (all branches) ---
+const totalAppointments = await this.appointmentRepository
+  .createQueryBuilder('a')
+  .where('a.deleted_at IS NULL')
+  .getCount();
+
+// --- Push Overall row ---
+const overall = {
+  branch_id: 0,
+  branch_name: 'Overall',
+  new_patients: { week: newPatientsWeek, month: newPatientsMonth },
+  gender_distribution: { male: maleCount, female: femaleCount, other: otherCount },
+  age_distribution: ageDistribution,
+  appointments_count: totalAppointments,
+};
+
+// --- Return ---
+return [...branchInsights, overall];
+
   } catch (error) {
     this.handleError('GetPatientsInsights', error);
   }
 }
+
+
+
+async getTotals(query?: DashboardQueryDto) {
+  try {
+    // Total therapists (not deleted)
+    const totalTherapists = await this.therapistMemberRepo.count({
+      where: { isDelete: false },
+    });
+
+    // Total patients (not deleted)
+    const totalPatients = await this.patientRepo.count({
+      where: { is_delete: false },
+    });
+
+    // Total appointments (not deleted)
+    let apptQuery = this.appointmentRepository
+      .createQueryBuilder('a')
+      .where('a.deleted_at IS NULL');
+
+    // Optional date filter
+    if (query?.timeFilter) {
+      const { startDate, endDate } = this.getDateRangeFromTimeFilter(query.timeFilter);
+      apptQuery.andWhere('a.startTime >= :startDate AND a.startTime <= :endDate', { startDate, endDate });
+    } else if (query?.startDate && query?.endDate) {
+      apptQuery.andWhere('a.startTime >= :startDate AND a.startTime <= :endDate', {
+        startDate: new Date(query.startDate),
+        endDate: new Date(query.endDate),
+      });
+    }
+
+    const totalAppointments = await apptQuery.getCount();
+
+    return {
+      totalTherapists,
+      totalPatients,
+      totalAppointments,
+    };
+  } catch (error) {
+    this.handleError('GetTotals', error);
+  }
+}
+
+
 
 
 

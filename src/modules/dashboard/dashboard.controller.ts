@@ -152,4 +152,18 @@ async getPatientsInsights() {
   }
 }
 
+
+
+@Get('totals')
+@Roles('super_admin', 'admin', 'therapist')
+async getTotals(@Query() query: DashboardQueryDto) {
+  const totals = await this.dashboardService.getTotals(query);
+  return {
+    status: true,
+    message: 'Totals fetched successfully',
+    data: totals,
+  };
+}
+
+
 }
