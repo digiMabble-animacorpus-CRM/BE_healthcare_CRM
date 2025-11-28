@@ -19,6 +19,7 @@ export class JwtMiddleware implements NestMiddleware {
       '/api/v1/auth/signup-staff',
       '/api/v1/auth/signup-branch-admin',
       '/api/v1/auth/signup-super-admin',
+      '/api/v1/rosa-token',
     ];
     // console.log('req.baseUrl', req.baseUrl);
     if (excludedRoutes.includes(req.baseUrl)) {

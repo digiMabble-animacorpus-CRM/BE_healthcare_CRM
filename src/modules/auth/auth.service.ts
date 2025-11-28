@@ -14,6 +14,7 @@ import { AddressesService } from '../addresses/addresses.service';
 import { SignupAdminDto } from './dto/signup.dto';
 import { TeamMember } from '../team-member/entities/team-member.entity';
 import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-team.entity';
+import { RosaTokenService } from '../rosa-token/rosa-token.service';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +27,7 @@ export class AuthService {
 
   @InjectRepository(TherapistMember)
   private readonly therapistRepo: Repository<TherapistMember>,
+  private readonly rosaTokenService: RosaTokenService,
   ) { }
 
   async signup(signupData: SignupAdminDto, user_type: 'admin'): Promise<any> {
@@ -75,66 +77,12 @@ export class AuthService {
 
 
 
-// async loginWithEmail(
-//   { email_id, password, remember_me }: LoginDto
-// ): Promise<{ user: Partial<User>, accessToken: string, refreshToken: string }> {
-//   logger.info(`Login_Entry: ` + JSON.stringify({ email_id, remember_me }));
 
-//   const user: User = await this.userService.findOneByEmail(email_id);
-
-//   if (!user) {
-//     logger.info(`Login_User_Not_Found: ${email_id}`);
-//     throw new NotFoundException(Errors.USER_NOT_EXISTS);
-//   }
-
-//   if (!user.password) {
-//     logger.info(`Login_Password_Missing: ${email_id}`);
-//     throw new UnauthorizedException(Errors.INVALID_USER_DETAILS);
-//   }
-
-//   if (!Encryption.comparePassword(password, user.password)) {
-//     logger.info(`Login_Invalid_Password: ${email_id}`);
-//     throw new UnauthorizedException(Errors.INCORRECT_USER_PASSWORD);
-//   }
-
-//   // 🔹 Fetch team member entry
-// const teamMember = await this.teamMemberRepo.findOne({
-//   where: { team_id: user.team_id },
-//   relations: ['branches', 'primary_branch'],
-// });
-
-
-//   if (!teamMember) {
-//     throw new UnauthorizedException('User does not belong to any team');
-//   }
-
-//   // ✅ Only put user_id in JWT payload
-//   const payload = { user_id: user.id };
-
-//   const { access_token, refresh_token } = await this.generateTokens(payload, remember_me);
-
-//   const { password: _, ...userResponse } = user;
-
-//   logger.debug(`Generated JWT payload: ${JSON.stringify(payload)}`);
-//   logger.info(`Login_Success: ${email_id} | Role=${teamMember.role}`);
-
-//   return {
-//     user: { ...userResponse, role: teamMember.role,
-//       photo: teamMember.photo,
-//      branches: teamMember.branches || [],
-//     primary_branch: teamMember.primary_branch || null,
-//     permissions: teamMember.permissions || {},
-//       status: teamMember.status,
-//      } as Partial<User> & { role: string },
-//     accessToken: access_token,
-//     refreshToken: refresh_token,
-//   };
-// }
 
 
 async loginWithEmail(
   { email_id, password, remember_me }: LoginDto
-): Promise<{ user: Partial<User>, accessToken: string, refreshToken: string }> {
+): Promise<{ user: Partial<User>, accessToken: string, refreshToken: string , rosaToken: string | null}> {
   logger.info(`Login_Entry: ` + JSON.stringify({ email_id, remember_me }));
 
   // 1️⃣ Find user by email
@@ -189,6 +137,10 @@ async loginWithEmail(
   logger.debug(`Generated JWT payload: ${JSON.stringify(payload)}`);
   logger.info(`Login_Success: ${email_id} | Role=${therapistMember.role}`);
 
+  // 🔥 6️⃣ Fetch Rosa Token (THIS IS WHERE YOU ADD IT)
+  const rosaTokenRecord = await this.rosaTokenService.getActiveToken();
+  const rosaToken = rosaTokenRecord?.token || null;
+
 return {
   user: { 
     ...userResponse, 
@@ -196,6 +148,7 @@ return {
   },
   accessToken: access_token,
   refreshToken: refresh_token,
+  rosaToken,
 };
 
 }
