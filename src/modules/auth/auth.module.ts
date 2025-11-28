@@ -26,6 +26,8 @@ import { TeamMemberModule } from '../team-member/team-member.module';
 import { TeamMember } from '../team-member/entities/team-member.entity';
 import { TherapistTeamModule } from '../therapists-team/therapist-team.module';
 import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-team.entity';
+import { RosaToken } from '../rosa-token/entities/rosa-token.entity';
+import { RosaTokenModule } from '../rosa-token/rosa-token.module';
 
 
 @Module({
@@ -35,8 +37,9 @@ import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-
     UsersModule,
     TeamMemberModule,
     TherapistTeamModule,
+    RosaTokenModule,
     // StaffModule,
-    TypeOrmModule.forFeature([Role, Token,TeamMember, TherapistMember]),
+    TypeOrmModule.forFeature([Role, Token,TeamMember, TherapistMember, RosaToken]),
     // forwardRef(() => AgentsModule),
     // JwtModule.register({
     //   secret: process.env.JWTKEY,

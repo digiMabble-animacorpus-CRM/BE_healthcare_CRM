@@ -43,6 +43,7 @@ import { ChatBotHistoryModule } from './modules/chat-bot-history/chat-bot-histor
 import { NewRequestsModule } from './modules/new_requests/new-requests.module';
 import { TherapistTeamModule } from './modules/therapists-team/therapist-team.module';
 import { AppLanguagesModule } from './modules/languages/app-languages.module';
+import { RosaTokenModule } from './modules/rosa-token/rosa-token.module';
 
 
 config();
@@ -102,6 +103,7 @@ console.log('env--->', DBconfig.host, DBconfig.port, DBconfig.username, DBconfig
     NewRequestsModule,
     TherapistTeamModule,
     AppLanguagesModule,
+    RosaTokenModule
   ],
   controllers: [AppController],
   providers: [AppService,
