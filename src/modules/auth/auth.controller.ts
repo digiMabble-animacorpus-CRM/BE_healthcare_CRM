@@ -137,9 +137,9 @@ async signupAdmin(@Body() reqBody: any) {
 
     //  Handle AES-encrypted or plain request body
     if (reqBody.data) {
-      const decryptedString = AES.decrypt(reqBody.data); // AES decryption function
-      decryptedObject = JSON.parse(decryptedString);
-      console.log('Decrypted body:', decryptedString, decryptedObject);
+      const decrypted = AES.decrypt(reqBody.data); // AES decryption function
+      decryptedObject = typeof decrypted === 'string' ? JSON.parse(decrypted) : decrypted;
+      console.log('Decrypted body:', decrypted, decryptedObject);
     } else {
       decryptedObject = reqBody; // Plain request (e.g., Postman or dev)
       console.log('Plain body:', decryptedObject);

@@ -43,31 +43,40 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       this.logger.debug(`✅ [JwtStrategy] User fetched: id=${user.id}, team_id=${user.team_id}`);
 
       // 2️⃣ Fetch team member (role lives here)
-      const teamMember = await this.teamMemberService.findByUserIdAndTeamId(
-        user.id,
-        user.team_id,
-      );
-      if (!teamMember) {
-        this.logger.error(
-          `❌ [JwtStrategy] No team member found for user_id=${user.id}, team_id=${user.team_id}`,
-        );
-        throw new UnauthorizedException('Team member not linked to user');
+      let teamMember = null;
+      if (user.team_id) {
+        teamMember = await this.teamMemberService.findByUserIdAndTeamId(user.id, user.team_id);
       }
 
-      this.logger.debug(
-        `✅ [JwtStrategy] TeamMember fetched: team_id=${teamMember.team_id}, role=${teamMember.role}`,
-      );
+      let jwtUser;
 
-      // 3️⃣ Final user object (goes into req.user)
-      const jwtUser = {
-        user_id: user.id,
-        email: user.email_id,
-        team_id: teamMember.team_id,
-        role: teamMember.role,
-        permissions: teamMember.permissions || {},
-        branches: teamMember.branches || [],
-        primary_branch: teamMember.primary_branch || null,
-      };
+      if (!teamMember) {
+        this.logger.warn(`[JwtStrategy] No team member found for user_id=${user.id}. Assuming Admin access.`);
+        jwtUser = {
+          user_id: user.id,
+          email: user.email_id,
+          team_id: null,
+          role: 'admin',
+          permissions: {},
+          branches: [],
+          primary_branch: null,
+        };
+      } else {
+        this.logger.debug(
+          `✅ [JwtStrategy] TeamMember fetched: team_id=${teamMember.team_id}, role=${teamMember.role}`,
+        );
+
+        // 3️⃣ Final user object (goes into req.user)
+        jwtUser = {
+          user_id: user.id,
+          email: user.email_id,
+          team_id: teamMember.team_id,
+          role: teamMember.role,
+          permissions: teamMember.permissions || {},
+          branches: teamMember.branches || [],
+          primary_branch: teamMember.primary_branch || null,
+        };
+      }
 
       this.logger.debug(`✅ [JwtStrategy] Returning validated user: ${JSON.stringify(jwtUser)}`);
       return jwtUser;

@@ -11,10 +11,12 @@ export class ProfileService {
     private userRepository: Repository<User>,
   ) {}
 
-  async getProfile(userId: number) {
-    return this.userRepository.findOne({
+  async getProfile(userId: number, role?: string) {
+    const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['therapistTeamMembers'], // join with therapist_team_members
     });
+
+    return user;
   }
 }

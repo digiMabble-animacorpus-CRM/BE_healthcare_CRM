@@ -13,7 +13,7 @@ import Encryption from 'src/core/utils/encryption';
 import { AddressesService } from '../addresses/addresses.service';
 import { SignupAdminDto } from './dto/signup.dto';
 import { TeamMember } from '../team-member/entities/team-member.entity';
-import { TherapistMember } from 'src/modules/therapists-team/entities/therapist-team.entity';
+import { TherapistMember, MemberRole, MemberStatus } from 'src/modules/therapists-team/entities/therapist-team.entity';
 import { RosaTokenService } from '../rosa-token/rosa-token.service';
 
 @Injectable()
@@ -40,16 +40,27 @@ export class AuthService {
     }
 
     try {
+      // Create the therapist profile first to capture their name
+      const nameParts = signupData.name ? signupData.name.trim().split(' ') : ['Admin', 'User'];
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ');
+
+      const newTherapist = this.therapistRepo.create({
+        firstName,
+        lastName,
+        contactEmail: signupData.email_id,
+        contactPhone: '',
+        role: MemberRole.ADMIN,
+        status: MemberStatus.ACTIVE,
+        aboutMe: '',
+        consultations: '',
+      });
+      const savedTherapist = await this.therapistRepo.save(newTherapist);
+
       const userData: Partial<User> = {
-        ...signupData,
-        // user_type,
-        // email_verified: false,
-        // last_login: new Date(),
-        // is_blocked: false,
-        // preferences: [],
-        // company_name: null,
-        // website: null,
-        // tax_id: null,
+        email_id: signupData.email_id,
+        password: signupData.password,
+        therapist_id: savedTherapist.therapistId,
       };
       
       const newUser = await this.userService.create(userData);
@@ -135,7 +146,7 @@ async loginWithEmail(
   };
 
   logger.debug(`Generated JWT payload: ${JSON.stringify(payload)}`);
-  logger.info(`Login_Success: ${email_id} | Role=${therapistMember.role}`);
+  logger.info(`Login_Success: ${email_id} | Role=${therapistData.role}`);
 
   // 🔥 6️⃣ Fetch Rosa Token (THIS IS WHERE YOU ADD IT)
   const rosaTokenRecord = await this.rosaTokenService.getActiveToken();
