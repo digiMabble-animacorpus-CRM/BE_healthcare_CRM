@@ -18,7 +18,8 @@ export class ProfileController {
 @ApiOkResponse({ description: 'Fetch logged-in user profile', type: ProfileDto })
 async getProfile(@Req() req): Promise<ProfileDto> {
   const userId = req.user.user_id;
-  const user = await this.profileService.getProfile(userId);
+  const role = req.user.role;
+  const user = await this.profileService.getProfile(userId, role);
   return new ProfileDto(user, user?.therapistTeamMembers);
 }
 
